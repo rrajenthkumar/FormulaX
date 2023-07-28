@@ -3,3 +3,13 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+.race_live {
+  @apply flex justify-center items-center h-[100vh];
+}
+.race_live .console {
+  @apply w-[40rem] h-[60rem] bg-gray-500 rounded-3xl flex justify-center;
+}
+
+.race_live .screen {
+  @apply w-[30rem] h-[30rem] bg-gray-50 mt-20 rounded-md;
+}
