@@ -5,11 +5,21 @@
 /* This file is for your main application CSS */
 .race_live {
   @apply flex justify-center items-center h-[100vh];
-}
-.race_live .console {
-  @apply w-[40rem] h-[60rem] bg-gray-500 rounded-3xl flex justify-center;
+  background-color: #fffff0d4;
 }
 
-.race_live .screen {
-  @apply w-[30rem] h-[30rem] bg-gray-50 mt-20 rounded-md;
+.race_live .console {
+  @apply w-[45rem] h-[60rem] bg-gray-600 rounded-3xl flex justify-center;
+}
+
+.race_live .console .screen {
+  @apply w-[35rem] h-[35rem] bg-gray-50 mt-20 rounded-md flex justify-center;
+}
+
+.race_live .console .screen .road .track {
+  @apply w-24 h-full inline-block border-r bg-gray-100;
+}
+
+.race_live .console .screen .cars {
+  @apply z-10 absolute;
 }

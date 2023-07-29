@@ -9,17 +9,13 @@ defmodule FormulaX.Race.Racer do
   @type racer_type :: :player | :computer
   @type car_model :: :model1 | :model2 | :model3 | :model4
   @typedoc """
-  Center point of a car is assumed to be at the common midpoint of the car along it's both axes.
-  X axis of the screen is split into 5 segments starting with 0 at the horizontal center of the screen
-  and ending at -2 and 2 at the left and right edges respectively.
-  The width of a car is assumed to be 1 unit along X axis.
+  Position from right side of the gaming console screen in pixels
   """
-  @type x_position :: -2..2
+  @type x_position :: integer()
   @typedoc """
-  Y axis of the screen is split into 10 segments starting with 0 at the bottom edge and ending with 10 at the top edge.
-  The length of a car is considered to be 2 units along Y axis.
+  Position from top of the gaming console screen in pixels
   """
-  @type y_position :: 0..10
+  @type y_position :: integer()
   @type speed :: :rest | :slow | :moderate | :high
 
   @typedoc "Racer struct"
