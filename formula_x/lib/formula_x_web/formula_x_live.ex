@@ -24,7 +24,7 @@ defmodule FormulaXWeb.RaceLive do
     ~H"""
     <div class="cars">
       <%= for car <- @cars do %>
-        <img src={car.image_source} class={car.class}/>
+        <img src={car.image_source} class={"w-14 inline-block #{car.position_class}"}/>
       <% end %>
     </div>
     """
