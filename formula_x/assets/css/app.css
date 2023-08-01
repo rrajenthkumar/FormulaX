@@ -9,17 +9,49 @@
 }
 
 .race_live .console {
-  @apply w-[45rem] h-[60rem] bg-gray-600 rounded-3xl flex justify-center;
+  @apply w-[45rem] h-[60rem] bg-gray-600 rounded-3xl flex flex-col items-center;
 }
 
 .race_live .console .screen {
-  @apply w-[35rem] h-[35rem] bg-gray-50 mt-20 rounded-md flex justify-center;
+  @apply w-[35rem] min-h-[35rem] bg-gray-50 mt-20 rounded-md flex justify-center;
 }
 
-.race_live .console .screen .road .track {
+.race_live .console .screen .tracks .track {
   @apply w-24 h-full inline-block border-r bg-gray-100;
 }
 
 .race_live .console .screen .cars {
-  @apply z-10 absolute;
+  @apply absolute;
+}
+
+.race_live .console .controls .top,
+.race_live .console .controls .bottom,
+.race_live .console .controls .right,
+.race_live .console .controls .left {
+  @apply w-20 h-20 relative;
+  background-color: #000000;
+}
+
+.race_live .console .controls .top {
+  border-radius: 0 0 0 80px;
+  transform: rotate(135deg);
+  @apply top-[60px];
+}
+
+.race_live .console .controls .bottom {
+  border-radius: 0 80px 0 0;
+  transform: rotate(135deg);
+  @apply top-[100px];
+}
+
+.race_live .console .controls .right {
+  border-radius: 0 0 80px 0;
+  transform: rotate(-45deg);
+  @apply top-[-40px] left-[60px];
+}
+
+.race_live .console .controls .left {
+  border-radius: 80px 0 0 0;
+  transform: rotate(-45deg);
+  @apply top-[-120px] right-[60px];
 }

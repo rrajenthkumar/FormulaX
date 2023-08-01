@@ -8,12 +8,18 @@ defmodule FormulaXWeb.RaceLive do
     <div class="race_live">
       <div class="console">
         <div class="screen">
-          <div class="road">
+          <div class="tracks">
             <div class="track border-l"></div>
             <div class="track"></div>
             <div class="track"></div>
           </div>
           <.cars cars={@cars}/>
+        </div>
+        <div class="controls">
+          <div class="top"></div>
+          <div class="bottom"></div>
+          <div class="right"></div>
+          <div class="left"></div>
         </div>
       </div>
     </div>
