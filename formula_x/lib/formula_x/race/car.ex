@@ -5,22 +5,23 @@ defmodule FormulaX.Race.Car do
   use TypedStruct
 
   alias __MODULE__
-  alias FormulaX.Race
 
-  @type image_path :: String.t()
+  @type image_filename :: String.t()
   @type driver :: :player | :computer
-  @typedoc "Position on screen where the car appears along the X direction"
+  @typedoc "Position on screen in pixels where the car appears along the X direction"
   @type x_position :: integer()
+  @typedoc "Position on screen in pixels where the car appears along the Y direction"
+  @type y_position :: integer()
   @type speed :: :rest | :slow | :moderate | :high
 
   @typedoc "Car struct"
   typedstruct do
     field(:id, integer(), enforce: true)
-    field(:car_image, image_path(), enforce: true)
+    field(:car_image, image_filename(), enforce: true)
     field(:driver, driver(), enforce: true)
     field(:x_position, x_position(), enforce: true)
+    field(:y_position, y_position(), enforce: true)
     field(:speed, speed(), default: :rest)
-    field(:distance_covered, Race.distance(), default: 0)
     field(:completion_time, Time.t(), default: nil)
   end
 
@@ -29,8 +30,16 @@ defmodule FormulaX.Race.Car do
     struct!(Car, attrs)
   end
 
-  def initialize(id, car_image, driver, x_position) do
-    # To initialize a car with id, car_image, driver, x_position
+  def initialize(id, car_image, driver) do
+    {x_position, y_position} = get_initial_x_and_y_positions(id)
+
+    new(%{
+      id: id,
+      car_image: car_image,
+      driver: driver,
+      x_position: x_position,
+      y_position: y_position
+    })
   end
 
   # To change a car's track check if there is no other car on the side to be moved to and if the car has already reached the edge
@@ -72,5 +81,31 @@ defmodule FormulaX.Race.Car do
 
   def change_speed(car = %Car{}, _action) do
     car
+  end
+
+  # The x and y positions are in pixels
+  @spec get_initial_x_and_y_positions(integer()) :: {integer(), integer()}
+  defp get_initial_x_and_y_positions(1) do
+    {0, 430}
+  end
+
+  defp get_initial_x_and_y_positions(2) do
+    {0, 290}
+  end
+
+  defp get_initial_x_and_y_positions(3) do
+    {-100, 430}
+  end
+
+  defp get_initial_x_and_y_positions(4) do
+    {-100, 290}
+  end
+
+  defp get_initial_x_and_y_positions(5) do
+    {100, 430}
+  end
+
+  defp get_initial_x_and_y_positions(6) do
+    {100, 290}
   end
 end

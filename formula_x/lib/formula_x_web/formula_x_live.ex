@@ -1,7 +1,11 @@
 defmodule FormulaXWeb.RaceLive do
+  @moduledoc """
+  Liveview that runs the race
+  """
   use FormulaXWeb, :live_view
 
-  alias FormulaXWeb.CarImageGenerator
+  alias FormulaX.Race
+  alias FormulaX.Race.Car
 
   def render(assigns) do
     ~H"""
@@ -13,14 +17,9 @@ defmodule FormulaXWeb.RaceLive do
             <div class="track"></div>
             <div class="track"></div>
           </div>
-          <.cars cars={@cars}/>
+          <.cars cars={@race.cars}/>
         </div>
-        <div class="controls" phx-window-keydown="keydown">
-          <a class="top" href="#" phx-click="accelerate"></a>
-          <a class="bottom" href="#" phx-click="decelerate"></a>
-          <a class="right" href="#" phx-click="move_right"></a>
-          <a class="left" href="#" phx-click="move_left"></a>
-        </div>
+        <.controls/>
       </div>
     </div>
     """
@@ -30,14 +29,35 @@ defmodule FormulaXWeb.RaceLive do
     ~H"""
     <div class="cars">
       <%= for car <- @cars do %>
-        <img src={car.image_source} class={"w-14 inline-block #{car.position_class}"}/>
+        <%= with car_coordinate_class <- car_coordinate_class(car) do %>
+          <%= cond do %>
+            <% car.id <= 5 -> %>
+                <img src={"/images/cars/#{car.car_image}"} class={"absolute #{car_coordinate_class}"}/>
+            <%= #For some strange reason the last car has to be set to relative class so that all cars appear on the screen. %>
+            <%= #To be investigated %>
+            <% car.id == 6 -> %>
+                <img src={"/images/cars/#{car.car_image}"} class={"relative #{car_coordinate_class}"}/>
+          <% end %>
+        <% end %>
       <% end %>
     </div>
     """
   end
 
+  defp controls(assigns) do
+    ~H"""
+    <div class="controls" phx-window-keydown="keydown">
+      <a class="top" href="#" phx-click="accelerate"></a>
+      <a class="bottom" href="#" phx-click="decelerate"></a>
+      <a class="right" href="#" phx-click="move_right"></a>
+      <a class="left" href="#" phx-click="move_left"></a>
+    </div>
+    """
+  end
+
   def mount(_params, %{}, socket) do
-    {:ok, assign(socket, :cars, CarImageGenerator.cars())}
+    race = Race.initialize()
+    {:ok, assign(socket, :race, race)}
   end
 
   def handle_event("accelerate", _params, socket) do
@@ -74,5 +94,12 @@ defmodule FormulaXWeb.RaceLive do
 
   def handle_event("keydown", %{"key" => _another_key}, socket) do
     {:noreply, socket}
+  end
+
+  defp car_coordinate_class(%Car{
+         x_position: x_position,
+         y_position: y_position
+       }) do
+    "right-[#{x_position}px] top-[#{y_position}px]"
   end
 end

@@ -24,6 +24,10 @@
   @apply absolute;
 }
 
+.race_live .console .screen .cars img {
+  @apply w-14 inline-block;
+}
+
 .race_live .console .controls .top,
 .race_live .console .controls .bottom,
 .race_live .console .controls .right,

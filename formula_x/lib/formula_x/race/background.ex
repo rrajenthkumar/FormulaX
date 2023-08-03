@@ -5,22 +5,23 @@ defmodule FormulaX.Race.Background do
   use TypedStruct
 
   alias __MODULE__
-  alias FormulaX.Utils
   alias FormulaX.Race
+  alias FormulaX.Utils
 
   # Every grid (100px wide) on each side holds an image of one of the available background items like a tree, a rock, a building etc
   # To be eventually calculated from config (RACE_DISTANCE)
   @number_of_grids 1000
 
-  @type image_path :: String.t()
-  @typedoc "List of backgound image paths"
-  @type image_paths :: list(image_path())
+  @type image_filename :: String.t()
+  @type image_filenames :: list(image_filename())
+  @typedoc "Position on screen in pixels to which both left and right side background sections have to be offsetted in Y direction, so that the player car appears to move along the Y direction"
+  @type y_position :: integer()
 
   @typedoc "Background struct"
   typedstruct do
-    field(:left_side_images, image_paths(), enforce: true)
-    field(:right_side_images, image_paths(), enforce: true)
-    field(:distance_covered, Race.distance(), default: 0)
+    field(:left_side, image_filenames(), enforce: true)
+    field(:right_side, image_filenames(), enforce: true)
+    field(:y_position, y_position(), default: 0)
   end
 
   @spec new(map()) :: Background.t()
@@ -30,20 +31,20 @@ defmodule FormulaX.Race.Background do
 
   @spec initialize() :: Background.t()
   def initialize() do
-    available_background_images = Utils.get_image_paths("/images/background")
-    left_side_images = generate_side_images(available_background_images)
-    right_side_images = generate_side_images(available_background_images)
+    available_background_images = Utils.get_images("backgrounds")
+    left_side = generate_side(available_background_images)
+    right_side = generate_side(available_background_images)
 
-    new(%{left_side_images: left_side_images, right_side_images: right_side_images})
+    new(%{left_side: left_side, right_side: right_side})
   end
 
-  @spec generate_side_images(image_paths()) :: image_paths()
-  defp generate_side_images(available_background_images) do
+  @spec generate_side(image_filenames()) :: image_filenames()
+  defp generate_side(available_background_images) do
     Enum.map(1..@number_of_grids, fn _grid_number -> Enum.random(available_background_images) end)
   end
 
-  @spec increment_distance_covered(Background.t()) :: Background.t()
-  def increment_distance_covered(background = %Background{distance_covered: distance_covered}) do
-    %Background{background | distance_covered: distance_covered + 1}
+  @spec offset(Background.t()) :: Background.t()
+  def offset(background = %Background{y_position: y_position}) do
+    %Background{background | y_position: y_position + 1}
   end
 end
