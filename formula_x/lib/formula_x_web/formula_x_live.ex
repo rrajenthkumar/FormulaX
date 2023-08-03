@@ -15,11 +15,11 @@ defmodule FormulaXWeb.RaceLive do
           </div>
           <.cars cars={@cars}/>
         </div>
-        <div class="controls">
-          <div class="top"></div>
-          <div class="bottom"></div>
-          <div class="right"></div>
-          <div class="left"></div>
+        <div class="controls" phx-window-keydown="keydown">
+          <a class="top" href="#" phx-click="accelerate"></a>
+          <a class="bottom" href="#" phx-click="decelerate"></a>
+          <a class="right" href="#" phx-click="move_right"></a>
+          <a class="left" href="#" phx-click="move_left"></a>
         </div>
       </div>
     </div>
@@ -38,5 +38,41 @@ defmodule FormulaXWeb.RaceLive do
 
   def mount(_params, %{}, socket) do
     {:ok, assign(socket, :cars, CarImageGenerator.cars())}
+  end
+
+  def handle_event("accelerate", _params, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("decelerate", _params, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("move_right", _params, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("move_left", _params, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("keydown", %{"key" => "ArrowUp"}, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("keydown", %{"key" => "ArrowDown"}, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("keydown", %{"key" => "ArrowLeft"}, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("keydown", %{"key" => "ArrowRight"}, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("keydown", %{"key" => _another_key}, socket) do
+    {:noreply, socket}
   end
 end

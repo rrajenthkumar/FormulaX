@@ -29,8 +29,8 @@ defmodule FormulaX.Race.Car do
     struct!(Car, attrs)
   end
 
-  def initiate(id, car_image, driver, x_position) do
-    # To initiate a car with id, car_image, driver, x_position
+  def initialize(id, car_image, driver, x_position) do
+    # To initialize a car with id, car_image, driver, x_position
   end
 
   # To change a car's track check if there is no other car on the side to be moved to and if the car has already reached the edge

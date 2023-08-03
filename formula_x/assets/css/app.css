@@ -28,30 +28,30 @@
 .race_live .console .controls .bottom,
 .race_live .console .controls .right,
 .race_live .console .controls .left {
-  @apply w-20 h-20 relative;
+  @apply w-20 h-20 relative block;
   background-color: #000000;
 }
 
 .race_live .console .controls .top {
-  border-radius: 0 0 0 80px;
+  border-radius: 0 0 0 5rem;
   transform: rotate(135deg);
-  @apply top-[60px];
+  @apply top-[3.75rem];
 }
 
 .race_live .console .controls .bottom {
-  border-radius: 0 80px 0 0;
+  border-radius: 0 5rem 0 0;
   transform: rotate(135deg);
-  @apply top-[100px];
+  @apply top-[6.25rem];
 }
 
 .race_live .console .controls .right {
-  border-radius: 0 0 80px 0;
+  border-radius: 0 0 5rem 0;
   transform: rotate(-45deg);
-  @apply top-[-40px] left-[60px];
+  @apply top-[-2.5rem] left-[3.75rem];
 }
 
 .race_live .console .controls .left {
-  border-radius: 80px 0 0 0;
+  border-radius: 5rem 0 0 0;
   transform: rotate(-45deg);
-  @apply top-[-120px] right-[60px];
+  @apply top-[-7.5rem] right-[3.75rem];
 }

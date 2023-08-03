@@ -29,18 +29,18 @@ defmodule FormulaX.Race do
     struct!(Race, attrs)
   end
 
-  @spec initiate() :: Race.t()
-  def initiate() do
-    cars = initiate_cars()
-    background = Background.initiate()
+  @spec initialize() :: Race.t()
+  def initialize() do
+    cars = initialize_cars()
+    background = Background.initialize()
     # To be eventually set as RACE_DISTANCE in config
     distance = 100_000
     new(%{cars: cars, background: background, distance: distance})
   end
 
-  @spec initiate_cars() :: list(Car.t())
-  def initiate_cars() do
-    # Loop and initiate 5 computer driven cars and one player car
+  @spec initialize_cars() :: list(Car.t())
+  def initialize_cars() do
+    # Loop and initialize 5 computer driven cars and one player car
     # Task of initiating induvidual cars is transferred from here to the car module
   end
 

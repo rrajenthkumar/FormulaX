@@ -28,8 +28,8 @@ defmodule FormulaX.Race.Background do
     struct!(Background, attrs)
   end
 
-  @spec initiate() :: Background.t()
-  def initiate() do
+  @spec initialize() :: Background.t()
+  def initialize() do
     available_background_images = Utils.get_image_paths("/images/background")
     left_side_images = generate_side_images(available_background_images)
     right_side_images = generate_side_images(available_background_images)
