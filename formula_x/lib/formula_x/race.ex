@@ -45,40 +45,40 @@ defmodule FormulaX.Race do
   @spec initialize_cars() :: list(Car.t())
   defp initialize_cars() do
     # Total number of cars in a race has been set to 6
-    all_possible_ids = [1, 2, 3, 4, 5, 6]
-    player_car_id = Enum.random(all_possible_ids)
+    possible_ids = [1, 2, 3, 4, 5, 6]
+    player_car_id = Enum.random(possible_ids)
 
-    all_car_images = Utils.get_images("cars")
-    player_car_image = Enum.random(all_car_images)
+    available_car_images = Utils.get_images("cars")
+    player_car_image = Enum.random(available_car_images)
 
     player_controlled_car = Car.initialize(player_car_id, player_car_image, :player)
 
-    available_ids = all_possible_ids -- [player_car_id]
-    available_car_images = all_car_images -- [player_car_image]
+    remaining_ids = possible_ids -- [player_car_id]
+    remaining_car_images = available_car_images -- [player_car_image]
 
     computer_controlled_cars =
-      initialize_computer_controlled_cars(available_ids, available_car_images)
+      initialize_computer_controlled_cars(remaining_ids, remaining_car_images)
 
     computer_controlled_cars ++ [player_controlled_car]
   end
 
   @spec initialize_computer_controlled_cars(list(), list()) :: list(Car.t())
-  defp initialize_computer_controlled_cars([id], available_car_images) do
-    computer_controlled_car_image = Enum.random(available_car_images)
+  defp initialize_computer_controlled_cars([id], car_images) do
+    computer_controlled_car_image = Enum.random(car_images)
 
     computer_controlled_car = Car.initialize(id, computer_controlled_car_image, :computer)
 
     [computer_controlled_car]
   end
 
-  defp initialize_computer_controlled_cars(_available_ids = [head | tail], available_car_images) do
-    computer_controlled_car_image = Enum.random(available_car_images)
+  defp initialize_computer_controlled_cars(_ids = [head | tail], car_images) do
+    computer_controlled_car_image = Enum.random(car_images)
 
     computer_controlled_car = Car.initialize(head, computer_controlled_car_image, :computer)
 
-    available_car_images = available_car_images -- [computer_controlled_car_image]
+    remaining_car_images = car_images -- [computer_controlled_car_image]
 
-    [computer_controlled_car] ++ initialize_computer_controlled_cars(tail, available_car_images)
+    [computer_controlled_car] ++ initialize_computer_controlled_cars(tail, remaining_car_images)
   end
 
   @spec start(Race.t()) :: Race.t()

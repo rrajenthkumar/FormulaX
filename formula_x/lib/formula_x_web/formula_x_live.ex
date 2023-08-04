@@ -29,14 +29,14 @@ defmodule FormulaXWeb.RaceLive do
     ~H"""
     <div class="cars">
       <%= for car <- @cars do %>
-        <%= with car_coordinate_class <- car_coordinate_class(car) do %>
+        <%= with coordinate_class <- coordinate_class(car) do %>
           <%= cond do %>
             <% car.id <= 5 -> %>
-                <img src={"/images/cars/#{car.car_image}"} class={"absolute #{car_coordinate_class}"}/>
+                <img src={"/images/cars/#{car.image}"} class={"absolute #{coordinate_class}"}/>
             <%= #For some strange reason the last car has to be set to relative class so that all cars appear on the screen. %>
             <%= #To be investigated %>
             <% car.id == 6 -> %>
-                <img src={"/images/cars/#{car.car_image}"} class={"relative #{car_coordinate_class}"}/>
+                <img src={"/images/cars/#{car.image}"} class={"relative #{coordinate_class}"}/>
           <% end %>
         <% end %>
       <% end %>
@@ -96,7 +96,7 @@ defmodule FormulaXWeb.RaceLive do
     {:noreply, socket}
   end
 
-  defp car_coordinate_class(%Car{
+  defp coordinate_class(%Car{
          x_position: x_position,
          y_position: y_position
        }) do

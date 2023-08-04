@@ -6,8 +6,8 @@ defmodule FormulaX.Race.Car do
 
   alias __MODULE__
 
-  @type image_filename :: String.t()
-  @type driver :: :player | :computer
+  @type filename :: String.t()
+  @type controller :: :player | :computer
   @typedoc "Position on screen in pixels where the car appears along the X direction"
   @type x_position :: integer()
   @typedoc "Position on screen in pixels where the car appears along the Y direction"
@@ -17,8 +17,8 @@ defmodule FormulaX.Race.Car do
   @typedoc "Car struct"
   typedstruct do
     field(:id, integer(), enforce: true)
-    field(:car_image, image_filename(), enforce: true)
-    field(:driver, driver(), enforce: true)
+    field(:image, filename(), enforce: true)
+    field(:controller, controller(), enforce: true)
     field(:x_position, x_position(), enforce: true)
     field(:y_position, y_position(), enforce: true)
     field(:speed, speed(), default: :rest)
@@ -30,13 +30,13 @@ defmodule FormulaX.Race.Car do
     struct!(Car, attrs)
   end
 
-  def initialize(id, car_image, driver) do
+  def initialize(id, image, controller) do
     {x_position, y_position} = get_initial_x_and_y_positions(id)
 
     new(%{
       id: id,
-      car_image: car_image,
-      driver: driver,
+      image: image,
+      controller: controller,
       x_position: x_position,
       y_position: y_position
     })
