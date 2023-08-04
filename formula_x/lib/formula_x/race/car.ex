@@ -6,6 +6,8 @@ defmodule FormulaX.Race.Car do
 
   alias __MODULE__
 
+  @typedoc "There will be 6 cars in total in a race"
+  @type car_id :: 1..6
   @type filename :: String.t()
   @type controller :: :player | :computer
   @typedoc "Position on screen in pixels where the car appears along the X direction"
@@ -16,7 +18,7 @@ defmodule FormulaX.Race.Car do
 
   @typedoc "Car struct"
   typedstruct do
-    field(:id, integer(), enforce: true)
+    field(:car_id, car_id(), enforce: true)
     field(:image, filename(), enforce: true)
     field(:controller, controller(), enforce: true)
     field(:x_position, x_position(), enforce: true)

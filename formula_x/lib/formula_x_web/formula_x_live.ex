@@ -29,14 +29,14 @@ defmodule FormulaXWeb.RaceLive do
     ~H"""
     <div class="cars">
       <%= for car <- @cars do %>
-        <%= with coordinate_class <- coordinate_class(car) do %>
+        <%= with position_class <- position_class(car) do %>
           <%= cond do %>
             <% car.id <= 5 -> %>
-                <img src={"/images/cars/#{car.image}"} class={"absolute #{coordinate_class}"}/>
+                <img src={"/images/cars/#{car.image}"} class={"absolute #{position_class}"}/>
             <%= #For some strange reason the last car has to be set to relative class so that all cars appear on the screen. %>
             <%= #To be investigated %>
             <% car.id == 6 -> %>
-                <img src={"/images/cars/#{car.image}"} class={"relative #{coordinate_class}"}/>
+                <img src={"/images/cars/#{car.image}"} class={"relative #{position_class}"}/>
           <% end %>
         <% end %>
       <% end %>
@@ -57,6 +57,15 @@ defmodule FormulaXWeb.RaceLive do
 
   def mount(_params, %{}, socket) do
     race = Race.initialize()
+
+    {:ok, assign(socket, :race, race)}
+  end
+
+  def handle_event("start_race", _params, socket = %{race: race}) do
+    race =
+      race
+      |> Race.start()
+
     {:ok, assign(socket, :race, race)}
   end
 
@@ -96,7 +105,19 @@ defmodule FormulaXWeb.RaceLive do
     {:noreply, socket}
   end
 
-  defp coordinate_class(%Car{
+  def handle_event("abort_race", _params, socket = %{race: race}) do
+    race = Race.abort(race)
+
+    {:ok, assign(socket, :race, race)}
+  end
+
+  def handle_event("complete_race", _params, socket = %{race: race}) do
+    race = Race.complete(race)
+
+    {:ok, assign(socket, :race, race)}
+  end
+
+  defp position_class(%Car{
          x_position: x_position,
          y_position: y_position
        }) do
