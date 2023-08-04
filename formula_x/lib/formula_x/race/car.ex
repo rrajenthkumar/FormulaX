@@ -5,6 +5,7 @@ defmodule FormulaX.Race.Car do
   use TypedStruct
 
   alias __MODULE__
+  alias FormulaX.Utils
 
   @typedoc "There will be 6 cars in total in a race"
   @type car_id :: 1..6
@@ -32,11 +33,47 @@ defmodule FormulaX.Race.Car do
     struct!(Car, attrs)
   end
 
-  def initialize(id, image, controller) do
-    {x_position, y_position} = get_initial_x_and_y_positions(id)
+  @spec initialize_cars() :: list(Car.t())
+  def initialize_cars() do
+    possible_ids = [1, 2, 3, 4, 5, 6]
+    player_car_id = Enum.random(possible_ids)
+
+    available_car_images = Utils.get_images("cars")
+    player_car_image = Enum.random(available_car_images)
+
+    player_car = initialize_car(player_car_id, player_car_image, :player)
+
+    remaining_ids = possible_ids -- [player_car_id]
+    remaining_car_images = available_car_images -- [player_car_image]
+
+    computer_controlled_cars =
+      initialize_computer_controlled_cars(remaining_ids, remaining_car_images)
+
+    computer_controlled_cars ++ [player_car]
+  end
+
+  @spec initialize_computer_controlled_cars(list(), list()) :: list(Car.t())
+  defp initialize_computer_controlled_cars([car_id], car_images) do
+    car_image = Enum.random(car_images)
+
+    [initialize_car(car_id, car_image, :computer)]
+  end
+
+  defp initialize_computer_controlled_cars(_car_ids = [head | tail], car_images) do
+    car_image = Enum.random(car_images)
+
+    car = initialize_car(head, car_image, :computer)
+
+    remaining_car_images = car_images -- [car_image]
+
+    [car] ++ initialize_computer_controlled_cars(tail, remaining_car_images)
+  end
+
+  defp initialize_car(car_id, image, controller) do
+    {x_position, y_position} = get_starting_x_and_y_positions(car_id)
 
     new(%{
-      id: id,
+      car_id: car_id,
       image: image,
       controller: controller,
       x_position: x_position,
@@ -86,28 +123,28 @@ defmodule FormulaX.Race.Car do
   end
 
   # The x and y positions are in pixels
-  @spec get_initial_x_and_y_positions(integer()) :: {integer(), integer()}
-  defp get_initial_x_and_y_positions(1) do
+  @spec get_starting_x_and_y_positions(integer()) :: {integer(), integer()}
+  defp get_starting_x_and_y_positions(1) do
     {0, 430}
   end
 
-  defp get_initial_x_and_y_positions(2) do
+  defp get_starting_x_and_y_positions(2) do
     {0, 290}
   end
 
-  defp get_initial_x_and_y_positions(3) do
+  defp get_starting_x_and_y_positions(3) do
     {-100, 430}
   end
 
-  defp get_initial_x_and_y_positions(4) do
+  defp get_starting_x_and_y_positions(4) do
     {-100, 290}
   end
 
-  defp get_initial_x_and_y_positions(5) do
+  defp get_starting_x_and_y_positions(5) do
     {100, 430}
   end
 
-  defp get_initial_x_and_y_positions(6) do
+  defp get_starting_x_and_y_positions(6) do
     {100, 290}
   end
 end

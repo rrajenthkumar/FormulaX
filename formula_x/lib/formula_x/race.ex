@@ -8,7 +8,6 @@ defmodule FormulaX.Race do
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
   alias FormulaX.Race.Commander
-  alias FormulaX.Utils
 
   @type cars :: list(Car.t())
   @typedoc """
@@ -33,7 +32,7 @@ defmodule FormulaX.Race do
 
   @spec initialize() :: Race.t()
   def initialize() do
-    cars = initialize_cars()
+    cars = Car.initialize_cars()
 
     background = Background.initialize()
 
@@ -41,42 +40,6 @@ defmodule FormulaX.Race do
     distance = 100_000
 
     new(%{cars: cars, background: background, distance: distance})
-  end
-
-  @spec initialize_cars() :: list(Car.t())
-  defp initialize_cars() do
-    possible_ids = [1, 2, 3, 4, 5, 6]
-    player_car_id = Enum.random(possible_ids)
-
-    available_car_images = Utils.get_images("cars")
-    player_car_image = Enum.random(available_car_images)
-
-    player_car = Car.initialize(player_car_id, player_car_image, :player)
-
-    remaining_ids = possible_ids -- [player_car_id]
-    remaining_car_images = available_car_images -- [player_car_image]
-
-    computer_controlled_cars =
-      initialize_computer_controlled_cars(remaining_ids, remaining_car_images)
-
-    computer_controlled_cars ++ [player_car]
-  end
-
-  @spec initialize_computer_controlled_cars(list(), list()) :: list(Car.t())
-  defp initialize_computer_controlled_cars([car_id], car_images) do
-    car_image = Enum.random(car_images)
-
-    [Car.initialize(car_id, car_image, :computer)]
-  end
-
-  defp initialize_computer_controlled_cars(_car_ids = [head | tail], car_images) do
-    car_image = Enum.random(car_images)
-
-    car = Car.initialize(head, car_image, :computer)
-
-    remaining_car_images = car_images -- [car_image]
-
-    [car] ++ initialize_computer_controlled_cars(tail, remaining_car_images)
   end
 
   @spec start(Race.t()) :: Race.t()
