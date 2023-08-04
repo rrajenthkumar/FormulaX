@@ -10,7 +10,8 @@ defmodule FormulaXWeb.RaceLive do
   def render(assigns) do
     ~H"""
     <div class="race_live">
-      <div class="console">
+      <div class="console" phx-window-keydown="keydown">
+        <.speed_controls/>
         <div class="screen">
           <div class="tracks">
             <div class="track border-l"></div>
@@ -19,8 +20,17 @@ defmodule FormulaXWeb.RaceLive do
           </div>
           <.cars cars={@race.cars}/>
         </div>
-        <.controls/>
+        <.direction_controls/>
       </div>
+    </div>
+    """
+  end
+
+  defp speed_controls(assigns) do
+    ~H"""
+    <div class="speed_controls">
+      <a class="top" href="#" phx-click="accelerate"></a>
+      <a class="bottom" href="#" phx-click="decelerate"></a>
     </div>
     """
   end
@@ -31,11 +41,11 @@ defmodule FormulaXWeb.RaceLive do
       <%= for car <- @cars do %>
         <%= with position_class <- position_class(car) do %>
           <%= cond do %>
-            <% car.id <= 5 -> %>
+            <% car.car_id <= 5 -> %>
                 <img src={"/images/cars/#{car.image}"} class={"absolute #{position_class}"}/>
             <%= #For some strange reason the last car has to be set to relative class so that all cars appear on the screen. %>
             <%= #To be investigated %>
-            <% car.id == 6 -> %>
+            <% car.car_id == 6 -> %>
                 <img src={"/images/cars/#{car.image}"} class={"relative #{position_class}"}/>
           <% end %>
         <% end %>
@@ -44,13 +54,11 @@ defmodule FormulaXWeb.RaceLive do
     """
   end
 
-  defp controls(assigns) do
+  defp direction_controls(assigns) do
     ~H"""
-    <div class="controls" phx-window-keydown="keydown">
-      <a class="top" href="#" phx-click="accelerate"></a>
-      <a class="bottom" href="#" phx-click="decelerate"></a>
-      <a class="right" href="#" phx-click="move_right"></a>
+    <div class="direction_controls">
       <a class="left" href="#" phx-click="move_left"></a>
+      <a class="right" href="#" phx-click="move_right"></a>
     </div>
     """
   end

@@ -7,7 +7,7 @@ defmodule FormulaX.Race do
   alias __MODULE__
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
-  alias FormulaX.Race.Commander
+  alias FormulaX.Race.Car.Controller
 
   @type cars :: list(Car.t())
   @typedoc """
@@ -46,7 +46,7 @@ defmodule FormulaX.Race do
   def start(race = %Race{status: :countdown}) do
     %Race{race | status: :ongoing, start_time: Time.utc_now()}
     # Task of driving computer controlled cars is transferred from here to a separate module
-    |> Commander.start_computer_controlled_cars()
+    |> Controller.start()
   end
 
   @spec complete(Race.t()) :: Race.t()

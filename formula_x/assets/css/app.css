@@ -9,11 +9,13 @@
 }
 
 .race_live .console {
-  @apply w-[45rem] h-[60rem] bg-gray-600 rounded-3xl flex flex-col items-center;
+  @apply w-[110rem] h-[45rem] bg-gray-600 rounded-full flex items-center justify-evenly;
+  box-shadow: 5px 5px 5px 5px rgb(65, 65, 65);
 }
 
 .race_live .console .screen {
-  @apply w-[35rem] min-h-[35rem] bg-gray-50 mt-20 rounded-md flex justify-center;
+  @apply w-[35rem] min-h-[35rem] bg-gray-50 rounded-md flex justify-center;
+  box-shadow: 0 0 30px rgb(197, 197, 197);
 }
 
 .race_live .console .screen .tracks .track {
@@ -28,34 +30,42 @@
   @apply w-14 inline-block;
 }
 
-.race_live .console .controls .top,
-.race_live .console .controls .bottom,
-.race_live .console .controls .right,
-.race_live .console .controls .left {
-  @apply w-20 h-20 relative block;
-  background-color: #000000;
+.race_live .console .speed_controls {
+  @apply flex flex-col gap-2;
 }
 
-.race_live .console .controls .top {
-  border-radius: 0 0 0 5rem;
-  transform: rotate(135deg);
-  @apply top-[3.75rem];
+.race_live .console .speed_controls .top,
+.race_live .console .speed_controls .bottom {
+  @apply w-64 h-32 relative block;
+  box-shadow: 3px 3px 2px 2px rgb(65, 65, 65);
 }
 
-.race_live .console .controls .bottom {
-  border-radius: 0 5rem 0 0;
-  transform: rotate(135deg);
-  @apply top-[6.25rem];
+.race_live .console .speed_controls .top {
+  @apply rounded-t-full;
+  background-color: #2f847c;
 }
 
-.race_live .console .controls .right {
-  border-radius: 0 0 5rem 0;
-  transform: rotate(-45deg);
-  @apply top-[-2.5rem] left-[3.75rem];
+.race_live .console .speed_controls .bottom {
+  @apply rounded-b-full;
+  background-color: #f08080;
 }
 
-.race_live .console .controls .left {
-  border-radius: 5rem 0 0 0;
-  transform: rotate(-45deg);
-  @apply top-[-7.5rem] right-[3.75rem];
+.race_live .console .direction_controls {
+  @apply flex gap-2;
+}
+
+.race_live .console .direction_controls .left,
+.race_live .console .direction_controls .right {
+  @apply w-32 h-64 relative block;
+  box-shadow: 3px 3px 2px 2px rgb(65, 65, 65);
+}
+
+.race_live .console .direction_controls .left {
+  @apply rounded-l-full;
+  background-color: #ffffe0;
+}
+
+.race_live .console .direction_controls .right {
+  @apply rounded-r-full;
+  background-color: #006994;
 }
