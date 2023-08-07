@@ -9,7 +9,7 @@
 }
 
 .race_live .console {
-  @apply w-[110rem] h-[45rem] bg-gray-600 rounded-full flex items-center justify-evenly;
+  @apply w-[100rem] h-[45rem] bg-gray-600 rounded-full flex items-center justify-evenly;
   box-shadow: 5px 5px 5px 5px rgb(65, 65, 65);
 }
 
@@ -62,7 +62,7 @@
 
 .race_live .console .direction_controls .left {
   @apply rounded-l-full;
-  background-color: #ffffe0;
+  background-color: #fada5e;
 }
 
 .race_live .console .direction_controls .right {
