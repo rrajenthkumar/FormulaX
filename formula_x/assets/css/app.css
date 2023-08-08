@@ -18,12 +18,12 @@
   box-shadow: 0 0 30px rgb(197, 197, 197);
 }
 
-.race_live .console .screen .tracks .track {
-  @apply w-24 h-full inline-block border-r bg-gray-100;
+.race_live .console .screen .race .track {
+  @apply w-24 h-full inline-block border-r bg-gray-100 -mb-2;
 }
 
 .race_live .console .screen .cars {
-  @apply absolute;
+  @apply relative;
 }
 
 .race_live .console .screen .cars img {

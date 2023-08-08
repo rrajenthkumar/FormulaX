@@ -125,26 +125,26 @@ defmodule FormulaX.Race.Car do
   # The x and y positions are in pixels
   @spec get_starting_x_and_y_positions(integer()) :: {integer(), integer()}
   defp get_starting_x_and_y_positions(1) do
-    {0, 430}
+    {20, 0}
   end
 
   defp get_starting_x_and_y_positions(2) do
-    {0, 290}
+    {20, 130}
   end
 
   defp get_starting_x_and_y_positions(3) do
-    {-100, 430}
+    {120, 0}
   end
 
   defp get_starting_x_and_y_positions(4) do
-    {-100, 290}
+    {120, 130}
   end
 
   defp get_starting_x_and_y_positions(5) do
-    {100, 430}
+    {220, 0}
   end
 
   defp get_starting_x_and_y_positions(6) do
-    {100, 290}
+    {220, 130}
   end
 end

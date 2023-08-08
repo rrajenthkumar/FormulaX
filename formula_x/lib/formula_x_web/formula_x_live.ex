@@ -13,12 +13,12 @@ defmodule FormulaXWeb.RaceLive do
       <div class="console" phx-window-keydown="keydown">
         <.speed_controls/>
         <div class="screen">
-          <div class="tracks">
+          <div class="race">
             <div class="track border-l"></div>
             <div class="track"></div>
             <div class="track"></div>
+            <.cars cars={@race.cars}/>
           </div>
-          <.cars cars={@race.cars}/>
         </div>
         <.direction_controls/>
       </div>
@@ -40,14 +40,7 @@ defmodule FormulaXWeb.RaceLive do
     <div class="cars">
       <%= for car <- @cars do %>
         <%= with position_class <- position_class(car) do %>
-          <%= cond do %>
-            <% car.car_id <= 5 -> %>
-                <img src={"/images/cars/#{car.image}"} class={"absolute #{position_class}"}/>
-            <%= #For some strange reason the last car has to be set to relative class so that all cars appear on the screen. %>
-            <%= #To be investigated %>
-            <% car.car_id == 6 -> %>
-                <img src={"/images/cars/#{car.image}"} class={"relative #{position_class}"}/>
-          <% end %>
+          <img src={"/images/cars/#{car.image}"} class={"#{position_class}"}/>
         <% end %>
       <% end %>
     </div>
@@ -129,6 +122,6 @@ defmodule FormulaXWeb.RaceLive do
          x_position: x_position,
          y_position: y_position
        }) do
-    "right-[#{x_position}px] top-[#{y_position}px]"
+    "absolute left-[#{x_position}px] bottom-[#{y_position}px]"
   end
 end
