@@ -39,9 +39,7 @@ defmodule FormulaXWeb.RaceLive do
     ~H"""
     <div class="cars">
       <%= for car <- @cars do %>
-        <%= with position_class <- position_class(car) do %>
-          <img src={"/images/cars/#{car.image}"} class={"#{position_class}"}/>
-        <% end %>
+        <img src={"/images/cars/#{car.image}"} class={position_class(car)}/>
       <% end %>
     </div>
     """
