@@ -4,7 +4,7 @@
 
 /* This file is for your main application CSS */
 .race_live {
-  @apply flex justify-center items-center h-[calc(100vh-2rem)] pt-8;
+  @apply flex justify-center items-center h-[calc(100vh-2.5rem)] pt-10;
   background-color: #fffff0d4;
 }
 
