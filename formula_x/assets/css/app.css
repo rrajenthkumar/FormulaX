@@ -14,19 +14,35 @@
 }
 
 .race_live .console .screen {
-  @apply w-[35rem] min-h-[35rem] bg-gray-50 rounded-md flex justify-center;
+  @apply w-[35rem] h-[35rem] bg-white rounded-md overflow-hidden grid;
+  /* 18rem width along X axis in total for 3 tracks, 6rem(96px) width per track */
+  grid-template-columns: 1fr 18rem 1fr;
   box-shadow: 0 0 30px rgb(197, 197, 197);
 }
 
-.race_live .console .screen .race .track {
-  @apply w-24 h-full inline-block border-r bg-gray-100 -mb-2;
+.race_live .console .screen .background .image_container {
+  /* Every image container is 12.5rem(200px) wide along Y axis */
+  @apply w-full h-[12.5rem] flex items-center justify-center;
 }
 
-.race_live .console .screen .cars {
+.race_live .console .screen .background .image_container img {
+  @apply w-24;
+}
+
+.race_live .console .screen .race {
+  @apply grid gap-1;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.race_live .console .screen .race .track {
+  @apply bg-gray-50;
+}
+
+.race_live .console .screen .race .cars {
   @apply relative;
 }
 
-.race_live .console .screen .cars img {
+.race_live .console .screen .race .cars img {
   @apply w-14 inline-block;
 }
 

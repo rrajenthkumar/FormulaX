@@ -7,9 +7,12 @@ defmodule FormulaX.Race.Background do
   alias __MODULE__
   alias FormulaX.Utils
 
-  # Every grid element (100px wide) holds an image of one of the available background items like a tree, a rock, a building etc
-  # To be eventually calculated from config (RACE_DISTANCE)
-  @number_of_grid_elements 1000
+  # Background images are shown on both left and right sides.
+  # Images can be of a tree, a rock, a building etc
+  # The total number of images per side decides the distance of the race
+  # and will eventually be read from config (RACE_DISTANCE)
+  # 1 image will result in 200px of race distance
+  @number_of_images_per_side 1000
 
   @type filename :: String.t()
   @type filenames :: list(filename())
@@ -18,8 +21,8 @@ defmodule FormulaX.Race.Background do
 
   @typedoc "Background struct"
   typedstruct do
-    field(:left_grid, filenames(), enforce: true)
-    field(:right_grid, filenames(), enforce: true)
+    field(:left_side_images, filenames(), enforce: true)
+    field(:right_side_images, filenames(), enforce: true)
     field(:y_position, y_position(), default: 0)
   end
 
@@ -31,15 +34,15 @@ defmodule FormulaX.Race.Background do
   @spec initialize() :: Background.t()
   def initialize() do
     available_background_images = Utils.get_images("backgrounds")
-    left_grid = generate_grid(available_background_images)
-    right_grid = generate_grid(available_background_images)
+    left_side_images = get_side_images(available_background_images)
+    right_side_images = get_side_images(available_background_images)
 
-    new(%{left_grid: left_grid, right_grid: right_grid})
+    new(%{left_side_images: left_side_images, right_side_images: right_side_images})
   end
 
-  @spec generate_grid(filenames()) :: filenames()
-  defp generate_grid(available_background_images) do
-    Enum.map(1..@number_of_grid_elements, fn _grid_number ->
+  @spec get_side_images(filenames()) :: filenames()
+  defp get_side_images(available_background_images) do
+    Enum.map(1..@number_of_images_per_side, fn _grid_number ->
       Enum.random(available_background_images)
     end)
   end

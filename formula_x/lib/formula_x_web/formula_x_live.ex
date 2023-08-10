@@ -13,12 +13,14 @@ defmodule FormulaXWeb.RaceLive do
       <div class="console" phx-window-keydown="keydown">
         <.speed_controls/>
         <div class="screen">
+          <.background images={@race.background.left_side_images}/>
           <div class="race">
-            <div class="track border-l"></div>
+            <div class="track"></div>
             <div class="track"></div>
             <div class="track"></div>
             <.cars cars={@race.cars}/>
           </div>
+          <.background images={@race.background.right_side_images}/>
         </div>
         <.direction_controls/>
       </div>
@@ -31,6 +33,18 @@ defmodule FormulaXWeb.RaceLive do
     <div class="speed_controls">
       <a class="top" href="#" phx-click="accelerate"></a>
       <a class="bottom" href="#" phx-click="decelerate"></a>
+    </div>
+    """
+  end
+
+  defp background(assigns) do
+    ~H"""
+    <div class="background">
+      <%= for image <- @images do %>
+        <div class="image_container">
+          <img src={"/images/backgrounds/#{image}"} />
+        </div>
+      <% end %>
     </div>
     """
   end
