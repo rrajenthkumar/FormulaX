@@ -54,18 +54,8 @@ defmodule FormulaXWeb.RaceLive do
   defp cars(assigns) do
     ~H"""
     <div class="cars">
-      <%= if @cars do %>
       <%= for car <- @cars do %>
         <img src={"/images/cars/#{car.image}"} class={position_class(car)}/>
-      <% end %>
-      <%= else %>
-      <%= #To reserve the positons %>
-       <div class="absolute left-[18px] bottom-[0px]"></div>
-       <div class="absolute left-[18px] bottom-[130px]"></div>
-       <div class="absolute left-[116px] bottom-[0px]"></div>
-       <div class="absolute left-[116px] bottom-[130px]"></div>
-       <div class="absolute left-[214px] bottom-[0px]"></div>
-       <div class="absolute left-[214px] bottom-[130px]"></div>
       <% end %>
     </div>
     """
@@ -94,8 +84,16 @@ defmodule FormulaXWeb.RaceLive do
     {:ok, assign(socket, :race, race)}
   end
 
-  def handle_event("accelerate", _params, socket) do
-    {:noreply, socket}
+  def handle_event("accelerate", _params, socket = %{assigns: %{race: race = %Race{cars: cars}}}) do
+    # For timebeing to test the forward movement of cars
+    cars =
+      Enum.map(cars, fn car = %Car{y_position: y_position} ->
+        %Car{car | y_position: y_position + 1}
+      end)
+
+    race = %Race{race | cars: cars}
+
+    {:noreply, assign(socket, :race, race)}
   end
 
   def handle_event("decelerate", _params, socket) do
