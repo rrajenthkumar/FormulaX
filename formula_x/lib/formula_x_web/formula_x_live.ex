@@ -9,15 +9,17 @@ defmodule FormulaXWeb.RaceLive do
 
   def render(assigns) do
     ~H"""
-    <div class="race_live">
-      <div class="console" phx-window-keydown="keydown">
+    <div class="race_live" phx-window-keydown="keydown">
+      <div class="console">
         <.speed_controls/>
         <div class="screen">
           <.background images={@race.background.left_side_images}/>
           <div class="race">
-            <div class="track"></div>
-            <div class="track"></div>
-            <div class="track"></div>
+            <div class="tracks">
+              <div class="track"></div>
+              <div class="track"></div>
+              <div class="track"></div>
+            </div>
             <.cars cars={@race.cars}/>
           </div>
           <.background images={@race.background.right_side_images}/>
