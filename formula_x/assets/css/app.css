@@ -25,7 +25,7 @@
 
 .race_live .console .speed_controls .top {
   @apply rounded-t-full;
-  background-color: cadetblue;
+  background-color: rgba(95, 160, 140, 0.884);
 }
 
 .race_live .console .speed_controls .bottom {
@@ -78,10 +78,10 @@
 
 .race_live .console .direction_controls .left {
   @apply rounded-l-full;
-  background-color: #ffda61dc;
+  background-color: #ffcd61bc;
 }
 
 .race_live .console .direction_controls .right {
   @apply rounded-r-full;
-  background-color: #007dafea;
+  background-color: #0069af8e;
 }
