@@ -59,11 +59,11 @@
 }
 
 .race_live .console .screen .race .cars {
-  @apply relative bottom-32 left-4;
+  @apply relative;
 }
 
 .race_live .console .screen .race .cars img {
-  @apply w-14 inline-block;
+  @apply w-14;
 }
 
 .race_live .console .direction_controls {

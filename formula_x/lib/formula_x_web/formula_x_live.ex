@@ -54,8 +54,18 @@ defmodule FormulaXWeb.RaceLive do
   defp cars(assigns) do
     ~H"""
     <div class="cars">
+      <%= if @cars do %>
       <%= for car <- @cars do %>
         <img src={"/images/cars/#{car.image}"} class={position_class(car)}/>
+      <% end %>
+      <%= else %>
+      <%= #To reserve the positons %>
+       <div class="absolute left-[18px] bottom-[0px]"></div>
+       <div class="absolute left-[18px] bottom-[130px]"></div>
+       <div class="absolute left-[116px] bottom-[0px]"></div>
+       <div class="absolute left-[116px] bottom-[130px]"></div>
+       <div class="absolute left-[214px] bottom-[0px]"></div>
+       <div class="absolute left-[214px] bottom-[130px]"></div>
       <% end %>
     </div>
     """
