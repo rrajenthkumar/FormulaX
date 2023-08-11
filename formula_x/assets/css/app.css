@@ -19,18 +19,18 @@
 
 .race_live .console .speed_controls .top,
 .race_live .console .speed_controls .bottom {
-  @apply w-64 h-32 relative block;
+  @apply w-64 h-32;
   box-shadow: 3px 3px 2px 2px rgb(65, 65, 65);
 }
 
 .race_live .console .speed_controls .top {
   @apply rounded-t-full;
-  background-color: #2f847c;
+  background-color: cadetblue;
 }
 
 .race_live .console .speed_controls .bottom {
   @apply rounded-b-full;
-  background-color: #f08080;
+  background-color: indianred;
 }
 
 .race_live .console .screen {
@@ -72,16 +72,16 @@
 
 .race_live .console .direction_controls .left,
 .race_live .console .direction_controls .right {
-  @apply w-32 h-64 relative block;
+  @apply w-32 h-64;
   box-shadow: 3px 3px 2px 2px rgb(65, 65, 65);
 }
 
 .race_live .console .direction_controls .left {
   @apply rounded-l-full;
-  background-color: #fada5e;
+  background-color: #ffda61dc;
 }
 
 .race_live .console .direction_controls .right {
   @apply rounded-r-full;
-  background-color: #006994;
+  background-color: #007dafea;
 }
