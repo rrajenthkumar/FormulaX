@@ -6,6 +6,7 @@ defmodule FormulaXWeb.RaceLive do
 
   alias FormulaX.Race
   alias FormulaX.Race.Car
+  alias FormulaX.Race.Background
 
   def render(assigns) do
     ~H"""
@@ -13,7 +14,7 @@ defmodule FormulaXWeb.RaceLive do
       <div class="console">
         <.speed_controls/>
         <div class="screen">
-          <.background images={@race.background.left_side_images}/>
+          <.background images={@race.background.left_side_images} y_position={@race.background.y_position}/>
           <div class="race">
             <div class="tracks">
               <div class="track"></div>
@@ -22,7 +23,7 @@ defmodule FormulaXWeb.RaceLive do
             </div>
             <.cars cars={@race.cars}/>
           </div>
-          <.background images={@race.background.right_side_images}/>
+          <.background images={@race.background.right_side_images} y_position={@race.background.y_position}/>
         </div>
         <.direction_controls/>
       </div>
@@ -41,7 +42,7 @@ defmodule FormulaXWeb.RaceLive do
 
   defp background(assigns) do
     ~H"""
-    <div class="background">
+    <div class={background_position_class(@y_position)}>
       <%= for image <- @images do %>
         <div class="image_container">
           <img src={"/images/backgrounds/#{image}"} />
@@ -55,7 +56,7 @@ defmodule FormulaXWeb.RaceLive do
     ~H"""
     <div class="cars">
       <%= for car <- @cars do %>
-        <img src={"/images/cars/#{car.image}"} class={position_class(car)}/>
+        <img src={"/images/cars/#{car.image}"} class={car_position_class(car)}/>
       <% end %>
     </div>
     """
@@ -84,14 +85,18 @@ defmodule FormulaXWeb.RaceLive do
     {:ok, assign(socket, :race, race)}
   end
 
-  def handle_event("accelerate", _params, socket = %{assigns: %{race: race = %Race{cars: cars}}}) do
-    # For timebeing to test the forward movement of cars
-    cars =
-      Enum.map(cars, fn car = %Car{y_position: y_position} ->
-        %Car{car | y_position: y_position + 1}
-      end)
+  def handle_event(
+        "accelerate",
+        _params,
+        socket = %{
+          assigns: %{
+            race: race = %Race{background: background}
+          }
+        }
+      ) do
+    background = Background.offset(background)
 
-    race = %Race{race | cars: cars}
+    race = %Race{race | background: background}
 
     {:noreply, assign(socket, :race, race)}
   end
@@ -140,10 +145,14 @@ defmodule FormulaXWeb.RaceLive do
     {:ok, assign(socket, :race, race)}
   end
 
-  defp position_class(%Car{
+  defp car_position_class(%Car{
          x_position: x_position,
          y_position: y_position
        }) do
     "absolute left-[#{x_position}px] bottom-[#{y_position}px]"
+  end
+
+  defp background_position_class(y_position) do
+    "background relative top-[#{y_position}px]"
   end
 end
