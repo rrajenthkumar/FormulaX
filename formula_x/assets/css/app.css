@@ -49,8 +49,12 @@
   @apply w-32;
 }
 
+.race_live .console .screen .race {
+  @apply h-[35rem];
+}
+
 .race_live .console .screen .race .tracks {
-  @apply grid gap-1 w-full h-[35rem];
+  @apply grid gap-1 h-full;
   grid-template-columns: 1fr 1fr 1fr;
 }
 
