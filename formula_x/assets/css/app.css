@@ -40,6 +40,10 @@
   box-shadow: 0 0 30px rgb(197, 197, 197);
 }
 
+.race_live .console .screen .background {
+  @apply relative;
+}
+
 .race_live .console .screen .background .image_container {
   /* Every image container is 12.5rem(200px) wide along Y axis */
   @apply w-full h-[12.5rem] flex items-center justify-center;
@@ -67,7 +71,7 @@
 }
 
 .race_live .console .screen .race .cars img {
-  @apply w-14;
+  @apply w-14 absolute;
 }
 
 .race_live .console .direction_controls {

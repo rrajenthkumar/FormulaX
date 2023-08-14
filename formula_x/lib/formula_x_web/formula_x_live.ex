@@ -42,7 +42,7 @@ defmodule FormulaXWeb.RaceLive do
 
   defp background(assigns) do
     ~H"""
-    <div class={background_position_class(@y_position)}>
+    <div class="background" style={background_position_style(@y_position)}>
       <%= for image <- @images do %>
         <div class="image_container">
           <img src={"/images/backgrounds/#{image}"} />
@@ -56,7 +56,7 @@ defmodule FormulaXWeb.RaceLive do
     ~H"""
     <div class="cars">
       <%= for car <- @cars do %>
-        <img src={"/images/cars/#{car.image}"} class={car_position_class(car)}/>
+        <img src={"/images/cars/#{car.image}"} style={car_position_style(car)}/>
       <% end %>
     </div>
     """
@@ -113,8 +113,20 @@ defmodule FormulaXWeb.RaceLive do
     {:noreply, socket}
   end
 
-  def handle_event("keydown", %{"key" => "ArrowUp"}, socket) do
-    {:noreply, socket}
+  def handle_event(
+        "keydown",
+        %{"key" => "ArrowUp"},
+        socket = %{
+          assigns: %{
+            race: race = %Race{background: background}
+          }
+        }
+      ) do
+    background = Background.offset(background)
+
+    race = %Race{race | background: background}
+
+    {:noreply, assign(socket, :race, race)}
   end
 
   def handle_event("keydown", %{"key" => "ArrowDown"}, socket) do
@@ -145,14 +157,14 @@ defmodule FormulaXWeb.RaceLive do
     {:ok, assign(socket, :race, race)}
   end
 
-  defp car_position_class(%Car{
+  defp car_position_style(%Car{
          x_position: x_position,
          y_position: y_position
        }) do
-    "absolute left-[#{x_position}px] bottom-[#{y_position}px]"
+    "left: #{x_position}px; bottom: #{y_position}px;"
   end
 
-  defp background_position_class(y_position) do
-    "background relative top-[#{y_position}px]"
+  defp background_position_style(y_position) do
+    "top: #{y_position}px"
   end
 end
