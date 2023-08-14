@@ -42,6 +42,7 @@
 
 .race_live .console .screen .background {
   @apply relative;
+  transition: top 1s ease-out;
 }
 
 .race_live .console .screen .background .image_container {

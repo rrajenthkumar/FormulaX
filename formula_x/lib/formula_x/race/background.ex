@@ -23,7 +23,7 @@ defmodule FormulaX.Race.Background do
   typedstruct do
     field(:left_side_images, filenames(), enforce: true)
     field(:right_side_images, filenames(), enforce: true)
-    field(:y_position, y_position(), default: 0)
+    field(:y_position, y_position(), default: -199_400)
   end
 
   @spec new(map()) :: Background.t()
@@ -49,6 +49,6 @@ defmodule FormulaX.Race.Background do
 
   @spec offset(Background.t()) :: Background.t()
   def offset(background = %Background{y_position: y_position}) do
-    %Background{background | y_position: y_position + 1}
+    %Background{background | y_position: y_position + 100}
   end
 end
