@@ -82,10 +82,10 @@
 
 .race_live .console .direction_controls .left {
   @apply rounded-l-full;
-  background-color: #ffcd61bc;
+  background-color: #ffdb58;
 }
 
 .race_live .console .direction_controls .right {
   @apply rounded-r-full;
-  background-color: #0069af8e;
+  background-color: #4682b4;
 }
