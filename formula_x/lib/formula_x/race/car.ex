@@ -15,7 +15,7 @@ defmodule FormulaX.Race.Car do
   @type x_position :: integer()
   @typedoc "Position on screen in pixels where the car appears along the Y direction"
   @type y_position :: integer()
-  @type speed :: :rest | :slow | :moderate | :high
+  @type speed :: :rest | :low | :moderate | :high
 
   @typedoc "Car struct"
   typedstruct do
@@ -24,7 +24,7 @@ defmodule FormulaX.Race.Car do
     field(:controller, controller(), enforce: true)
     field(:x_position, x_position(), enforce: true)
     field(:y_position, y_position(), enforce: true)
-    field(:speed, speed(), default: :rest)
+    field(:speed, speed(), default: :moderate)
     field(:completion_time, Time.t(), default: nil)
   end
 
@@ -81,18 +81,33 @@ defmodule FormulaX.Race.Car do
     })
   end
 
-  # To change a car's track check if there is no other car on the side to be moved to and if the car has already reached the edge
-  @spec change_track(Car.t(), :left | :right) :: Car.t()
-  def change_track(car = %Car{x_position: x_position}, :left) do
-    %Car{car | x_position: x_position - 1}
+  @spec get_player_car(list(Car.t())) :: Car.t()
+  def get_player_car(cars) do
+    Enum.find(cars, fn car -> car.controller == :player end)
   end
 
-  def change_track(car = %Car{x_position: x_position}, :right) do
-    %Car{car | x_position: x_position + 1}
+  @spec update_cars(list(Car.t()), Car.t()) :: list(Car.t())
+  def update_cars(cars, updated_car) do
+    Enum.map(cars, fn car ->
+      if car.car_id == updated_car.car_id do
+        updated_car
+      else
+        car
+      end
+    end)
   end
 
-  # To accelerate a car check if there is no other car directly in the front
-  # To decelerate a car check if there is no other car directly at the back
+  # To move a car sidewards check if there is no other car on the side to be moved to
+  # and if the car has not already reached the edge
+  @spec steer(Car.t(), :left | :right) :: Car.t()
+  def steer(car = %Car{x_position: x_position}, :left) do
+    %Car{car | x_position: x_position - 10}
+  end
+
+  def steer(car = %Car{x_position: x_position}, :right) do
+    %Car{car | x_position: x_position + 10}
+  end
+
   @spec change_speed(Car.t(), :accelerate | :decelerate) :: Car.t()
   def change_speed(car = %Car{speed: :rest}, :accelerate) do
     %Car{car | speed: :slow}

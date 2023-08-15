@@ -49,6 +49,15 @@ defmodule FormulaX.Race do
     |> Controller.start()
   end
 
+  @spec update(Race.t(), Background.t() | list(Car.t())) :: Race.t()
+  def update(race = %Race{}, updated_background = %Background{}) do
+    %Race{race | background: updated_background}
+  end
+
+  def update(race = %Race{}, updated_cars) when is_list(updated_cars) do
+    %Race{race | cars: updated_cars}
+  end
+
   @spec complete(Race.t()) :: Race.t()
   def complete(race = %Race{status: :ongoing}) do
     %Race{race | status: :completed}

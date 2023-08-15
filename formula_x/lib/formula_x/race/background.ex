@@ -16,7 +16,7 @@ defmodule FormulaX.Race.Background do
 
   @type filename :: String.t()
   @type filenames :: list(filename())
-  @typedoc "Position on screen in pixels to which both left and right side background sections have to be offsetted in Y direction, so that the player car appears to move along the Y direction"
+  @typedoc "Position on screen in pixels to which the background has to be moved in opposite Y (reverse) direction, so that the player car appears to move forward along Y direction"
   @type y_position :: integer()
 
   @typedoc "Background struct"
@@ -47,8 +47,15 @@ defmodule FormulaX.Race.Background do
     end)
   end
 
-  @spec offset(Background.t()) :: Background.t()
-  def offset(background = %Background{y_position: y_position}) do
-    %Background{background | y_position: y_position + 100}
+  # To move the player car (i.e to simulate movement using Background) check if there is no other car directly in the front
+  # To stop the player car check if there is no other car directly at the back
+  @spec move(Background.t(), :rest | :low | :moderate | :high) :: Background.t()
+  def move(background = %Background{y_position: y_position}, player_car_speed) do
+    case player_car_speed do
+      :rest -> background
+      :slow -> %Background{background | y_position: y_position + 100}
+      :moderate -> %Background{background | y_position: y_position + 250}
+      :high -> %Background{background | y_position: y_position + 450}
+    end
   end
 end
