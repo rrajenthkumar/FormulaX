@@ -72,7 +72,7 @@
 }
 
 .race_live .console .screen .race .cars img {
-  @apply w-14 absolute;
+  @apply w-14 h-28 absolute;
 }
 
 .race_live .console .direction_controls {

@@ -34,12 +34,12 @@ defmodule FormulaX.Race do
   def initialize() do
     cars = Car.initialize_cars()
 
-    background = Background.initialize()
-
+    # Race distance is measured in pixels
     # To be eventually set as RACE_DISTANCE in config
-    distance = 100_000
+    race_distance = 100_000
+    background = Background.initialize(race_distance)
 
-    new(%{cars: cars, background: background, distance: distance})
+    new(%{cars: cars, background: background, distance: race_distance})
   end
 
   @spec start(Race.t()) :: Race.t()
@@ -66,5 +66,43 @@ defmodule FormulaX.Race do
   @spec abort(Race.t()) :: Race.t()
   def abort(race = %Race{status: :ongoing}) do
     %Race{race | status: :aborted}
+  end
+
+  # Below 3 functions are to be improved to have only the coordinates
+  # actually relevant during car movements forward and sidewards
+  # The sidewards movement is lagging now
+  @spec crash?(Race.t(), Car.t()) :: boolean()
+  def crash?(
+        %Race{cars: cars},
+        requesting_car = %Car{}
+      ) do
+    crash_zone_coordinates = get_crash_zone_coordinates(cars, requesting_car)
+
+    requesting_car
+    |> get_car_coordinates()
+    |> Enum.map(fn car_coordinate ->
+      Enum.any?(crash_zone_coordinates, fn crash_zone_coordinate ->
+        crash_zone_coordinate == car_coordinate
+      end)
+    end)
+    |> Enum.any?()
+  end
+
+  @spec get_crash_zone_coordinates(list(Car.t()), Car.t()) :: list({integer(), integer()})
+  defp get_crash_zone_coordinates(cars, requesting_car = %Car{}) when is_list(cars) do
+    cars
+    |> Enum.reject(fn car -> car.car_id == requesting_car.car_id end)
+    |> Enum.flat_map(fn car -> get_car_coordinates(car) end)
+  end
+
+  @spec get_car_coordinates(Car.t()) :: list({integer(), integer()})
+  defp get_car_coordinates(%Car{x_position: car_edge_x, y_position: car_edge_y}) do
+    # A car is 56px wide and 112px long
+    opposite_car_edge_x = car_edge_x + 56
+    opposite_car_edge_y = car_edge_y + 112
+
+    Enum.flat_map(car_edge_x..opposite_car_edge_x, fn x ->
+      Enum.map(car_edge_y..opposite_car_edge_y, fn y -> {x, y} end)
+    end)
   end
 end

@@ -53,13 +53,14 @@ defmodule FormulaX.Race.Car do
   end
 
   @spec initialize_computer_controlled_cars(list(), list()) :: list(Car.t())
-  defp initialize_computer_controlled_cars([car_id], car_images) do
+  defp initialize_computer_controlled_cars([car_id], car_images) when is_list(car_images) do
     car_image = Enum.random(car_images)
 
     [initialize_car(car_id, car_image, :computer)]
   end
 
-  defp initialize_computer_controlled_cars(_car_ids = [head | tail], car_images) do
+  defp initialize_computer_controlled_cars(_car_ids = [head | tail], car_images)
+       when is_list(car_images) do
     car_image = Enum.random(car_images)
 
     car = initialize_car(head, car_image, :computer)
@@ -69,7 +70,8 @@ defmodule FormulaX.Race.Car do
     [car] ++ initialize_computer_controlled_cars(tail, remaining_car_images)
   end
 
-  defp initialize_car(car_id, image, controller) do
+  defp initialize_car(car_id, image, controller)
+       when is_integer(car_id) and is_binary(image) and is_atom(controller) do
     {x_position, y_position} = get_starting_x_and_y_positions(car_id)
 
     new(%{
@@ -82,12 +84,12 @@ defmodule FormulaX.Race.Car do
   end
 
   @spec get_player_car(list(Car.t())) :: Car.t()
-  def get_player_car(cars) do
+  def get_player_car(cars) when is_list(cars) do
     Enum.find(cars, fn car -> car.controller == :player end)
   end
 
   @spec update_cars(list(Car.t()), Car.t()) :: list(Car.t())
-  def update_cars(cars, updated_car) do
+  def update_cars(cars, updated_car = %Car{}) when is_list(cars) do
     Enum.map(cars, fn car ->
       if car.car_id == updated_car.car_id do
         updated_car
@@ -137,14 +139,14 @@ defmodule FormulaX.Race.Car do
     car
   end
 
-  # The x and y positions are in pixels
+  # The x and y positions are in pixels from the orign at the left bottom corner of tracks on screen
   @spec get_starting_x_and_y_positions(integer()) :: {integer(), integer()}
   defp get_starting_x_and_y_positions(1) do
     {18, 0}
   end
 
   defp get_starting_x_and_y_positions(2) do
-    {18, 130}
+    {18, 115}
   end
 
   defp get_starting_x_and_y_positions(3) do
@@ -152,7 +154,7 @@ defmodule FormulaX.Race.Car do
   end
 
   defp get_starting_x_and_y_positions(4) do
-    {116, 130}
+    {116, 115}
   end
 
   defp get_starting_x_and_y_positions(5) do
@@ -160,6 +162,6 @@ defmodule FormulaX.Race.Car do
   end
 
   defp get_starting_x_and_y_positions(6) do
-    {214, 130}
+    {214, 115}
   end
 end

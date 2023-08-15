@@ -179,17 +179,24 @@ defmodule FormulaXWeb.RaceLive do
            }
          },
          direction
-       ) do
+       )
+       when is_atom(direction) do
     updated_player_car =
       cars
       |> Car.get_player_car()
       |> Car.steer(direction)
 
-    updated_cars = Car.update_cars(cars, updated_player_car)
+    case Race.crash?(race, updated_player_car) do
+      true ->
+        socket
 
-    updated_race = Race.update(race, updated_cars)
+      false ->
+        updated_cars = Car.update_cars(cars, updated_player_car)
 
-    assign(socket, :race, updated_race)
+        updated_race = Race.update(race, updated_cars)
+
+        assign(socket, :race, updated_race)
+    end
   end
 
   defp car_position_style(%Car{
@@ -199,7 +206,7 @@ defmodule FormulaXWeb.RaceLive do
     "left: #{x_position}px; bottom: #{y_position}px;"
   end
 
-  defp background_position_style(y_position) do
+  defp background_position_style(y_position) when is_integer(y_position) do
     "top: #{y_position}px"
   end
 end

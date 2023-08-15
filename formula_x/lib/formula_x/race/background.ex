@@ -1,18 +1,13 @@
 defmodule FormulaX.Race.Background do
   @moduledoc """
   Background context
+  Background images are shown on both left and right sides.
+  Images can be of a tree, a rock, a building etc.
   """
   use TypedStruct
 
   alias __MODULE__
   alias FormulaX.Utils
-
-  # Background images are shown on both left and right sides.
-  # Images can be of a tree, a rock, a building etc
-  # The total number of images per side decides the distance of the race
-  # and will eventually be read from config (RACE_DISTANCE)
-  # 1 image will result in 200px of race distance
-  @number_of_images_per_side 1000
 
   @type filename :: String.t()
   @type filenames :: list(filename())
@@ -23,7 +18,7 @@ defmodule FormulaX.Race.Background do
   typedstruct do
     field(:left_side_images, filenames(), enforce: true)
     field(:right_side_images, filenames(), enforce: true)
-    field(:y_position, y_position(), default: -199_400)
+    field(:y_position, y_position(), enforce: true)
   end
 
   @spec new(map()) :: Background.t()
@@ -31,18 +26,32 @@ defmodule FormulaX.Race.Background do
     struct!(Background, attrs)
   end
 
-  @spec initialize() :: Background.t()
-  def initialize() do
+  @spec initialize(integer()) :: Background.t()
+  def initialize(race_distance) when is_integer(race_distance) do
     available_background_images = Utils.get_images("backgrounds")
-    left_side_images = get_side_images(available_background_images)
-    right_side_images = get_side_images(available_background_images)
+    left_side_images = get_side_images(race_distance, available_background_images)
+    right_side_images = get_side_images(race_distance, available_background_images)
 
-    new(%{left_side_images: left_side_images, right_side_images: right_side_images})
+    # To bring the bottom of the background block
+    # to the origin point of cars (bottom left corner of racing tracks)
+    # 560px is the console screen height
+    # This has to be avoided by correcting css if possible
+    y_position = 560 + race_distance * -1
+
+    new(%{
+      left_side_images: left_side_images,
+      right_side_images: right_side_images,
+      y_position: y_position
+    })
   end
 
-  @spec get_side_images(filenames()) :: filenames()
-  defp get_side_images(available_background_images) do
-    Enum.map(1..@number_of_images_per_side, fn _grid_number ->
+  @spec get_side_images(integer(), filenames()) :: filenames()
+  defp get_side_images(race_distance, available_background_images)
+       when is_integer(race_distance) and is_list(available_background_images) do
+    # 200px is the width of one background image container in Y direction
+    number_of_images_required = div(race_distance, 200)
+
+    Enum.map(1..number_of_images_required, fn _grid_number ->
       Enum.random(available_background_images)
     end)
   end
@@ -50,12 +59,13 @@ defmodule FormulaX.Race.Background do
   # To move the player car (i.e to simulate movement using Background) check if there is no other car directly in the front
   # To stop the player car check if there is no other car directly at the back
   @spec move(Background.t(), :rest | :low | :moderate | :high) :: Background.t()
-  def move(background = %Background{y_position: y_position}, player_car_speed) do
+  def move(background = %Background{y_position: y_position}, player_car_speed)
+      when is_atom(player_car_speed) do
     case player_car_speed do
       :rest -> background
       :slow -> %Background{background | y_position: y_position + 100}
-      :moderate -> %Background{background | y_position: y_position + 250}
-      :high -> %Background{background | y_position: y_position + 450}
+      :moderate -> %Background{background | y_position: y_position + 175}
+      :high -> %Background{background | y_position: y_position + 250}
     end
   end
 end
