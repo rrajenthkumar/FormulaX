@@ -33,7 +33,7 @@ defmodule FormulaX.Race.Background do
     right_side_images = get_side_images(race_distance, available_background_images)
 
     # To bring the bottom of the background block
-    # to the origin point of cars (bottom left corner of racing tracks)
+    # to the origin point of cars (bottom left corner of left racing lane)
     # 560px is the console screen height
     # This has to be avoided by correcting css if possible
     y_position = 560 + race_distance * -1
@@ -56,8 +56,6 @@ defmodule FormulaX.Race.Background do
     end)
   end
 
-  # To move the player car (i.e to simulate movement using Background) check if there is no other car directly in the front
-  # To stop the player car check if there is no other car directly at the back
   @spec move(Background.t(), :rest | :low | :moderate | :high) :: Background.t()
   def move(background = %Background{y_position: y_position}, player_car_speed)
       when is_atom(player_car_speed) do

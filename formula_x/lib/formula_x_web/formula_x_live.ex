@@ -16,10 +16,10 @@ defmodule FormulaXWeb.RaceLive do
         <div class="screen">
           <.background images={@race.background.left_side_images} y_position={@race.background.y_position}/>
           <div class="race">
-            <div class="tracks">
-              <div class="track"></div>
-              <div class="track"></div>
-              <div class="track"></div>
+            <div class="lanes">
+              <div class="lane"></div>
+              <div class="lane"></div>
+              <div class="lane"></div>
             </div>
             <.cars cars={@race.cars}/>
           </div>
@@ -156,18 +156,15 @@ defmodule FormulaXWeb.RaceLive do
   defp move_player_car(
          socket = %{
            assigns: %{
-             race: race = %Race{background: background, cars: cars}
+             race: race = %Race{background: background}
            }
          }
        ) do
-    _player_car =
-      %Car{speed: speed} =
-      cars
-      |> Car.get_player_car()
+    _player_car = %Car{speed: speed} = Race.get_player_car(race)
 
+    # Background is moved in opposite direction to simulate car movement
     updated_background = Background.move(background, speed)
-
-    updated_race = Race.update(race, updated_background)
+    updated_race = Race.update_background(race, updated_background)
 
     assign(socket, :race, updated_race)
   end
@@ -175,30 +172,29 @@ defmodule FormulaXWeb.RaceLive do
   defp steer_player_car(
          socket = %{
            assigns: %{
-             race: race = %Race{cars: cars}
+             race: race = %Race{}
            }
          },
          direction
        )
        when is_atom(direction) do
-    updated_player_car =
-      cars
-      |> Car.get_player_car()
-      |> Car.steer(direction)
+    player_car = Race.get_player_car(race)
 
-    case Race.crash?(race, updated_player_car) do
+    case Race.crash?(race, player_car.car_id, direction) do
       true ->
+        IO.puts("*******************CRASH!!!*********************")
         socket
 
       false ->
-        updated_cars = Car.update_cars(cars, updated_player_car)
+        updated_player_car = Car.steer(player_car, direction)
 
-        updated_race = Race.update(race, updated_cars)
+        updated_race = Race.update_cars(race, updated_player_car)
 
         assign(socket, :race, updated_race)
     end
   end
 
+  @spec car_position_style(Car.t()) :: String.t()
   defp car_position_style(%Car{
          x_position: x_position,
          y_position: y_position
@@ -206,6 +202,7 @@ defmodule FormulaXWeb.RaceLive do
     "left: #{x_position}px; bottom: #{y_position}px;"
   end
 
+  @spec car_position_style(integer()) :: String.t()
   defp background_position_style(y_position) when is_integer(y_position) do
     "top: #{y_position}px"
   end

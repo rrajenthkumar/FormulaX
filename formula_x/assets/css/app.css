@@ -35,7 +35,7 @@
 
 .race_live .console .screen {
   @apply w-[35rem] h-[35rem] bg-white rounded-md overflow-hidden grid;
-  /* 18rem width along X axis in total for 3 tracks, 6rem(96px) width per track */
+  /* 18rem width along X axis in total for 3 lanes, 6rem(96px) width per lane */
   grid-template-columns: 1fr 18rem 1fr;
   box-shadow: 0 0 30px rgb(197, 197, 197);
 }
@@ -58,12 +58,12 @@
   @apply h-[35rem];
 }
 
-.race_live .console .screen .race .tracks {
+.race_live .console .screen .race .lanes {
   @apply grid gap-1 h-full;
   grid-template-columns: 1fr 1fr 1fr;
 }
 
-.race_live .console .screen .race .tracks .track {
+.race_live .console .screen .race .lanes .lane {
   @apply bg-gray-50;
 }
 

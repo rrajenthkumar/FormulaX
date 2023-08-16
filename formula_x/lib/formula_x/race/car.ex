@@ -83,31 +83,13 @@ defmodule FormulaX.Race.Car do
     })
   end
 
-  @spec get_player_car(list(Car.t())) :: Car.t()
-  def get_player_car(cars) when is_list(cars) do
-    Enum.find(cars, fn car -> car.controller == :player end)
-  end
-
-  @spec update_cars(list(Car.t()), Car.t()) :: list(Car.t())
-  def update_cars(cars, updated_car = %Car{}) when is_list(cars) do
-    Enum.map(cars, fn car ->
-      if car.car_id == updated_car.car_id do
-        updated_car
-      else
-        car
-      end
-    end)
-  end
-
-  # To move a car sidewards check if there is no other car on the side to be moved to
-  # and if the car has not already reached the edge
   @spec steer(Car.t(), :left | :right) :: Car.t()
   def steer(car = %Car{x_position: x_position}, :left) do
-    %Car{car | x_position: x_position - 10}
+    %Car{car | x_position: x_position - 5}
   end
 
   def steer(car = %Car{x_position: x_position}, :right) do
-    %Car{car | x_position: x_position + 10}
+    %Car{car | x_position: x_position + 5}
   end
 
   @spec change_speed(Car.t(), :accelerate | :decelerate) :: Car.t()
@@ -139,7 +121,17 @@ defmodule FormulaX.Race.Car do
     car
   end
 
-  # The x and y positions are in pixels from the orign at the left bottom corner of tracks on screen
+  def get_lane(%Car{x_position: x_position}) do
+    cond do
+      # x = 60 is the limit of right side movement of car in lane 1
+      # x = 160 is the limit of right side movement of car in lane 2
+      x_position <= 60 -> 1
+      x_position > 60 and x_position <= 160 -> 2
+      x_position > 160 -> 3
+    end
+  end
+
+  # The x and y positions are in pixels from the orign at the left bottom corner of left racing lane
   @spec get_starting_x_and_y_positions(integer()) :: {integer(), integer()}
   defp get_starting_x_and_y_positions(1) do
     {18, 0}
