@@ -16,6 +16,7 @@ defmodule FormulaX.Race.Car do
   @typedoc "Position on screen in pixels where the car appears along the Y direction"
   @type y_position :: integer()
   @type speed :: :rest | :low | :moderate | :high
+  @type coordinate :: {x_position(), y_position()}
 
   @typedoc "Car struct"
   typedstruct do
@@ -52,7 +53,7 @@ defmodule FormulaX.Race.Car do
     computer_controlled_cars ++ [player_car]
   end
 
-  @spec initialize_computer_controlled_cars(list(), list()) :: list(Car.t())
+  @spec initialize_computer_controlled_cars(list(car_id()), list(filename())) :: list(Car.t())
   defp initialize_computer_controlled_cars([car_id], car_images) when is_list(car_images) do
     car_image = Enum.random(car_images)
 
@@ -70,6 +71,7 @@ defmodule FormulaX.Race.Car do
     [car] ++ initialize_computer_controlled_cars(tail, remaining_car_images)
   end
 
+  @spec initialize_car(car_id(), filename(), controller()) :: Car.t()
   defp initialize_car(car_id, image, controller)
        when is_integer(car_id) and is_binary(image) and is_atom(controller) do
     {x_position, y_position} = get_starting_x_and_y_positions(car_id)
@@ -92,35 +94,64 @@ defmodule FormulaX.Race.Car do
     %Car{car | x_position: x_position + 5}
   end
 
-  @spec change_speed(Car.t(), :accelerate | :decelerate) :: Car.t()
-  def change_speed(car = %Car{speed: :rest}, :accelerate) do
+  @spec drive(Car.t()) :: Car.t()
+  def drive(car = %Car{y_position: y_position, speed: :slow}) do
+    %Car{car | y_position: y_position + 50}
+  end
+
+  def drive(car = %Car{y_position: y_position, speed: :moderate}) do
+    %Car{car | y_position: y_position + 75}
+  end
+
+  def drive(car = %Car{y_position: y_position, speed: :high}) do
+    %Car{car | y_position: y_position + 100}
+  end
+
+  @spec accelerate(Car.t()) :: Car.t()
+  def accelerate(car = %Car{speed: :rest}) do
     %Car{car | speed: :slow}
   end
 
-  def change_speed(car = %Car{speed: :slow}, :accelerate) do
+  def accelerate(car = %Car{speed: :slow}) do
     %Car{car | speed: :moderate}
   end
 
-  def change_speed(car = %Car{speed: :moderate}, :accelerate) do
+  def accelerate(car = %Car{speed: :moderate}) do
     %Car{car | speed: :high}
   end
 
-  def change_speed(car = %Car{speed: :high}, :decelerate) do
-    %Car{car | speed: :moderate}
-  end
-
-  def change_speed(car = %Car{speed: :moderate}, :decelerate) do
-    %Car{car | speed: :slow}
-  end
-
-  def change_speed(car = %Car{speed: :slow}, :decelerate) do
-    %Car{car | speed: :rest}
-  end
-
-  def change_speed(car = %Car{}, _action) do
+  def accelerate(car = %Car{speed: :high}) do
     car
   end
 
+  @spec decelerate(Car.t()) :: Car.t()
+  def decelerate(car = %Car{speed: :rest}) do
+    car
+  end
+
+  def decelerate(car = %Car{speed: :slow}) do
+    %Car{car | speed: :rest}
+  end
+
+  def decelerate(car = %Car{speed: :moderate}) do
+    %Car{car | speed: :slow}
+  end
+
+  def decelerate(car = %Car{speed: :high}) do
+    %Car{car | speed: :moderate}
+  end
+
+  @spec start(Car.t()) :: Car.t()
+  def start(car = %Car{speed: :rest}) do
+    %Car{car | speed: :slow}
+  end
+
+  @spec stop(Car.t()) :: Car.t()
+  def stop(car = %Car{}) do
+    %Car{car | speed: :rest}
+  end
+
+  @spec get_lane(Car.t()) :: Car.t()
   def get_lane(%Car{x_position: x_position}) do
     cond do
       # x = 60 is the limit of right side movement of car in lane 1
@@ -132,7 +163,7 @@ defmodule FormulaX.Race.Car do
   end
 
   # The x and y positions are in pixels from the orign at the left bottom corner of left racing lane
-  @spec get_starting_x_and_y_positions(integer()) :: {integer(), integer()}
+  @spec get_starting_x_and_y_positions(car_id()) :: coordinate()
   defp get_starting_x_and_y_positions(1) do
     {18, 0}
   end

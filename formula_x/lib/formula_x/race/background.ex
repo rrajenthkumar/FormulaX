@@ -26,7 +26,7 @@ defmodule FormulaX.Race.Background do
     struct!(Background, attrs)
   end
 
-  @spec initialize(integer()) :: Background.t()
+  @spec initialize(Race.distance()) :: Background.t()
   def initialize(race_distance) when is_integer(race_distance) do
     available_background_images = Utils.get_images("backgrounds")
     left_side_images = get_side_images(race_distance, available_background_images)
@@ -45,7 +45,7 @@ defmodule FormulaX.Race.Background do
     })
   end
 
-  @spec get_side_images(integer(), filenames()) :: filenames()
+  @spec get_side_images(Race.distance(), filenames()) :: filenames()
   defp get_side_images(race_distance, available_background_images)
        when is_integer(race_distance) and is_list(available_background_images) do
     # 200px is the width of one background image container in Y direction
@@ -61,9 +61,9 @@ defmodule FormulaX.Race.Background do
       when is_atom(player_car_speed) do
     case player_car_speed do
       :rest -> background
-      :slow -> %Background{background | y_position: y_position + 100}
-      :moderate -> %Background{background | y_position: y_position + 175}
-      :high -> %Background{background | y_position: y_position + 250}
+      :slow -> %Background{background | y_position: y_position + 50}
+      :moderate -> %Background{background | y_position: y_position + 75}
+      :high -> %Background{background | y_position: y_position + 100}
     end
   end
 end
