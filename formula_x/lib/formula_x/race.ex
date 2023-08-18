@@ -18,7 +18,7 @@ defmodule FormulaX.Race do
   Distance refers to number of pixels of the screen, cars have to traverse in a race in total, in Y direction.
   """
   @type distance :: integer()
-  @type status :: :countdown | :ongoing | :completed
+  @type status :: :countdown | :ongoing | :aborted | :completed
 
   @typedoc "Race struct"
   typedstruct do
@@ -46,7 +46,6 @@ defmodule FormulaX.Race do
   @spec start(Race.t()) :: Race.t()
   def start(race = %Race{status: :countdown}) do
     %Race{race | status: :ongoing, start_time: Time.utc_now()}
-    # Task of driving computer controlled cars is transferred from here to a separate module. Try to use genserver if it makes sense.
     |> CarController.start()
   end
 

@@ -5,9 +5,8 @@ defmodule FormulaXWeb.RaceLive do
   use FormulaXWeb, :live_view
 
   alias FormulaX.Race
-  alias FormulaX.Race.Background
   alias FormulaX.Race.Car
-  alias FormulaX.Race.CrashDetection
+  alias FormulaX.Race.CarController
 
   def render(assigns) do
     ~H"""
@@ -73,7 +72,7 @@ defmodule FormulaXWeb.RaceLive do
   end
 
   def mount(_params, %{}, socket) do
-    race = Race.initialize()
+    race = FormulaX.Race.initialize()
 
     {:ok, assign(socket, :race, race)}
   end
@@ -157,114 +156,41 @@ defmodule FormulaXWeb.RaceLive do
   def drive_player_car(
         socket = %{
           assigns: %{
-            race: race = %Race{background: background}
+            race: race
           }
         }
       ) do
-    player_car = %Car{speed: speed} = Race.get_player_car(race)
+    updated_race = CarController.drive_player_car(race)
 
-    # Background is moved in opposite direction to simulate car movement
-    updated_background = Background.move(background, speed)
-
-    case CrashDetection.crash?(race, player_car, :forward) do
-      true ->
-        updated_player_car = Car.stop(player_car)
-
-        updated_race =
-          race
-          |> Race.update_background(updated_background)
-          |> Race.update_cars(updated_player_car)
-          |> Race.abort()
-
-        socket = put_flash(socket, :error, "Car crash!!!")
-        assign(socket, :race, updated_race)
-
-      false ->
-        updated_race = Race.update_background(race, updated_background)
-        assign(socket, :race, updated_race)
-    end
-  end
-
-  # For CarController
-  def drive_car(
-        socket = %{
-          assigns: %{
-            race: race = %Race{}
-          }
-        },
-        car = %Car{}
-      ) do
-    case CrashDetection.crash?(race, car, :forward) do
-      true ->
+    socket =
+      if updated_race.status == :aborted do
+        put_flash(socket, :error, "Race aborted due to crash!!!")
+      else
         socket
+      end
 
-      false ->
-        updated_car = Car.drive(car)
-
-        updated_race = Race.update_cars(race, updated_car)
-
-        assign(socket, :race, updated_race)
-    end
+    assign(socket, :race, updated_race)
   end
 
   def steer_player_car(
         socket = %{
           assigns: %{
-            race: race = %Race{}
+            race: race
           }
         },
         direction
       )
       when is_atom(direction) do
-    player_car = Race.get_player_car(race)
+    updated_race = CarController.steer_player_car(race, direction)
 
-    case CrashDetection.crash?(race, player_car, direction) do
-      true ->
-        updated_player_car =
-          player_car
-          |> Car.steer(direction)
-          |> Car.stop()
-
-        updated_race =
-          race
-          |> Race.update_cars(updated_player_car)
-          |> Race.abort()
-
-        socket = put_flash(socket, :error, "Car crash!!!")
-
-        assign(socket, :race, updated_race)
-
-      false ->
-        updated_player_car = Car.steer(player_car, direction)
-
-        updated_race = Race.update_cars(race, updated_player_car)
-
-        assign(socket, :race, updated_race)
-    end
-  end
-
-  # For CarController module
-  def steer_car(
-        socket = %{
-          assigns: %{
-            race: race = %Race{}
-          }
-        },
-        car = %Car{},
-        direction
-      )
-      when is_atom(direction) do
-    case CrashDetection.crash?(race, car, direction) do
-      true ->
+    socket =
+      if updated_race.status == :aborted do
+        put_flash(socket, :error, "Race aborted due to crash!!!")
+      else
         socket
+      end
 
-      false ->
-        updated_car = Car.steer(car, direction)
-
-        updated_race = Race.update_cars(race, updated_car)
-
-        assign(socket, :race, updated_race)
-    end
+    assign(socket, :race, updated_race)
   end
 
   @spec car_position_style(Car.t()) :: String.t()

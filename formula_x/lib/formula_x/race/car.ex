@@ -25,7 +25,7 @@ defmodule FormulaX.Race.Car do
     field(:controller, controller(), enforce: true)
     field(:x_position, x_position(), enforce: true)
     field(:y_position, y_position(), enforce: true)
-    field(:speed, speed(), default: :moderate)
+    field(:speed, speed(), enforce: true)
     field(:completion_time, Time.t(), default: nil)
   end
 
@@ -75,13 +75,15 @@ defmodule FormulaX.Race.Car do
   defp initialize_car(car_id, image, controller)
        when is_integer(car_id) and is_binary(image) and is_atom(controller) do
     {x_position, y_position} = get_starting_x_and_y_positions(car_id)
+    speed = Enum.random([:low, :moderate, :high])
 
     new(%{
       car_id: car_id,
       image: image,
       controller: controller,
       x_position: x_position,
-      y_position: y_position
+      y_position: y_position,
+      speed: speed
     })
   end
 
@@ -94,25 +96,47 @@ defmodule FormulaX.Race.Car do
     %Car{car | x_position: x_position + 5}
   end
 
-  @spec drive(Car.t()) :: Car.t()
-  def drive(car = %Car{y_position: y_position, speed: :slow}) do
-    %Car{car | y_position: y_position + 50}
+  @spec drive(Car.t(), integer()) :: Car.t()
+  def drive(
+        car = %Car{speed: :rest},
+        _position_correction_factor
+      ) do
+    car
   end
 
-  def drive(car = %Car{y_position: y_position, speed: :moderate}) do
-    %Car{car | y_position: y_position + 75}
+  def drive(
+        car = %Car{
+          y_position: y_position,
+          speed: :low
+        },
+        position_correction_factor
+      ) do
+    updated_y_position = y_position + 50 + position_correction_factor
+    %Car{car | y_position: updated_y_position}
   end
 
-  def drive(car = %Car{y_position: y_position, speed: :high}) do
-    %Car{car | y_position: y_position + 100}
+  def drive(
+        car = %Car{y_position: y_position, speed: :moderate},
+        position_correction_factor
+      ) do
+    updated_y_position = y_position + 75 + position_correction_factor
+    %Car{car | y_position: updated_y_position}
+  end
+
+  def drive(
+        car = %Car{y_position: y_position, speed: :high},
+        position_correction_factor
+      ) do
+    updated_y_position = y_position + 100 + position_correction_factor
+    %Car{car | y_position: updated_y_position}
   end
 
   @spec accelerate(Car.t()) :: Car.t()
   def accelerate(car = %Car{speed: :rest}) do
-    %Car{car | speed: :slow}
+    %Car{car | speed: :low}
   end
 
-  def accelerate(car = %Car{speed: :slow}) do
+  def accelerate(car = %Car{speed: :low}) do
     %Car{car | speed: :moderate}
   end
 
@@ -129,12 +153,12 @@ defmodule FormulaX.Race.Car do
     car
   end
 
-  def decelerate(car = %Car{speed: :slow}) do
+  def decelerate(car = %Car{speed: :low}) do
     %Car{car | speed: :rest}
   end
 
   def decelerate(car = %Car{speed: :moderate}) do
-    %Car{car | speed: :slow}
+    %Car{car | speed: :low}
   end
 
   def decelerate(car = %Car{speed: :high}) do
@@ -143,7 +167,7 @@ defmodule FormulaX.Race.Car do
 
   @spec start(Car.t()) :: Car.t()
   def start(car = %Car{speed: :rest}) do
-    %Car{car | speed: :slow}
+    %Car{car | speed: :low}
   end
 
   @spec stop(Car.t()) :: Car.t()

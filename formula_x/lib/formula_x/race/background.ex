@@ -61,7 +61,7 @@ defmodule FormulaX.Race.Background do
       when is_atom(player_car_speed) do
     case player_car_speed do
       :rest -> background
-      :slow -> %Background{background | y_position: y_position + 50}
+      :low -> %Background{background | y_position: y_position + 50}
       :moderate -> %Background{background | y_position: y_position + 75}
       :high -> %Background{background | y_position: y_position + 100}
     end
