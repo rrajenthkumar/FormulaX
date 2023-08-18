@@ -32,11 +32,12 @@ defmodule FormulaX.Race.Background do
     left_side_images = get_side_images(race_distance, available_background_images)
     right_side_images = get_side_images(race_distance, available_background_images)
 
-    # To bring the bottom of the background block
+    # The origin of background div is at Top left corner of screen is .
+    # To bring the bottom of the background strips on both sides
     # to the origin point of cars (bottom left corner of left racing lane)
+    # This has to be avoided by correcting css if possible!!!
+    y_position = -race_distance + 560
     # 560px is the console screen height
-    # This has to be avoided by correcting css if possible
-    y_position = 560 + race_distance * -1
 
     new(%{
       left_side_images: left_side_images,

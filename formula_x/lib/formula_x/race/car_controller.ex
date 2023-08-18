@@ -75,10 +75,7 @@ defmodule FormulaX.Race.CarController do
   end
 
   def drive_computer_controlled_car(
-        race = %Race{
-          distance: race_distance,
-          background: %Background{y_position: background_y_position}
-        },
+        race = %Race{},
         car = %Car{}
       ) do
     case CrashDetection.crash?(race, car, :forward) do
@@ -86,9 +83,10 @@ defmodule FormulaX.Race.CarController do
         race
 
       false ->
-        # To be checked if it is correct
-        position_correction_factor = background_y_position - 560 + race_distance
-        updated_car = Car.drive(car, position_correction_factor)
+        updated_car =
+          car
+          |> Car.drive()
+          |> Car.adapt_car_position_with_reference_to_background(race)
 
         Race.update_cars(race, updated_car)
     end

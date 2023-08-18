@@ -4,7 +4,6 @@ defmodule FormulaX.Race.CrashDetection do
   by Race module to alert player car crash
   """
   alias FormulaX.Race
-  alias FormulaX.Race.Background
   alias FormulaX.Race.Car
 
   @spec crash?(Race.t(), Car.t(), :forward | :left | :right) :: boolean()
@@ -118,10 +117,7 @@ defmodule FormulaX.Race.CrashDetection do
   end
 
   def crash?(
-        race = %Race{
-          distance: race_distance,
-          background: %Background{y_position: background_y_position}
-        },
+        race = %Race{},
         querying_car = %Car{
           y_position: querying_car_y_position,
           speed: querying_car_speed,
@@ -164,14 +160,15 @@ defmodule FormulaX.Race.CrashDetection do
         false
 
       [car_in_the_front] ->
-        # To be checked if it is correct
-        position_correction_factor =
+        querying_car_after_moving_forward =
           case querying_car_controller do
-            :computer -> background_y_position - 560 + race_distance
-            :player -> 0
-          end
+            :computer ->
+              Car.drive(querying_car)
+              |> Car.adapt_car_position_with_reference_to_background(race)
 
-        querying_car_after_moving_forward = Car.drive(querying_car, position_correction_factor)
+            :player ->
+              Car.drive(querying_car)
+          end
 
         crash_between_cars?(
           querying_car_after_moving_forward,

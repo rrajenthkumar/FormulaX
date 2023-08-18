@@ -5,6 +5,8 @@ defmodule FormulaX.Race.Car do
   use TypedStruct
 
   alias __MODULE__
+  alias FormulaX.Race
+  alias FormulaX.Race.Background
   alias FormulaX.Utils
 
   @typedoc "There will be 6 cars in total in a race"
@@ -96,11 +98,8 @@ defmodule FormulaX.Race.Car do
     %Car{car | x_position: x_position + 5}
   end
 
-  @spec drive(Car.t(), integer()) :: Car.t()
-  def drive(
-        car = %Car{speed: :rest},
-        _position_correction_factor
-      ) do
+  @spec drive(Car.t()) :: Car.t()
+  def drive(car = %Car{speed: :rest}) do
     car
   end
 
@@ -108,26 +107,19 @@ defmodule FormulaX.Race.Car do
         car = %Car{
           y_position: y_position,
           speed: :low
-        },
-        position_correction_factor
+        }
       ) do
-    updated_y_position = y_position + 50 + position_correction_factor
+    updated_y_position = y_position + 50
     %Car{car | y_position: updated_y_position}
   end
 
-  def drive(
-        car = %Car{y_position: y_position, speed: :moderate},
-        position_correction_factor
-      ) do
-    updated_y_position = y_position + 75 + position_correction_factor
+  def drive(car = %Car{y_position: y_position, speed: :moderate}) do
+    updated_y_position = y_position + 75
     %Car{car | y_position: updated_y_position}
   end
 
-  def drive(
-        car = %Car{y_position: y_position, speed: :high},
-        position_correction_factor
-      ) do
-    updated_y_position = y_position + 100 + position_correction_factor
+  def drive(car = %Car{y_position: y_position, speed: :high}) do
+    updated_y_position = y_position + 100
     %Car{car | y_position: updated_y_position}
   end
 
@@ -184,6 +176,25 @@ defmodule FormulaX.Race.Car do
       x_position > 60 and x_position <= 160 -> 2
       x_position > 160 -> 3
     end
+  end
+
+  @doc """
+  Function to find the correct position of computer controlled cars on the screen
+
+  This is done because the background has already been offset by the value '- race_distance + 560px' in Y direction, to shift its origin to the origin of cars.
+  Also the 'background_y_position' value reflects the correct position of player car. SO we have to adjust the computer controlled cars w.r.t background position.
+  """
+  @spec adapt_car_position_with_reference_to_background(Car.t(), Race.t()) :: Car.t()
+  def adapt_car_position_with_reference_to_background(
+        car = %Car{y_position: car_y_position},
+        %Race{
+          distance: race_distance,
+          background: %Background{y_position: background_y_position}
+        }
+      ) do
+    adapted_car_y_position = car_y_position - (background_y_position - 560 + race_distance)
+
+    %Car{car | y_position: adapted_car_y_position}
   end
 
   # The x and y positions are in pixels from the orign at the left bottom corner of left racing lane
