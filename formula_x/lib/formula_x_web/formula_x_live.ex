@@ -65,8 +65,8 @@ defmodule FormulaXWeb.RaceLive do
   defp direction_controls(assigns) do
     ~H"""
     <div class="direction_controls">
-      <a class="left" href="#" phx-click="steer_left"></a>
-      <a class="right" href="#" phx-click="steer_right"></a>
+      <a class="left" href="#" phx-click="move_left"></a>
+      <a class="right" href="#" phx-click="move_right"></a>
     </div>
     """
   end
@@ -90,7 +90,7 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket
       ) do
-    socket = drive_player_car(socket)
+    socket = move_player_car(socket, :forward)
 
     {:noreply, socket}
   end
@@ -100,7 +100,7 @@ defmodule FormulaXWeb.RaceLive do
         %{"key" => "ArrowUp"},
         socket
       ) do
-    socket = drive_player_car(socket)
+    socket = move_player_car(socket, :forward)
 
     {:noreply, socket}
   end
@@ -113,18 +113,18 @@ defmodule FormulaXWeb.RaceLive do
     {:noreply, socket}
   end
 
-  def handle_event("steer_right", _params, socket) do
-    socket = steer_player_car(socket, :right)
+  def handle_event("move_right", _params, socket) do
+    socket = move_player_car(socket, :right)
     {:noreply, socket}
   end
 
   def handle_event("keydown", %{"key" => "ArrowRight"}, socket) do
-    socket = steer_player_car(socket, :right)
+    socket = move_player_car(socket, :right)
     {:noreply, socket}
   end
 
-  def handle_event("steer_left", _params, socket) do
-    socket = steer_player_car(socket, :left)
+  def handle_event("move_left", _params, socket) do
+    socket = move_player_car(socket, :left)
     {:noreply, socket}
   end
 
@@ -133,7 +133,7 @@ defmodule FormulaXWeb.RaceLive do
         %{"key" => "ArrowLeft"},
         socket
       ) do
-    socket = steer_player_car(socket, :left)
+    socket = move_player_car(socket, :left)
     {:noreply, socket}
   end
 
@@ -153,26 +153,7 @@ defmodule FormulaXWeb.RaceLive do
     {:ok, assign(socket, :race, race)}
   end
 
-  def drive_player_car(
-        socket = %{
-          assigns: %{
-            race: race
-          }
-        }
-      ) do
-    updated_race = CarController.drive_player_car(race)
-
-    socket =
-      if updated_race.status == :aborted do
-        put_flash(socket, :error, "Race aborted due to crash!!!")
-      else
-        socket
-      end
-
-    assign(socket, :race, updated_race)
-  end
-
-  def steer_player_car(
+  def move_player_car(
         socket = %{
           assigns: %{
             race: race
@@ -181,7 +162,7 @@ defmodule FormulaXWeb.RaceLive do
         direction
       )
       when is_atom(direction) do
-    updated_race = CarController.steer_player_car(race, direction)
+    updated_race = CarController.move_player_car(race, direction)
 
     socket =
       if updated_race.status == :aborted do

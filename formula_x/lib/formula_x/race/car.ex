@@ -92,24 +92,23 @@ defmodule FormulaX.Race.Car do
     })
   end
 
-  @spec steer(Car.t(), :left | :right) :: Car.t()
-  def steer(car = %Car{x_position: x_position}, :left) do
+  @spec move(Car.t(), :left | :right | :forward) :: Car.t()
+  def move(car = %Car{x_position: x_position}, :left) do
     car_sideward_movement_step = Parameters.car_sideward_movement_step()
     %Car{car | x_position: x_position - car_sideward_movement_step}
   end
 
-  def steer(car = %Car{x_position: x_position}, :right) do
+  def move(car = %Car{x_position: x_position}, :right) do
     car_sideward_movement_step = Parameters.car_sideward_movement_step()
     %Car{car | x_position: x_position + car_sideward_movement_step}
   end
 
-  @spec drive(Car.t()) :: Car.t()
-
-  def drive(
+  def move(
         car = %Car{
           y_position: y_position,
           speed: speed
-        }
+        },
+        :forward
       ) do
     car_forward_movement_step = Parameters.car_forward_movement_step(speed)
     updated_y_position = y_position + car_forward_movement_step

@@ -54,11 +54,11 @@ defmodule FormulaX.Race.CrashDetection do
             )
           end)
 
-        querying_car_after_steering_left = Car.steer(querying_car, movement_direction)
+        querying_car_after_moving_left = Car.move(querying_car, movement_direction)
 
         Enum.any?(left_lane_cars_in_the_vicinity, fn left_lane_car ->
           crash_between_cars?(
-            querying_car_after_steering_left,
+            querying_car_after_moving_left,
             left_lane_car,
             movement_direction
           )
@@ -107,11 +107,11 @@ defmodule FormulaX.Race.CrashDetection do
             )
           end)
 
-        querying_car_after_steering_right = Car.steer(querying_car, movement_direction)
+        querying_car_after_moving_right = Car.move(querying_car, movement_direction)
 
         Enum.any?(right_lane_cars_in_the_vicinity, fn right_lane_car ->
           crash_between_cars?(
-            querying_car_after_steering_right,
+            querying_car_after_moving_right,
             right_lane_car,
             movement_direction
           )
@@ -162,11 +162,11 @@ defmodule FormulaX.Race.CrashDetection do
         querying_car_after_moving_forward =
           case querying_car_controller do
             :computer ->
-              Car.drive(querying_car)
+              Car.move(querying_car, :forward)
               |> Car.adapt_car_position_with_reference_to_background(race)
 
             :player ->
-              Car.drive(querying_car)
+              Car.move(querying_car, :forward)
           end
 
         crash_between_cars?(
