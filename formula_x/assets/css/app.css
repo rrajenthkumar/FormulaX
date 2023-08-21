@@ -3,6 +3,7 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+/* Keep console screen, lane, car dimensions same as in FormulaX.Race.Parameters module */
 .race_live {
   @apply flex justify-center items-center h-[calc(100vh-2.5rem)] pt-10;
   background-color: #fffff0d4;
@@ -46,7 +47,7 @@
 }
 
 .race_live .console .screen .background .image_container {
-  /* Every image container is 12.5rem(200px) wide along Y axis */
+  /* Every image container is 12.5rem(200px) long along Y axis */
   @apply w-full h-[12.5rem] flex items-center justify-center;
 }
 
@@ -72,7 +73,8 @@
 }
 
 .race_live .console .screen .race .cars img {
-  @apply w-14 h-28 absolute;
+  @apply w-[55px] absolute;
+  aspect-ratio: 0.5;
 }
 
 .race_live .console .direction_controls {

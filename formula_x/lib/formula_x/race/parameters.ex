@@ -2,6 +2,7 @@ defmodule FormulaX.Race.Parameters do
   @moduledoc """
   All the racing game related parameters are defined here.
   All numbers are in pixels.
+  !!! Keep all the values in this module as factors of 5 to be in sync with position_range_step() fn !!!
   TO DO: When it makes sense the values defined in this module should be defined as environment variables
   """
 
@@ -56,7 +57,8 @@ defmodule FormulaX.Race.Parameters do
   """
   @spec car_dimensions() :: map()
   def car_dimensions() do
-    %{width: 56, length: 112}
+    width = 55
+    %{width: width, length: 2 * width}
   end
 
   @doc """
@@ -65,7 +67,7 @@ defmodule FormulaX.Race.Parameters do
   """
   @spec car_initial_positions() :: list(Car.coordinates())
   def car_initial_positions() do
-    [{18, 0}, {18, 115}, {116, 0}, {116, 115}, {214, 0}, {214, 115}]
+    [{20, 0}, {20, 115}, {115, 0}, {115, 115}, {210, 0}, {210, 115}]
   end
 
   @spec number_of_cars() :: integer()
@@ -93,6 +95,16 @@ defmodule FormulaX.Race.Parameters do
 
   @spec car_sideward_movement_step() :: pixel_value()
   def car_sideward_movement_step() do
+    5
+  end
+
+  @doc """
+  This is the step value used to create x and y position ranges used in Crash Detection module.
+  It is set to a value of 5 because the car border coordinates those will result after any kind of car movement have been ensured to be as factors of 5.
+  So the number of coordinates that will be used in crash checks will not be too many.
+  """
+  @spec position_range_step() :: integer()
+  def position_range_step() do
     5
   end
 end

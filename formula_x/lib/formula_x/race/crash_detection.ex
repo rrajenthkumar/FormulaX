@@ -9,6 +9,7 @@ defmodule FormulaX.Race.CrashDetection do
 
   @car_width Parameters.car_dimensions().width
   @car_length Parameters.car_dimensions().length
+  @position_range_step Parameters.position_range_step()
 
   @spec crash?(Race.t(), Car.t(), :forward | :left | :right) :: boolean()
   def crash?(
@@ -42,7 +43,7 @@ defmodule FormulaX.Race.CrashDetection do
 
         y_positions_for_vicinity_check =
           (querying_car_y_position - div(@car_length, 2))..(querying_car_y_position + @car_length +
-                                                              div(@car_length, 2))
+                                                              div(@car_length, 2))//@position_range_step
 
         left_lane_cars_in_the_vicinity =
           Enum.filter(left_lane_cars, fn %Car{y_position: left_lane_car_y_position} ->
@@ -95,7 +96,7 @@ defmodule FormulaX.Race.CrashDetection do
 
         y_positions_for_vicinity_check =
           (querying_car_y_position - div(@car_length, 2))..(querying_car_y_position + @car_length +
-                                                              div(@car_length, 2))
+                                                              div(@car_length, 2))//@position_range_step
 
         right_lane_cars_in_the_vicinity =
           Enum.filter(right_lane_cars, fn %Car{y_position: right_lane_car_y_position} ->
@@ -142,7 +143,7 @@ defmodule FormulaX.Race.CrashDetection do
           car_forward_movement_step = Parameters.car_forward_movement_step(querying_car_speed)
 
           (querying_car_y_position + @car_length)..(querying_car_y_position + @car_length +
-                                                      car_forward_movement_step)
+                                                      car_forward_movement_step)//@position_range_step
       end
 
     result =
@@ -245,30 +246,39 @@ defmodule FormulaX.Race.CrashDetection do
          %Car{x_position: car_edge_x, y_position: car_edge_y},
          :front
        ) do
-    Enum.map(car_edge_x..(car_edge_x + @car_width), fn x -> {x, car_edge_y + @car_length} end)
+    Enum.map(car_edge_x..(car_edge_x + @car_width)//@position_range_step, fn x ->
+      {x, car_edge_y + @car_length}
+    end)
   end
 
   defp get_car_border_coordinates(
          %Car{x_position: car_edge_x, y_position: car_edge_y},
          :rear
        ) do
-    Enum.map(car_edge_x..(car_edge_x + @car_width), fn x -> {x, car_edge_y} end)
+    Enum.map(car_edge_x..(car_edge_x + @car_width)//@position_range_step, fn x ->
+      {x, car_edge_y}
+    end)
   end
 
   defp get_car_border_coordinates(
          %Car{x_position: car_edge_x, y_position: car_edge_y},
          :left
        ) do
-    Enum.map(car_edge_y..(car_edge_y + @car_length), fn y -> {car_edge_x, y} end)
+    Enum.map(car_edge_y..(car_edge_y + @car_length)//@position_range_step, fn y ->
+      {car_edge_x, y}
+    end)
   end
 
   defp get_car_border_coordinates(
          %Car{x_position: car_edge_x, y_position: car_edge_y},
          :right
        ) do
-    Enum.map(car_edge_y..(car_edge_y + @car_length), fn y -> {car_edge_x + @car_width, y} end)
+    Enum.map(car_edge_y..(car_edge_y + @car_length)//@position_range_step, fn y ->
+      {car_edge_x + @car_width, y}
+    end)
   end
 
+  @spec get_lane_limits(integer()) :: map()
   defp get_lane_limits(lane) do
     Parameters.lanes()
     |> Enum.find(fn %{lane_number: lane_number} -> lane_number == lane end)
