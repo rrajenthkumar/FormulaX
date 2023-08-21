@@ -7,7 +7,6 @@ defmodule FormulaX.Race do
   alias __MODULE__
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
-  alias FormulaX.Race.CarController
   alias FormulaX.Race.Parameters
 
   @type cars :: list(Car.t())
@@ -43,7 +42,6 @@ defmodule FormulaX.Race do
   @spec start(Race.t()) :: Race.t()
   def start(race = %Race{status: :countdown}) do
     %Race{race | status: :ongoing, start_time: Time.utc_now()}
-    |> CarController.start()
   end
 
   @spec update_background(Race.t(), Background.t()) :: Race.t()
@@ -67,12 +65,6 @@ defmodule FormulaX.Race do
 
   @spec abort(Race.t()) :: Race.t()
   def abort(race = %Race{status: :ongoing}) do
-    %Race{race | status: :aborted}
-  end
-
-  # to be removed
-  @spec abort(Race.t()) :: Race.t()
-  def abort(race = %Race{}) do
     %Race{race | status: :aborted}
   end
 

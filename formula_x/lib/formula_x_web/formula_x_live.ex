@@ -72,9 +72,15 @@ defmodule FormulaXWeb.RaceLive do
   end
 
   def mount(_params, %{}, socket) do
-    race = Race.initialize()
+    race =
+      Race.initialize()
+      |> Race.start()
 
-    {:ok, assign(socket, :race, race)}
+    CarController.start(race, self())
+
+    socket = assign(socket, :race, race)
+
+    {:ok, socket}
   end
 
   def handle_event(
@@ -134,6 +140,15 @@ defmodule FormulaXWeb.RaceLive do
   end
 
   def handle_info(
+        {:update_race, race = %Race{}},
+        socket
+      ) do
+    socket = assign(socket, :race, race)
+
+    {:noreply, socket}
+  end
+
+  def handle_info(
         :clash_detected,
         socket
       ) do
@@ -179,7 +194,7 @@ defmodule FormulaXWeb.RaceLive do
     "left: #{x_position}px; bottom: #{y_position}px;"
   end
 
-  @spec car_position_style(Car.y_position()) :: String.t()
+  @spec background_position_style(Car.y_position()) :: String.t()
   defp background_position_style(y_position) when is_integer(y_position) do
     "top: #{y_position}px"
   end

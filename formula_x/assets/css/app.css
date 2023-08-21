@@ -75,6 +75,7 @@
 .race_live .console .screen .race .cars img {
   @apply w-[55px] absolute;
   aspect-ratio: 0.5;
+  transition: left 1s ease-out, bottom 1s ease-out;
 }
 
 .race_live .console .direction_controls {
