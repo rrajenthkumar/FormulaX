@@ -1,6 +1,7 @@
 defmodule FormulaX.Race.CarController do
   @moduledoc """
-  Module which controls all cars
+  **Car Controller context**
+  This module takes care of controlling the player and computer controlled cars
   """
   alias FormulaX.Race
   alias FormulaX.Race.Background
@@ -14,7 +15,7 @@ defmodule FormulaX.Race.CarController do
   @doc """
   Start the controller.
   """
-  # This has to be somehow made to keep driving the cars until race distance is reached by all cars. It is incomplete now.
+  # TO DO: This has to be somehow made to keep driving the cars until race distance is reached by all cars..
   def start(race = %Race{}) do
     GenServer.start_link(__MODULE__, race, name: __MODULE__)
   end
@@ -54,10 +55,12 @@ defmodule FormulaX.Race.CarController do
     end
   end
 
+  @doc """
+  Background is moved in opposite direction to simulate player car movement
+  """
   def drive_player_car(race = %Race{background: background}) do
     player_car = Race.get_player_car(race)
 
-    # Background is moved in opposite direction to simulate car movement
     updated_background = Background.move(background, player_car.speed)
 
     case CrashDetection.crash?(race, player_car, :forward) do

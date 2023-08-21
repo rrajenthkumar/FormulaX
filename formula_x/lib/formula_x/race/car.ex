@@ -1,16 +1,16 @@
 defmodule FormulaX.Race.Car do
   @moduledoc """
-  Car context
+  **Car context**
   """
   use TypedStruct
 
   alias __MODULE__
   alias FormulaX.Race
   alias FormulaX.Race.Background
+  alias FormulaX.Race.Parameters
   alias FormulaX.Utils
 
-  @typedoc "There will be 6 cars in total in a race"
-  @type car_id :: 1..6
+  @type car_id :: integer()
   @type filename :: String.t()
   @type controller :: :player | :computer
   @typedoc "Position on screen in pixels where the car appears along the X direction"
@@ -18,7 +18,7 @@ defmodule FormulaX.Race.Car do
   @typedoc "Position on screen in pixels where the car appears along the Y direction"
   @type y_position :: integer()
   @type speed :: :rest | :low | :moderate | :high
-  @type coordinate :: {x_position(), y_position()}
+  @type coordinates :: {x_position(), y_position()}
 
   @typedoc "Car struct"
   typedstruct do
@@ -38,7 +38,10 @@ defmodule FormulaX.Race.Car do
 
   @spec initialize_cars() :: list(Car.t())
   def initialize_cars() do
-    possible_ids = [1, 2, 3, 4, 5, 6]
+    possible_ids =
+      1..Parameters.number_of_cars()
+      |> Enum.to_list()
+
     player_car_id = Enum.random(possible_ids)
 
     available_car_images = Utils.get_images("cars")
@@ -91,35 +94,25 @@ defmodule FormulaX.Race.Car do
 
   @spec steer(Car.t(), :left | :right) :: Car.t()
   def steer(car = %Car{x_position: x_position}, :left) do
-    %Car{car | x_position: x_position - 5}
+    car_sideward_movement_step = Parameters.car_sideward_movement_step()
+    %Car{car | x_position: x_position - car_sideward_movement_step}
   end
 
   def steer(car = %Car{x_position: x_position}, :right) do
-    %Car{car | x_position: x_position + 5}
+    car_sideward_movement_step = Parameters.car_sideward_movement_step()
+    %Car{car | x_position: x_position + car_sideward_movement_step}
   end
 
   @spec drive(Car.t()) :: Car.t()
-  def drive(car = %Car{speed: :rest}) do
-    car
-  end
 
   def drive(
         car = %Car{
           y_position: y_position,
-          speed: :low
+          speed: speed
         }
       ) do
-    updated_y_position = y_position + 50
-    %Car{car | y_position: updated_y_position}
-  end
-
-  def drive(car = %Car{y_position: y_position, speed: :moderate}) do
-    updated_y_position = y_position + 75
-    %Car{car | y_position: updated_y_position}
-  end
-
-  def drive(car = %Car{y_position: y_position, speed: :high}) do
-    updated_y_position = y_position + 100
+    car_forward_movement_step = Parameters.car_forward_movement_step(speed)
+    updated_y_position = y_position + car_forward_movement_step
     %Car{car | y_position: updated_y_position}
   end
 
@@ -167,22 +160,34 @@ defmodule FormulaX.Race.Car do
     %Car{car | speed: :rest}
   end
 
-  @spec get_lane(Car.t()) :: Car.t()
-  def get_lane(%Car{x_position: x_position}) do
-    cond do
-      # x = 60 is the limit of right side movement of car in lane 1
-      # x = 160 is the limit of right side movement of car in lane 2
-      x_position <= 60 -> 1
-      x_position > 60 and x_position <= 160 -> 2
-      x_position > 160 -> 3
-    end
+  # TO DO: Improve
+  @spec get_lane(Car.t()) :: integer()
+  def get_lane(%Car{x_position: car_x_position}) do
+    %{x_end: driving_area_x_end} = Parameters.driving_area_limits()
+
+    lanes = Parameters.lanes()
+
+    default_lane_info =
+      if(car_x_position > driving_area_x_end) do
+        Enum.find(lanes, fn %{lane_number: lane_number} -> lane_number == 3 end)
+      else
+        Enum.find(lanes, fn %{lane_number: lane_number} -> lane_number == 1 end)
+      end
+
+    lanes
+    |> Enum.find(
+      default_lane_info,
+      fn %{x_start: lane_x_start, x_end: lane_x_end} ->
+        car_x_position in lane_x_start..lane_x_end
+      end
+    )
+    |> Map.fetch!(:lane_number)
   end
 
   @doc """
-  Function to find the correct position of computer controlled cars on the screen
+  Function to position computer controlled cars correctly on the screen.
 
-  This is done because the background has already been offset by the value '- race_distance + 560px' in Y direction, to shift its origin to the origin of cars.
-  Also the 'background_y_position' value reflects the correct position of player car. SO we have to adjust the computer controlled cars w.r.t background position.
+  The background has already been offset by the value 'console_screen_height-race_distance' in Y direction, to shift its Y position reference to the Y position reference of cars. Also the 'background_y_position' value reflects the correct position of player car. So we have to adjust the computer controlled cars w.r.t background position.
   """
   @spec adapt_car_position_with_reference_to_background(Car.t(), Race.t()) :: Car.t()
   def adapt_car_position_with_reference_to_background(
@@ -192,34 +197,18 @@ defmodule FormulaX.Race.Car do
           background: %Background{y_position: background_y_position}
         }
       ) do
-    adapted_car_y_position = car_y_position - (background_y_position - 560 + race_distance)
+    console_screen_height = Parameters.console_screen_height()
+
+    adapted_car_y_position =
+      car_y_position -
+        (background_y_position + race_distance - console_screen_height)
 
     %Car{car | y_position: adapted_car_y_position}
   end
 
-  # The x and y positions are in pixels from the orign at the left bottom corner of left racing lane
-  @spec get_starting_x_and_y_positions(car_id()) :: coordinate()
-  defp get_starting_x_and_y_positions(1) do
-    {18, 0}
-  end
-
-  defp get_starting_x_and_y_positions(2) do
-    {18, 115}
-  end
-
-  defp get_starting_x_and_y_positions(3) do
-    {116, 0}
-  end
-
-  defp get_starting_x_and_y_positions(4) do
-    {116, 115}
-  end
-
-  defp get_starting_x_and_y_positions(5) do
-    {214, 0}
-  end
-
-  defp get_starting_x_and_y_positions(6) do
-    {214, 115}
+  @spec get_starting_x_and_y_positions(car_id()) :: coordinates()
+  defp get_starting_x_and_y_positions(car_id) do
+    Parameters.car_initial_positions()
+    |> Enum.at(car_id - 1)
   end
 end

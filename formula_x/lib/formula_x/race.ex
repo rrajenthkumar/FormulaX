@@ -1,6 +1,6 @@
 defmodule FormulaX.Race do
   @moduledoc """
-  Race context
+  **Race context**
   """
   use TypedStruct
 
@@ -8,10 +8,7 @@ defmodule FormulaX.Race do
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
   alias FormulaX.Race.CarController
-
-  # Race distance is measured in pixels
-  # To be eventually set as RACE_DISTANCE in config
-  @race_distance 100_000
+  alias FormulaX.Race.Parameters
 
   @type cars :: list(Car.t())
   @typedoc """
@@ -37,7 +34,7 @@ defmodule FormulaX.Race do
   @spec initialize() :: Race.t()
   def initialize() do
     cars = Car.initialize_cars()
-    race_distance = @race_distance
+    race_distance = Parameters.race_distance()
     background = Background.initialize(race_distance)
 
     new(%{cars: cars, background: background, distance: race_distance})
