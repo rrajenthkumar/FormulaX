@@ -159,15 +159,7 @@ defmodule FormulaX.Race.CrashDetection do
         false
 
       [car_in_the_front] ->
-        querying_car_after_moving_forward =
-          case querying_car_controller do
-            :computer ->
-              Car.move(querying_car, :forward)
-              |> Car.adapt_car_position_with_reference_to_background(race)
-
-            :player ->
-              Car.move(querying_car, :forward)
-          end
+        querying_car_after_moving_forward = Car.move(querying_car, :forward)
 
         crash_between_cars?(
           querying_car_after_moving_forward,
@@ -177,7 +169,7 @@ defmodule FormulaX.Race.CrashDetection do
     end
   end
 
-  @spec get_crash_check_parameters(Race.t(), Car.t()) :: {Car.t(), integer(), map()}
+  @spec get_crash_check_parameters(Race.t(), Car.t()) :: {map(), integer()}
   defp get_crash_check_parameters(%Race{cars: cars}, querying_car) do
     querying_car_lane = Car.get_lane(querying_car)
     lanes_and_cars_map = Enum.group_by(cars, &Car.get_lane/1, & &1)

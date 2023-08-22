@@ -1,13 +1,15 @@
 defmodule FormulaXWeb.RaceLive do
   @moduledoc """
-  Liveview that runs the race
+  Liveview to view and control the racing game
   """
   use FormulaXWeb, :live_view
 
   alias FormulaX.Race
   alias FormulaX.Race.Car
-  alias FormulaX.Race.CarController
+  alias FormulaX.Race.CarDriveServer
+  alias FormulaX.Race.CarControl
 
+  @impl true
   def render(assigns) do
     ~H"""
     <div class="race_live" phx-window-keydown="keydown">
@@ -34,8 +36,8 @@ defmodule FormulaXWeb.RaceLive do
   defp speed_controls(assigns) do
     ~H"""
     <div class="speed_controls">
-      <a class="top" href="#" phx-click="move"></a>
-      <a class="bottom" href="#" phx-click="slow_down"></a>
+      <a class="top" href="#" phx-click="speedup"></a>
+      <a class="bottom" href="#" phx-click="slowdown"></a>
     </div>
     """
   end
@@ -71,24 +73,30 @@ defmodule FormulaXWeb.RaceLive do
     """
   end
 
+  @impl true
   def mount(_params, %{}, socket) do
     race =
       Race.initialize()
-      |> Race.start()
+      |> Race.flag_off()
 
-    CarController.start(race, self())
+    CarDriveServer.start(race, self())
 
     socket = assign(socket, :race, race)
 
     {:ok, socket}
   end
 
+  @impl true
   def handle_event(
-        "move",
+        "speedup",
         _params,
-        socket
+        socket = %{
+          assigns: %{
+            race: race
+          }
+        }
       ) do
-    socket = move_player_car(socket, :forward)
+    CarControl.change_player_car_speed(race, :speedup)
 
     {:noreply, socket}
   end
@@ -96,42 +104,94 @@ defmodule FormulaXWeb.RaceLive do
   def handle_event(
         "keydown",
         %{"key" => "ArrowUp"},
-        socket
+        socket = %{
+          assigns: %{
+            race: race
+          }
+        }
       ) do
-    socket = move_player_car(socket, :forward)
+    CarControl.change_player_car_speed(race, :speedup)
 
     {:noreply, socket}
   end
 
-  def handle_event("move_right", _params, socket) do
-    socket = move_player_car(socket, :right)
+  def handle_event(
+        "slowdown",
+        _params,
+        socket = %{
+          assigns: %{
+            race: race
+          }
+        }
+      ) do
+    CarControl.change_player_car_speed(race, :slowdown)
+
     {:noreply, socket}
   end
 
-  def handle_event("keydown", %{"key" => "ArrowRight"}, socket) do
-    socket = move_player_car(socket, :right)
+  def handle_event(
+        "keydown",
+        %{"key" => "ArrowDown"},
+        socket = %{
+          assigns: %{
+            race: race
+          }
+        }
+      ) do
+    CarControl.change_player_car_speed(race, :slowdown)
+
     {:noreply, socket}
   end
 
-  def handle_event("move_left", _params, socket) do
-    socket = move_player_car(socket, :left)
+  def handle_event(
+        "move_right",
+        _params,
+        socket = %{
+          assigns: %{
+            race: race
+          }
+        }
+      ) do
+    CarControl.move_player_car(race, :right)
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "keydown",
+        %{"key" => "ArrowRight"},
+        socket = %{
+          assigns: %{
+            race: race
+          }
+        }
+      ) do
+    CarControl.move_player_car(race, :right)
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "move_left",
+        _params,
+        socket = %{
+          assigns: %{
+            race: race
+          }
+        }
+      ) do
+    CarControl.move_player_car(race, :left)
     {:noreply, socket}
   end
 
   def handle_event(
         "keydown",
         %{"key" => "ArrowLeft"},
-        socket
+        socket = %{
+          assigns: %{
+            race: race
+          }
+        }
       ) do
-    socket = move_player_car(socket, :left)
-    {:noreply, socket}
-  end
-
-  def handle_event("slow_down", _params, socket) do
-    {:noreply, socket}
-  end
-
-  def handle_event("keydown", %{"key" => "ArrowDown"}, socket) do
+    CarControl.move_player_car(race, :left)
     {:noreply, socket}
   end
 
@@ -139,11 +199,16 @@ defmodule FormulaXWeb.RaceLive do
     {:noreply, socket}
   end
 
+  @impl true
   def handle_info(
-        {:update_race, race = %Race{}},
+        {:update_race, race = %Race{status: status}},
         socket
       ) do
     socket = assign(socket, :race, race)
+
+    if status == :aborted do
+      Process.send_after(self(), :clash_detected, 500)
+    end
 
     {:noreply, socket}
   end
@@ -166,24 +231,6 @@ defmodule FormulaXWeb.RaceLive do
     socket = assign(socket, :race, Race.initialize())
 
     {:noreply, socket}
-  end
-
-  def move_player_car(
-        socket = %{
-          assigns: %{
-            race: race
-          }
-        },
-        direction
-      )
-      when is_atom(direction) do
-    updated_race = %Race{status: status} = CarController.move_player_car(race, direction)
-
-    if status == :aborted do
-      Process.send_after(self(), :clash_detected, 500)
-    end
-
-    assign(socket, :race, updated_race)
   end
 
   @spec car_position_style(Car.t()) :: String.t()

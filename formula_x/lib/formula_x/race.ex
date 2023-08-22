@@ -39,8 +39,8 @@ defmodule FormulaX.Race do
     new(%{cars: cars, background: background, distance: race_distance})
   end
 
-  @spec start(Race.t()) :: Race.t()
-  def start(race = %Race{status: :countdown}) do
+  @spec flag_off(Race.t()) :: Race.t()
+  def flag_off(race = %Race{status: :countdown}) do
     %Race{race | status: :ongoing, start_time: Time.utc_now()}
   end
 
@@ -49,8 +49,8 @@ defmodule FormulaX.Race do
     %Race{race | background: updated_background}
   end
 
-  @spec update_cars(Race.t(), Car.t()) :: Race.t()
-  def update_cars(race = %Race{cars: cars}, updated_car = %Car{car_id: updated_car_id}) do
+  @spec update_car(Race.t(), Car.t()) :: Race.t()
+  def update_car(race = %Race{cars: cars}, updated_car = %Car{car_id: updated_car_id}) do
     updated_cars =
       Enum.map(cars, fn car ->
         if car.car_id == updated_car_id do

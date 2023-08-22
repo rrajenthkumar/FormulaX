@@ -52,20 +52,19 @@ defmodule FormulaX.Race.Car do
     remaining_ids = possible_ids -- [player_car_id]
     remaining_car_images = available_car_images -- [player_car_image]
 
-    computer_controlled_cars =
-      initialize_computer_controlled_cars(remaining_ids, remaining_car_images)
+    autonomous_cars = initialize_autonomous_cars(remaining_ids, remaining_car_images)
 
-    computer_controlled_cars ++ [player_car]
+    autonomous_cars ++ [player_car]
   end
 
-  @spec initialize_computer_controlled_cars(list(car_id()), list(filename())) :: list(Car.t())
-  defp initialize_computer_controlled_cars([car_id], car_images) when is_list(car_images) do
+  @spec initialize_autonomous_cars(list(car_id()), list(filename())) :: list(Car.t())
+  defp initialize_autonomous_cars([car_id], car_images) when is_list(car_images) do
     car_image = Enum.random(car_images)
 
     [initialize_car(car_id, car_image, :computer)]
   end
 
-  defp initialize_computer_controlled_cars(_car_ids = [head | tail], car_images)
+  defp initialize_autonomous_cars(_car_ids = [head | tail], car_images)
        when is_list(car_images) do
     car_image = Enum.random(car_images)
 
@@ -73,10 +72,25 @@ defmodule FormulaX.Race.Car do
 
     remaining_car_images = car_images -- [car_image]
 
-    [car] ++ initialize_computer_controlled_cars(tail, remaining_car_images)
+    [car] ++ initialize_autonomous_cars(tail, remaining_car_images)
   end
 
   @spec initialize_car(car_id(), filename(), controller()) :: Car.t()
+  defp initialize_car(car_id, image, controller = :player)
+       when is_integer(car_id) and is_binary(image) do
+    {x_position, y_position} = get_starting_x_and_y_positions(car_id)
+    speed = :rest
+
+    new(%{
+      car_id: car_id,
+      image: image,
+      controller: controller,
+      x_position: x_position,
+      y_position: y_position,
+      speed: speed
+    })
+  end
+
   defp initialize_car(car_id, image, controller)
        when is_integer(car_id) and is_binary(image) and is_atom(controller) do
     {x_position, y_position} = get_starting_x_and_y_positions(car_id)
@@ -115,43 +129,37 @@ defmodule FormulaX.Race.Car do
     %Car{car | y_position: updated_y_position}
   end
 
-  @spec accelerate(Car.t()) :: Car.t()
-  def accelerate(car = %Car{speed: :rest}) do
+  @spec change_speed(Car.t(), :speedup | :slowdown) :: Car.t()
+  def change_speed(car = %Car{speed: :rest}, _action = :speedup) do
     %Car{car | speed: :low}
   end
 
-  def accelerate(car = %Car{speed: :low}) do
+  def change_speed(car = %Car{speed: :low}, _action = :speedup) do
     %Car{car | speed: :moderate}
   end
 
-  def accelerate(car = %Car{speed: :moderate}) do
+  def change_speed(car = %Car{speed: :moderate}, _action = :speedup) do
     %Car{car | speed: :high}
   end
 
-  def accelerate(car = %Car{speed: :high}) do
+  def change_speed(car = %Car{speed: :high}, _action = :speedup) do
     car
   end
 
-  @spec decelerate(Car.t()) :: Car.t()
-  def decelerate(car = %Car{speed: :rest}) do
+  def change_speed(car = %Car{speed: :rest}, _action = :slowdown) do
     car
   end
 
-  def decelerate(car = %Car{speed: :low}) do
+  def change_speed(car = %Car{speed: :low}, _action = :slowdown) do
     %Car{car | speed: :rest}
   end
 
-  def decelerate(car = %Car{speed: :moderate}) do
+  def change_speed(car = %Car{speed: :moderate}, _action = :slowdown) do
     %Car{car | speed: :low}
   end
 
-  def decelerate(car = %Car{speed: :high}) do
+  def change_speed(car = %Car{speed: :high}, _action = :slowdown) do
     %Car{car | speed: :moderate}
-  end
-
-  @spec start(Car.t()) :: Car.t()
-  def start(car = %Car{speed: :rest}) do
-    %Car{car | speed: :low}
   end
 
   @spec stop(Car.t()) :: Car.t()
@@ -186,7 +194,7 @@ defmodule FormulaX.Race.Car do
   @doc """
   Function to position computer controlled cars correctly on the screen.
 
-  The background has already been offset by the value 'console_screen_height-race_distance' in Y direction, to shift its Y position reference to the Y position reference of cars. Also the 'background_y_position' value reflects the correct position of player car. So we have to adjust the computer controlled cars w.r.t background position.
+  The background has already been offset by the value 'console_screen_height - race_distance' in Y direction, to shift its Y position reference to the Y position reference of cars. Also the 'background_y_position' value reflects the correct position of player car. So we have to adjust the computer controlled cars w.r.t background position.
   """
   @spec adapt_car_position_with_reference_to_background(Car.t(), Race.t()) :: Car.t()
   def adapt_car_position_with_reference_to_background(
