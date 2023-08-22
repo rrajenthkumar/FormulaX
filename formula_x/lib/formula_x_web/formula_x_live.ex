@@ -6,7 +6,7 @@ defmodule FormulaXWeb.RaceLive do
 
   alias FormulaX.Race
   alias FormulaX.Race.Car
-  alias FormulaX.Race.CarDriveServer
+  alias FormulaX.Race.RaceEngine
   alias FormulaX.Race.CarControl
 
   @impl true
@@ -79,7 +79,7 @@ defmodule FormulaXWeb.RaceLive do
       Race.initialize()
       |> Race.flag_off()
 
-    CarDriveServer.start(race, self())
+    RaceEngine.start(race, self())
 
     socket = assign(socket, :race, race)
 

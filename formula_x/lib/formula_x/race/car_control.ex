@@ -6,7 +6,7 @@ defmodule FormulaX.Race.CarControl do
   alias FormulaX.Race
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
-  alias FormulaX.Race.CarDriveServer
+  alias FormulaX.Race.RaceEngine
   alias FormulaX.Race.CrashDetection
 
   @doc """
@@ -55,7 +55,7 @@ defmodule FormulaX.Race.CarControl do
           Race.update_car(race, updated_player_car)
       end
 
-    CarDriveServer.update_player_car(updated_race)
+    RaceEngine.update_player_car(updated_race)
   end
 
   @spec change_player_car_speed(Race.t(), :speedup | :slowdown) :: Race.t()
@@ -68,7 +68,7 @@ defmodule FormulaX.Race.CarControl do
 
     race
     |> Race.update_car(updated_player_car)
-    |> CarDriveServer.update_player_car()
+    |> RaceEngine.update_player_car()
   end
 
   @spec move_autonomous_cars(Race.t(), :left | :right | :forward) :: Race.t()

@@ -1,4 +1,4 @@
-defmodule FormulaX.Race.CarDriveServer do
+defmodule FormulaX.Race.RaceEngine do
   @moduledoc """
   GenServer module that drives all cars
   """
