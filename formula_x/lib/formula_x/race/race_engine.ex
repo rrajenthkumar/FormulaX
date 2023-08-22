@@ -5,7 +5,7 @@ defmodule FormulaX.Race.RaceEngine do
   use GenServer
 
   alias FormulaX.Race
-  alias FormulaX.Race.CarControl
+  alias FormulaX.Race.Car.Control
 
   # Car position will be changed every 200 milliseconds
   @timeout 200
@@ -30,8 +30,8 @@ defmodule FormulaX.Race.RaceEngine do
   """
   def handle_info(:timeout, _state = {race = %Race{}, race_live_pid}) do
     updated_race =
-      CarControl.move_autonomous_cars(race, :forward)
-      |> CarControl.move_player_car(:forward)
+      Control.move_autonomous_cars(race, :forward)
+      |> Control.move_player_car(:forward)
 
     updated_state = {updated_race, race_live_pid}
     Process.send(race_live_pid, {:update_race, updated_race}, [])

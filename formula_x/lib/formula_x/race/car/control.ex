@@ -1,4 +1,4 @@
-defmodule FormulaX.Race.CarControl do
+defmodule FormulaX.Race.Car.Control do
   @moduledoc """
   **Car Control context**
   This module is an interface for all controls related to player and autonomous cars
@@ -58,6 +58,16 @@ defmodule FormulaX.Race.CarControl do
     RaceEngine.update_player_car(updated_race)
   end
 
+  @spec move_autonomous_cars(Race.t(), :left | :right | :forward) :: Race.t()
+  def move_autonomous_cars(
+        race = %Race{},
+        direction
+      ) do
+    autonomous_cars = get_autonomous_cars(race)
+
+    move_autonomous_cars(race, autonomous_cars, direction)
+  end
+
   @spec change_player_car_speed(Race.t(), :speedup | :slowdown) :: Race.t()
   def change_player_car_speed(race = %Race{}, action) do
     player_car = Race.get_player_car(race)
@@ -69,16 +79,6 @@ defmodule FormulaX.Race.CarControl do
     race
     |> Race.update_car(updated_player_car)
     |> RaceEngine.update_player_car()
-  end
-
-  @spec move_autonomous_cars(Race.t(), :left | :right | :forward) :: Race.t()
-  def move_autonomous_cars(
-        race = %Race{},
-        direction
-      ) do
-    autonomous_cars = get_autonomous_cars(race)
-
-    move_autonomous_cars(race, autonomous_cars, direction)
   end
 
   @spec move_autonomous_cars(Race.t(), list(Car.t()), :left | :right | :forward) :: Race.t()
@@ -100,22 +100,6 @@ defmodule FormulaX.Race.CarControl do
   end
 
   @spec move_autonomous_car(Race.t(), Car.t(), :left | :right | :forward) :: Race.t()
-  defp move_autonomous_car(race = %Race{}, car = %Car{}, direction = :forward) do
-    case CrashDetection.crash?(race, car, direction) do
-      true ->
-        race
-
-      false ->
-        updated_car =
-          car
-          |> Car.move(direction)
-
-        # |> Car.adapt_car_position_with_reference_to_background(race)
-
-        Race.update_car(race, updated_car)
-    end
-  end
-
   defp move_autonomous_car(race = %Race{}, car = %Car{}, direction) do
     case CrashDetection.crash?(race, car, direction) do
       true ->

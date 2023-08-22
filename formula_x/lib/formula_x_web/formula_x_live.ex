@@ -7,7 +7,7 @@ defmodule FormulaXWeb.RaceLive do
   alias FormulaX.Race
   alias FormulaX.Race.Car
   alias FormulaX.Race.RaceEngine
-  alias FormulaX.Race.CarControl
+  alias FormulaX.Race.Car.Control
 
   @impl true
   def render(assigns) do
@@ -96,7 +96,7 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    CarControl.change_player_car_speed(race, :speedup)
+    Control.change_player_car_speed(race, :speedup)
 
     {:noreply, socket}
   end
@@ -110,7 +110,7 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    CarControl.change_player_car_speed(race, :speedup)
+    Control.change_player_car_speed(race, :speedup)
 
     {:noreply, socket}
   end
@@ -124,7 +124,7 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    CarControl.change_player_car_speed(race, :slowdown)
+    Control.change_player_car_speed(race, :slowdown)
 
     {:noreply, socket}
   end
@@ -138,7 +138,7 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    CarControl.change_player_car_speed(race, :slowdown)
+    Control.change_player_car_speed(race, :slowdown)
 
     {:noreply, socket}
   end
@@ -152,7 +152,7 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    CarControl.move_player_car(race, :right)
+    Control.move_player_car(race, :right)
     {:noreply, socket}
   end
 
@@ -165,7 +165,7 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    CarControl.move_player_car(race, :right)
+    Control.move_player_car(race, :right)
     {:noreply, socket}
   end
 
@@ -178,7 +178,7 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    CarControl.move_player_car(race, :left)
+    Control.move_player_car(race, :left)
     {:noreply, socket}
   end
 
@@ -191,7 +191,7 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    CarControl.move_player_car(race, :left)
+    Control.move_player_car(race, :left)
     {:noreply, socket}
   end
 
