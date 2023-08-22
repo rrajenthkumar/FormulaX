@@ -100,6 +100,21 @@ defmodule FormulaX.Race.Car.Control do
   end
 
   @spec move_autonomous_car(Race.t(), Car.t(), :left | :right | :forward) :: Race.t()
+  defp move_autonomous_car(race = %Race{}, car = %Car{}, direction = :forward) do
+    case CrashDetection.crash?(race, car, direction) do
+      true ->
+        race
+
+      false ->
+        updated_car =
+          car
+          |> Car.move(direction)
+          |> Car.adapt_car_position_with_reference_to_background(race)
+
+        Race.update_car(race, updated_car)
+    end
+  end
+
   defp move_autonomous_car(race = %Race{}, car = %Car{}, direction) do
     case CrashDetection.crash?(race, car, direction) do
       true ->

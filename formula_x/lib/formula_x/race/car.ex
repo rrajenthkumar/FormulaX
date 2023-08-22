@@ -206,9 +206,9 @@ defmodule FormulaX.Race.Car do
       ) do
     console_screen_height = Parameters.console_screen_height()
 
-    adapted_car_y_position =
-      car_y_position -
-        (background_y_position + race_distance - console_screen_height)
+    correction_factor = race_distance + background_y_position - console_screen_height
+
+    adapted_car_y_position = car_y_position - correction_factor
 
     %Car{car | y_position: adapted_car_y_position}
   end

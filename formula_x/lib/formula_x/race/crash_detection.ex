@@ -159,7 +159,15 @@ defmodule FormulaX.Race.CrashDetection do
         false
 
       [car_in_the_front] ->
-        querying_car_after_moving_forward = Car.move(querying_car, :forward)
+        querying_car_after_moving_forward =
+          case querying_car_controller do
+            :computer ->
+              Car.move(querying_car, movement_direction)
+              |> Car.adapt_car_position_with_reference_to_background(race)
+
+            :player ->
+              Car.move(querying_car, movement_direction)
+          end
 
         crash_between_cars?(
           querying_car_after_moving_forward,
