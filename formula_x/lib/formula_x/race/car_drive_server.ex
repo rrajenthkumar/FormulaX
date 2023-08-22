@@ -49,7 +49,7 @@ defmodule FormulaX.Race.CarDriveServer do
       ) do
     updated_state = {race_with_updated_player_car, race_live_pid}
 
-    Process.send(race_live_pid, {:update_race, updated_race}, [])
+    Process.send(race_live_pid, {:update_race, race_with_updated_player_car}, [])
     {:noreply, updated_state, @timeout}
   end
 end
