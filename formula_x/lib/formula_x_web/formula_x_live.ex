@@ -96,7 +96,9 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    Control.change_player_car_speed(race, :speedup)
+    race
+    |> Control.change_player_car_speed(:speedup)
+    |> RaceEngine.update_player_car()
 
     {:noreply, socket}
   end
@@ -110,7 +112,9 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    Control.change_player_car_speed(race, :speedup)
+    race
+    |> Control.change_player_car_speed(:speedup)
+    |> RaceEngine.update_player_car()
 
     {:noreply, socket}
   end
@@ -124,7 +128,9 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    Control.change_player_car_speed(race, :slowdown)
+    race
+    |> Control.change_player_car_speed(:slowdown)
+    |> RaceEngine.update_player_car()
 
     {:noreply, socket}
   end
@@ -138,7 +144,9 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    Control.change_player_car_speed(race, :slowdown)
+    race
+    |> Control.change_player_car_speed(:slowdown)
+    |> RaceEngine.update_player_car()
 
     {:noreply, socket}
   end
@@ -152,7 +160,10 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    Control.move_player_car(race, :right)
+    race
+    |> Control.move_player_car(:right)
+    |> RaceEngine.update_player_car()
+
     {:noreply, socket}
   end
 
@@ -165,7 +176,10 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    Control.move_player_car(race, :right)
+    race
+    |> Control.move_player_car(:right)
+    |> RaceEngine.update_player_car()
+
     {:noreply, socket}
   end
 
@@ -178,7 +192,10 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    Control.move_player_car(race, :left)
+    race
+    |> Control.move_player_car(:left)
+    |> RaceEngine.update_player_car()
+
     {:noreply, socket}
   end
 
@@ -191,7 +208,10 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    Control.move_player_car(race, :left)
+    race
+    |> Control.move_player_car(:left)
+    |> RaceEngine.update_player_car()
+
     {:noreply, socket}
   end
 

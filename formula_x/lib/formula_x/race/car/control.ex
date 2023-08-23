@@ -6,7 +6,6 @@ defmodule FormulaX.Race.Car.Control do
   alias FormulaX.Race
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
-  alias FormulaX.Race.RaceEngine
   alias FormulaX.Race.CrashDetection
 
   @doc """
@@ -33,29 +32,28 @@ defmodule FormulaX.Race.Car.Control do
   end
 
   # Left or right side movement
-  @spec move_player_car(Race.t(), :left | :right) :: :ok
   def move_player_car(race = %Race{}, direction) do
     player_car = Race.get_player_car(race)
 
-    updated_race =
-      case CrashDetection.crash?(race, player_car, direction) do
-        true ->
-          updated_player_car =
-            player_car
-            |> Car.move(direction)
-            |> Car.stop()
+    case CrashDetection.crash?(race, player_car, direction) do
+      true ->
+        updated_player_car =
+          player_car
+          |> Car.move(direction)
+          |> Car.stop()
 
-          race
-          |> Race.update_car(updated_player_car)
-          |> Race.abort()
+        race
+        |> Race.update_car(updated_player_car)
+        |> Race.abort()
 
-        false ->
-          updated_player_car = Car.move(player_car, direction)
+      false ->
+        updated_player_car = Car.move(player_car, direction)
 
-          Race.update_car(race, updated_player_car)
-      end
-
-    RaceEngine.update_player_car(updated_race)
+        race
+        |> Race.update_car(updated_player_car)
+        # To keep the forward movement as well during the sideward movement
+        |> move_player_car(:forward)
+    end
   end
 
   @spec move_autonomous_cars(Race.t(), :left | :right | :forward) :: Race.t()
@@ -76,9 +74,7 @@ defmodule FormulaX.Race.Car.Control do
       player_car
       |> Car.change_speed(action)
 
-    race
-    |> Race.update_car(updated_player_car)
-    |> RaceEngine.update_player_car()
+    Race.update_car(race, updated_player_car)
   end
 
   @spec move_autonomous_cars(Race.t(), list(Car.t()), :left | :right | :forward) :: Race.t()
@@ -123,7 +119,10 @@ defmodule FormulaX.Race.Car.Control do
       false ->
         updated_car = Car.move(car, direction)
 
-        Race.update_car(race, updated_car)
+        race
+        |> Race.update_car(updated_car)
+        # To keep the forward movement as well during the sideward movement
+        |> move_autonomous_car(updated_car, :forward)
     end
   end
 
