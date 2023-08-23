@@ -163,7 +163,7 @@ defmodule FormulaX.Race.CrashDetection do
           case querying_car_controller do
             :computer ->
               Car.move(querying_car, movement_direction)
-              |> Car.adapt_car_position_with_reference_to_background(race)
+              |> Car.update_autonomous_car_y_position(race)
 
             :player ->
               Car.move(querying_car, movement_direction)

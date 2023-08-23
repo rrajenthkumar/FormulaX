@@ -6,7 +6,6 @@ defmodule FormulaX.Race.Car do
 
   alias __MODULE__
   alias FormulaX.Race
-  alias FormulaX.Race.Background
   alias FormulaX.Race.Parameters
   alias FormulaX.Utils
 
@@ -27,6 +26,7 @@ defmodule FormulaX.Race.Car do
     field(:controller, controller(), enforce: true)
     field(:x_position, x_position(), enforce: true)
     field(:y_position, y_position(), enforce: true)
+    field(:distance_travelled, integer(), default: 0)
     field(:speed, speed(), enforce: true)
     field(:completion_time, Time.t(), default: nil)
   end
@@ -119,14 +119,14 @@ defmodule FormulaX.Race.Car do
 
   def move(
         car = %Car{
-          y_position: y_position,
-          speed: speed
+          speed: speed,
+          distance_travelled: distance_travelled
         },
         :forward
       ) do
     car_forward_movement_step = Parameters.car_forward_movement_step(speed)
-    updated_y_position = y_position + car_forward_movement_step
-    %Car{car | y_position: updated_y_position}
+
+    %Car{car | distance_travelled: distance_travelled + car_forward_movement_step}
   end
 
   @spec change_speed(Car.t(), :speedup | :slowdown) :: Car.t()
@@ -196,21 +196,18 @@ defmodule FormulaX.Race.Car do
 
   The background has already been offset by the value 'console_screen_height - race_distance' in Y direction, to shift its Y position reference to the Y position reference of cars. Also the 'background_y_position' value reflects the correct position of player car. So we have to adjust the computer controlled cars w.r.t background position.
   """
-  @spec adapt_car_position_with_reference_to_background(Car.t(), Race.t()) :: Car.t()
-  def adapt_car_position_with_reference_to_background(
-        car = %Car{y_position: car_y_position},
-        %Race{
-          distance: race_distance,
-          background: %Background{y_position: background_y_position}
-        }
+  @spec update_autonomous_car_y_position(Car.t(), Race.t()) :: Car.t()
+  def update_autonomous_car_y_position(
+        car = %Car{
+          distance_travelled: distance_travelled_by_autonomous_car
+        },
+        race = %Race{}
       ) do
-    console_screen_height = Parameters.console_screen_height()
+    %Car{distance_travelled: distance_travelled_by_player_car} = Race.get_player_car(race)
 
-    correction_factor = race_distance + background_y_position - console_screen_height
+    updated_y_position = distance_travelled_by_autonomous_car - distance_travelled_by_player_car
 
-    adapted_car_y_position = car_y_position - correction_factor
-
-    %Car{car | y_position: adapted_car_y_position}
+    %Car{car | y_position: updated_y_position}
   end
 
   @spec get_starting_x_and_y_positions(car_id()) :: coordinates()

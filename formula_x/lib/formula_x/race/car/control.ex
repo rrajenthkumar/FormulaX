@@ -17,9 +17,15 @@ defmodule FormulaX.Race.Car.Control do
 
     updated_background = Background.move(background, player_car.speed)
 
+    updated_player_car =
+      player_car
+      |> Car.move(direction)
+
     case CrashDetection.crash?(race, player_car, direction) do
       true ->
-        updated_player_car = Car.stop(player_car)
+        updated_player_car =
+          updated_player_car
+          |> Car.stop()
 
         race
         |> Race.update_background(updated_background)
@@ -27,7 +33,9 @@ defmodule FormulaX.Race.Car.Control do
         |> Race.abort()
 
       false ->
-        Race.update_background(race, updated_background)
+        race
+        |> Race.update_background(updated_background)
+        |> Race.update_car(updated_player_car)
     end
   end
 
@@ -35,11 +43,14 @@ defmodule FormulaX.Race.Car.Control do
   def move_player_car(race = %Race{}, direction) do
     player_car = Race.get_player_car(race)
 
+    updated_player_car =
+      player_car
+      |> Car.move(direction)
+
     case CrashDetection.crash?(race, player_car, direction) do
       true ->
         updated_player_car =
-          player_car
-          |> Car.move(direction)
+          updated_player_car
           |> Car.stop()
 
         race
@@ -47,23 +58,11 @@ defmodule FormulaX.Race.Car.Control do
         |> Race.abort()
 
       false ->
-        updated_player_car = Car.move(player_car, direction)
-
         race
         |> Race.update_car(updated_player_car)
-        # To keep the forward movement as well during the sideward movement
+        # To keep it real adding forward movement as well during the sideward movement
         |> move_player_car(:forward)
     end
-  end
-
-  @spec move_autonomous_cars(Race.t(), :left | :right | :forward) :: Race.t()
-  def move_autonomous_cars(
-        race = %Race{},
-        direction
-      ) do
-    autonomous_cars = get_autonomous_cars(race)
-
-    move_autonomous_cars(race, autonomous_cars, direction)
   end
 
   @spec change_player_car_speed(Race.t(), :speedup | :slowdown) :: Race.t()
@@ -75,6 +74,16 @@ defmodule FormulaX.Race.Car.Control do
       |> Car.change_speed(action)
 
     Race.update_car(race, updated_player_car)
+  end
+
+  @spec move_autonomous_cars(Race.t(), :left | :right | :forward) :: Race.t()
+  def move_autonomous_cars(
+        race = %Race{},
+        direction
+      ) do
+    autonomous_cars = get_autonomous_cars(race)
+
+    move_autonomous_cars(race, autonomous_cars, direction)
   end
 
   @spec move_autonomous_cars(Race.t(), list(Car.t()), :left | :right | :forward) :: Race.t()
@@ -105,12 +114,13 @@ defmodule FormulaX.Race.Car.Control do
         updated_car =
           car
           |> Car.move(direction)
-          |> Car.adapt_car_position_with_reference_to_background(race)
+          |> Car.update_autonomous_car_y_position(race)
 
         Race.update_car(race, updated_car)
     end
   end
 
+  # Left or right side movement
   defp move_autonomous_car(race = %Race{}, car = %Car{}, direction) do
     case CrashDetection.crash?(race, car, direction) do
       true ->
@@ -121,7 +131,7 @@ defmodule FormulaX.Race.Car.Control do
 
         race
         |> Race.update_car(updated_car)
-        # To keep the forward movement as well during the sideward movement
+        # To keep it real adding forward movement as well during the sideward movement
         |> move_autonomous_car(updated_car, :forward)
     end
   end
