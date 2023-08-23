@@ -1,11 +1,11 @@
 defmodule FormulaX.Race.Parameters do
   @moduledoc """
   All the racing game related parameters are defined here.
-  All numbers are in pixels.
   !!! Keep all the values in this module as factors of 5 to be in sync with position_range_step() fn !!!
   TO DO: When it makes sense the values defined in this module should be defined as environment variables
   """
 
+  alias FormulaX.Race
   alias FormulaX.Race.Car
 
   @typedoc """
@@ -32,8 +32,9 @@ defmodule FormulaX.Race.Parameters do
   end
 
   @doc """
-  Total race distance in pixels.
+  Total race distance.
   """
+  @spec race_distance() :: Race.distance()
   def race_distance() do
     100_000
   end
@@ -103,7 +104,7 @@ defmodule FormulaX.Race.Parameters do
   It is set to a value of 5 because the car border coordinates those will result after any kind of car movement have been ensured to be as factors of 5.
   So the number of coordinates that will be used in crash checks will not be too many.
   """
-  @spec position_range_step() :: integer()
+  @spec position_range_step() :: pixel_value()
   def position_range_step() do
     5
   end

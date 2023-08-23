@@ -20,9 +20,9 @@ defmodule FormulaX.Race do
   typedstruct do
     field(:cars, cars(), enforce: true)
     field(:background, Background.t(), enforce: true)
+    field(:start_time, Time.t(), default: nil)
     field(:distance, distance(), enforce: true)
     field(:status, status(), default: :countdown)
-    field(:start_time, Time.t(), default: nil)
   end
 
   @spec new(map()) :: Race.t()
@@ -39,8 +39,8 @@ defmodule FormulaX.Race do
     new(%{cars: cars, background: background, distance: race_distance})
   end
 
-  @spec flag_off(Race.t()) :: Race.t()
-  def flag_off(race = %Race{status: :countdown}) do
+  @spec start(Race.t()) :: Race.t()
+  def start(race = %Race{status: :countdown}) do
     %Race{race | status: :ongoing, start_time: Time.utc_now()}
   end
 

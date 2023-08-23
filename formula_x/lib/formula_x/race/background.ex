@@ -28,12 +28,11 @@ defmodule FormulaX.Race.Background do
   @spec initialize(Race.distance()) :: Background.t()
   def initialize(race_distance) when is_integer(race_distance) do
     available_background_images = Utils.get_images("backgrounds")
-    left_side_images = get_side_images(race_distance, available_background_images)
-    right_side_images = get_side_images(race_distance, available_background_images)
+    left_side_images = get_side_images(available_background_images, race_distance)
+    right_side_images = get_side_images(available_background_images, race_distance)
 
     # In the beginning, background DIVs are positioned in Y direction, w.r.t the top of console screen.
     # The following is done to position them in Y direction with the same reference as that of cars (bottom of console screen)
-    # TO DO: Improve if possible
     console_screen_height = Parameters.console_screen_height()
     y_position = console_screen_height - race_distance
 
@@ -44,17 +43,6 @@ defmodule FormulaX.Race.Background do
     })
   end
 
-  @spec get_side_images(Race.distance(), filenames()) :: filenames()
-  defp get_side_images(race_distance, available_background_images)
-       when is_integer(race_distance) and is_list(available_background_images) do
-    image_container_height = Parameters.background_image_container_height()
-    number_of_images_required = div(race_distance, image_container_height)
-
-    Enum.map(1..number_of_images_required, fn _grid_number ->
-      Enum.random(available_background_images)
-    end)
-  end
-
   @spec move(Background.t(), :rest | :low | :moderate | :high) :: Background.t()
   def move(background = %Background{y_position: y_position}, player_car_speed)
       when is_atom(player_car_speed) do
@@ -62,5 +50,16 @@ defmodule FormulaX.Race.Background do
     updated_y_position = y_position + car_forward_movement_step
 
     %Background{background | y_position: updated_y_position}
+  end
+
+  @spec get_side_images(filenames(), Race.distance()) :: filenames()
+  defp get_side_images(available_background_images, race_distance)
+       when is_integer(race_distance) and is_list(available_background_images) do
+    image_container_height = Parameters.background_image_container_height()
+    number_of_images_required = div(race_distance, image_container_height)
+
+    Enum.map(1..number_of_images_required, fn _grid_number ->
+      Enum.random(available_background_images)
+    end)
   end
 end

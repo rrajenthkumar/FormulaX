@@ -6,8 +6,8 @@ defmodule FormulaXWeb.RaceLive do
 
   alias FormulaX.Race
   alias FormulaX.Race.Car
+  alias FormulaX.Race.Car.Controls
   alias FormulaX.Race.RaceEngine
-  alias FormulaX.Race.Car.Control
 
   @impl true
   def render(assigns) do
@@ -77,7 +77,7 @@ defmodule FormulaXWeb.RaceLive do
   def mount(_params, %{}, socket) do
     race =
       Race.initialize()
-      |> Race.flag_off()
+      |> Race.start()
 
     RaceEngine.start(race, self())
 
@@ -97,8 +97,8 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> Control.change_player_car_speed(:speedup)
-    |> RaceEngine.update_player_car()
+    |> Controls.change_player_car_speed(:speedup)
+    |> RaceEngine.update()
 
     {:noreply, socket}
   end
@@ -113,8 +113,8 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> Control.change_player_car_speed(:speedup)
-    |> RaceEngine.update_player_car()
+    |> Controls.change_player_car_speed(:speedup)
+    |> RaceEngine.update()
 
     {:noreply, socket}
   end
@@ -129,8 +129,8 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> Control.change_player_car_speed(:slowdown)
-    |> RaceEngine.update_player_car()
+    |> Controls.change_player_car_speed(:slowdown)
+    |> RaceEngine.update()
 
     {:noreply, socket}
   end
@@ -145,8 +145,8 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> Control.change_player_car_speed(:slowdown)
-    |> RaceEngine.update_player_car()
+    |> Controls.change_player_car_speed(:slowdown)
+    |> RaceEngine.update()
 
     {:noreply, socket}
   end
@@ -161,8 +161,8 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> Control.move_player_car(:right)
-    |> RaceEngine.update_player_car()
+    |> Controls.move_player_car(:right)
+    |> RaceEngine.update()
 
     {:noreply, socket}
   end
@@ -177,8 +177,8 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> Control.move_player_car(:right)
-    |> RaceEngine.update_player_car()
+    |> Controls.move_player_car(:right)
+    |> RaceEngine.update()
 
     {:noreply, socket}
   end
@@ -193,8 +193,8 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> Control.move_player_car(:left)
-    |> RaceEngine.update_player_car()
+    |> Controls.move_player_car(:left)
+    |> RaceEngine.update()
 
     {:noreply, socket}
   end
@@ -209,8 +209,8 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> Control.move_player_car(:left)
-    |> RaceEngine.update_player_car()
+    |> Controls.move_player_car(:left)
+    |> RaceEngine.update()
 
     {:noreply, socket}
   end
@@ -221,25 +221,24 @@ defmodule FormulaXWeb.RaceLive do
 
   @impl true
   def handle_info(
-        {:update_race, race = %Race{status: status}},
+        {:update_visuals, race = %Race{status: status}},
         socket
       ) do
-    socket = assign(socket, :race, race)
-
     if status == :aborted do
-      Process.send_after(self(), :clash_detected, 500)
+      Process.send_after(self(), :car_crash, 500)
     end
+
+    socket = assign(socket, :race, race)
 
     {:noreply, socket}
   end
 
   def handle_info(
-        :clash_detected,
+        :car_crash,
         socket
       ) do
-    socket = put_flash(socket, :error, "Race aborted due to crash!!!")
-
     Process.send_after(self(), :restart_race, 1500)
+    socket = put_flash(socket, :error, "Race aborted due to crash!!!")
 
     {:noreply, socket}
   end

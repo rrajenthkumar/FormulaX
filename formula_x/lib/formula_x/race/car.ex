@@ -26,8 +26,8 @@ defmodule FormulaX.Race.Car do
     field(:controller, controller(), enforce: true)
     field(:x_position, x_position(), enforce: true)
     field(:y_position, y_position(), enforce: true)
-    field(:distance_travelled, integer(), default: 0)
     field(:speed, speed(), enforce: true)
+    field(:distance_travelled, Race.distance(), default: 0)
     field(:completion_time, Time.t(), default: nil)
   end
 
@@ -57,64 +57,13 @@ defmodule FormulaX.Race.Car do
     autonomous_cars ++ [player_car]
   end
 
-  @spec initialize_autonomous_cars(list(car_id()), list(filename())) :: list(Car.t())
-  defp initialize_autonomous_cars([car_id], car_images) when is_list(car_images) do
-    car_image = Enum.random(car_images)
-
-    [initialize_car(car_id, car_image, :computer)]
-  end
-
-  defp initialize_autonomous_cars(_car_ids = [head | tail], car_images)
-       when is_list(car_images) do
-    car_image = Enum.random(car_images)
-
-    car = initialize_car(head, car_image, :computer)
-
-    remaining_car_images = car_images -- [car_image]
-
-    [car] ++ initialize_autonomous_cars(tail, remaining_car_images)
-  end
-
-  @spec initialize_car(car_id(), filename(), controller()) :: Car.t()
-  defp initialize_car(car_id, image, controller = :player)
-       when is_integer(car_id) and is_binary(image) do
-    {x_position, y_position} = get_starting_x_and_y_positions(car_id)
-    speed = :rest
-
-    new(%{
-      car_id: car_id,
-      image: image,
-      controller: controller,
-      x_position: x_position,
-      y_position: y_position,
-      speed: speed
-    })
-  end
-
-  defp initialize_car(car_id, image, controller)
-       when is_integer(car_id) and is_binary(image) and is_atom(controller) do
-    {x_position, y_position} = get_starting_x_and_y_positions(car_id)
-    speed = Enum.random([:low, :moderate, :high])
-
-    new(%{
-      car_id: car_id,
-      image: image,
-      controller: controller,
-      x_position: x_position,
-      y_position: y_position,
-      speed: speed
-    })
-  end
-
   @spec move(Car.t(), :left | :right | :forward) :: Car.t()
   def move(car = %Car{x_position: x_position}, :left) do
-    car_sideward_movement_step = Parameters.car_sideward_movement_step()
-    %Car{car | x_position: x_position - car_sideward_movement_step}
+    %Car{car | x_position: x_position - Parameters.car_sideward_movement_step()}
   end
 
   def move(car = %Car{x_position: x_position}, :right) do
-    car_sideward_movement_step = Parameters.car_sideward_movement_step()
-    %Car{car | x_position: x_position + car_sideward_movement_step}
+    %Car{car | x_position: x_position + Parameters.car_sideward_movement_step()}
   end
 
   def move(
@@ -124,9 +73,10 @@ defmodule FormulaX.Race.Car do
         },
         :forward
       ) do
-    car_forward_movement_step = Parameters.car_forward_movement_step(speed)
-
-    %Car{car | distance_travelled: distance_travelled + car_forward_movement_step}
+    %Car{
+      car
+      | distance_travelled: distance_travelled + Parameters.car_forward_movement_step(speed)
+    }
   end
 
   @spec change_speed(Car.t(), :speedup | :slowdown) :: Car.t()
@@ -143,6 +93,10 @@ defmodule FormulaX.Race.Car do
   end
 
   def change_speed(car = %Car{speed: :high}, _action = :speedup) do
+    car
+  end
+
+  def change_speed(car = %Car{speed: :rest}, _action = :slowdown) do
     car
   end
 
@@ -193,8 +147,6 @@ defmodule FormulaX.Race.Car do
 
   @doc """
   Function to position computer controlled cars correctly on the screen.
-
-  The background has already been offset by the value 'console_screen_height - race_distance' in Y direction, to shift its Y position reference to the Y position reference of cars. Also the 'background_y_position' value reflects the correct position of player car. So we have to adjust the computer controlled cars w.r.t background position.
   """
   @spec update_autonomous_car_y_position(Car.t(), Race.t()) :: Car.t()
   def update_autonomous_car_y_position(
@@ -208,6 +160,55 @@ defmodule FormulaX.Race.Car do
     updated_y_position = distance_travelled_by_autonomous_car - distance_travelled_by_player_car
 
     %Car{car | y_position: updated_y_position}
+  end
+
+  @spec initialize_autonomous_cars(list(car_id()), list(filename())) :: list(Car.t())
+  defp initialize_autonomous_cars([car_id], car_images) when is_list(car_images) do
+    car_image = Enum.random(car_images)
+
+    [initialize_car(car_id, car_image, :computer)]
+  end
+
+  defp initialize_autonomous_cars(_car_ids = [head | tail], car_images)
+       when is_list(car_images) do
+    car_image = Enum.random(car_images)
+
+    car = initialize_car(head, car_image, :computer)
+
+    remaining_car_images = car_images -- [car_image]
+
+    [car] ++ initialize_autonomous_cars(tail, remaining_car_images)
+  end
+
+  @spec initialize_car(car_id(), filename(), controller()) :: Car.t()
+  defp initialize_car(car_id, image, controller = :player)
+       when is_integer(car_id) and is_binary(image) do
+    {x_position, y_position} = get_starting_x_and_y_positions(car_id)
+    speed = :rest
+
+    new(%{
+      car_id: car_id,
+      image: image,
+      controller: controller,
+      x_position: x_position,
+      y_position: y_position,
+      speed: speed
+    })
+  end
+
+  defp initialize_car(car_id, image, controller)
+       when is_integer(car_id) and is_binary(image) and is_atom(controller) do
+    {x_position, y_position} = get_starting_x_and_y_positions(car_id)
+    speed = Enum.random([:low, :moderate, :high])
+
+    new(%{
+      car_id: car_id,
+      image: image,
+      controller: controller,
+      x_position: x_position,
+      y_position: y_position,
+      speed: speed
+    })
   end
 
   @spec get_starting_x_and_y_positions(car_id()) :: coordinates()
