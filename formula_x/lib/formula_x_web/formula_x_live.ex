@@ -225,29 +225,10 @@ defmodule FormulaXWeb.RaceLive do
         socket
       ) do
     if status == :aborted do
-      Process.send_after(self(), :car_crash, 500)
+      RaceEngine.stop()
     end
 
     socket = assign(socket, :race, race)
-
-    {:noreply, socket}
-  end
-
-  def handle_info(
-        :car_crash,
-        socket
-      ) do
-    Process.send_after(self(), :restart_race, 1500)
-    socket = put_flash(socket, :error, "Race aborted due to crash!!!")
-
-    {:noreply, socket}
-  end
-
-  def handle_info(
-        :restart_race,
-        socket
-      ) do
-    socket = assign(socket, :race, Race.initialize())
 
     {:noreply, socket}
   end

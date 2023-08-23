@@ -20,7 +20,7 @@ defmodule FormulaX.Race.CrashDetection do
         },
         movement_direction = :left
       ) do
-    {lanes_and_cars_map, querying_car_lane} = get_crash_check_parameters(race, querying_car)
+    {lanes_and_cars_map, querying_car_lane} = get_lane_info(race, querying_car)
 
     case querying_car_lane do
       # Possibility of crash with a background item ouside the leftmost lane
@@ -74,7 +74,7 @@ defmodule FormulaX.Race.CrashDetection do
         },
         movement_direction = :right
       ) do
-    {lanes_and_cars_map, querying_car_lane} = get_crash_check_parameters(race, querying_car)
+    {lanes_and_cars_map, querying_car_lane} = get_lane_info(race, querying_car)
 
     case querying_car_lane do
       # Possibility of crash with a background item ouside the rightmost lane
@@ -128,7 +128,7 @@ defmodule FormulaX.Race.CrashDetection do
         },
         movement_direction = :forward
       ) do
-    {lanes_and_cars_map, querying_car_lane} = get_crash_check_parameters(race, querying_car)
+    {lanes_and_cars_map, querying_car_lane} = get_lane_info(race, querying_car)
 
     same_lane_cars = Map.get(lanes_and_cars_map, querying_car_lane, []) -- [querying_car]
 
@@ -175,14 +175,6 @@ defmodule FormulaX.Race.CrashDetection do
           movement_direction
         )
     end
-  end
-
-  @spec get_crash_check_parameters(Race.t(), Car.t()) :: {map(), integer()}
-  defp get_crash_check_parameters(%Race{cars: cars}, querying_car) do
-    querying_car_lane = Car.get_lane(querying_car)
-    lanes_and_cars_map = Enum.group_by(cars, &Car.get_lane/1, & &1)
-
-    {lanes_and_cars_map, querying_car_lane}
   end
 
   @spec crash_between_cars?(Car.t(), Car.t(), :left | :right | :forward) :: boolean()
@@ -276,6 +268,14 @@ defmodule FormulaX.Race.CrashDetection do
     Enum.map(car_edge_y..(car_edge_y + @car_length)//@position_range_step, fn y ->
       {car_edge_x + @car_width, y}
     end)
+  end
+
+  @spec get_lane_info(Race.t(), Car.t()) :: {map(), integer()}
+  defp get_lane_info(%Race{cars: cars}, querying_car) do
+    lanes_and_cars_map = Enum.group_by(cars, &Car.get_lane/1, & &1)
+    querying_car_lane = Car.get_lane(querying_car)
+
+    {lanes_and_cars_map, querying_car_lane}
   end
 
   @spec get_lane_limits(integer()) :: map()

@@ -35,10 +35,6 @@ defmodule FormulaX.Race.Car.Controls do
 
     race
     |> update_race_based_on_crash_check(updated_player_car, direction)
-
-    # To keep it real forward movement is added as well during the sideward movement
-    # TO DO: May be the below movement should be with reduced step value as the car seems to go very fast during sideward movements
-    |> move_player_car(:forward)
   end
 
   @spec move_autonomous_cars_forward(Race.t()) :: Race.t()
@@ -75,10 +71,6 @@ defmodule FormulaX.Race.Car.Controls do
 
         race
         |> Race.update_car(updated_car)
-
-        # To keep it real forward movement is added as well during the sideward movement
-        # TO DO: May be the below movement should be with reduced step value
-        |> move_autonomous_car(updated_car, :forward)
     end
   end
 

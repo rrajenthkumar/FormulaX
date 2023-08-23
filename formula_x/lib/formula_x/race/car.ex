@@ -100,10 +100,6 @@ defmodule FormulaX.Race.Car do
     car
   end
 
-  def change_speed(car = %Car{speed: :rest}, _action = :slowdown) do
-    car
-  end
-
   def change_speed(car = %Car{speed: :low}, _action = :slowdown) do
     %Car{car | speed: :rest}
   end

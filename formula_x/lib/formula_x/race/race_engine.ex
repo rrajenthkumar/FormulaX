@@ -21,6 +21,10 @@ defmodule FormulaX.Race.RaceEngine do
     GenServer.cast(__MODULE__, {:update, updated_race})
   end
 
+  def stop() do
+    GenServer.cast(__MODULE__, :stop)
+  end
+
   # Callbacks
 
   @impl true
@@ -45,7 +49,8 @@ defmodule FormulaX.Race.RaceEngine do
 
   @impl true
   @doc """
-  This callback updates the Genserver state with changes resulting from player interactions
+  :update - to update the Genserver state and LiveView based on player interactions
+  :stop - to stop the Genserver
   """
   def handle_cast(
         {:update, updated_race = %Race{}},
@@ -54,5 +59,9 @@ defmodule FormulaX.Race.RaceEngine do
     Process.send(race_live_pid, {:update_visuals, updated_race}, [])
     updated_state = {updated_race, race_live_pid}
     {:noreply, updated_state, @timeout}
+  end
+
+  def handle_cast(:stop, state) do
+    {:stop, :normal, state}
   end
 end
