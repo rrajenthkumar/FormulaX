@@ -44,7 +44,9 @@ defmodule FormulaXWeb.RaceLive do
           </div>
         </div>
       </div>
-      <div class="footer">Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> to proceed</div>
+      <div class="footer">
+        <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to proceed</p>
+      </div>
     </div>
     """
   end
@@ -59,8 +61,8 @@ defmodule FormulaXWeb.RaceLive do
         <% end %>
       </div>
       <div class="footer">
-      <p>Browse cars using <span class="yellow">Yellow</span> and <span class="blue">Blue</span> buttons or using <span class="arrow">&#8678</span> and <span class="arrow">&#8680</span></p>
-      <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> to select your car and proceed</p>
+        <p>Browse cars using <span class="yellow">Yellow</span> and <span class="blue">Blue</span> buttons or using <span class="arrow">&#8678</span> and <span class="arrow">&#8680</span> keys</p>
+        <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to select your car and proceed</p>
       </div>
     </div>
     """
@@ -68,26 +70,62 @@ defmodule FormulaXWeb.RaceLive do
 
   defp screen(assigns = %{phase: :race_info}) do
     ~H"""
-    <div class="screen">
+    <div class="screen race_info_screen">
+      <div class="body">
+        <h1 class="title">Instructions</h1>
+        <ul class="instructions_list">
+          <li>
+            <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to start car</p>
+          </li>
+          <li>
+            <p>After car starts use the <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to switch speeds in the increasing order of rest, low, moderate and high</p>
+          </li>
+          <li>
+            <p>Use the <span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch speeds in the decreasing order of high, moderate, low, rest</p>
+          </li>
+          <li>
+            <p>Use the <span class="yellow">Yellow</span> button or <span class="arrow">&#8678</span> key to move left</p>
+          </li>
+          <li>
+            <p>Use the <span class="blue">Blue</span> button or <span class="arrow">&#8680</span> key to move right</p>
+          </li>
+          <li>
+            <p>Try to navigate the lanes and finish the race</p>
+          </li>
+          <li>
+            <p>Whoever finishes the race in the shortest time wins the race!!!</p>
+          </li>
+        </ul>
+      </div>
+      <div class="footer">
+        <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to proceed</p>
+      </div>
     </div>
     """
   end
 
   defp screen(assigns = %{phase: :countdown}) do
     ~H"""
-    <div class="screen">
+    <%= # Insert countdown screen in this template and once countdown is over send a message ":start_race" to live view. This template should have race initial visual along with countdown div" %>
+    <div class="screen countdown_screen">
+      <.background images={@race.background.left_side_images} y_position={@race.background.y_position}/>
+      <div class="race">
+        <.lanes/>
+        <.cars cars={@race.cars}/>
+      </div>
+      <.background images={@race.background.right_side_images} y_position={@race.background.y_position}/>
     </div>
     """
   end
 
-  defp screen(assigns = %{phase: :race}) do
+  defp screen(assigns = %{phase: :active_race}) do
     ~H"""
-    <div class="screen race_screen">
+    <div class="screen active_race_screen">
       <.background images={@race.background.left_side_images} y_position={@race.background.y_position}/>
-        <div class="race">
-          <.lanes/>
-          <.cars cars={@race.cars}/>
-        </div>
+      <div class="race">
+        <.lanes/>
+        <.cars cars={@race.cars}/>
+      </div>
       <.background images={@race.background.right_side_images} y_position={@race.background.y_position}/>
     </div>
     """
@@ -150,17 +188,11 @@ defmodule FormulaXWeb.RaceLive do
 
   @impl true
   def mount(_params, %{}, socket) do
-    # race =
-    #   Race.initialize()
-    #   |> Race.start()
-
     socket =
       socket
       |> assign(:car_selection_tuple, nil)
       |> assign(:race, nil)
       |> assign(:phase, :startup)
-
-    # RaceEngine.start(race, self())
 
     {:ok, socket}
   end
@@ -207,17 +239,11 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket = %{
           assigns: %{
-            phase: :car_selection,
-            car_selection_tuple: {current_selection_index, _maximum_index, all_available_cars}
+            phase: :car_selection
           }
         }
       ) do
-    player_car_image = Enum.at(all_available_cars, current_selection_index)
-
-    socket =
-      socket
-      |> assign(:player_car_image, player_car_image)
-      |> assign(:phase, :race_info)
+    socket = assign(socket, :phase, :race_info)
 
     {:noreply, socket}
   end
@@ -241,8 +267,48 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket = %{
           assigns: %{
+            phase: :race_info
+          }
+        }
+      ) do
+    # Player car initialisation function to be updated to use info from car_selection_tuple!!!
+    race = Race.initialize()
+
+    socket =
+      socket
+      |> assign(:race, race)
+      |> assign(:phase, :countdown)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "keydown",
+        %{"key" => "ArrowUp"},
+        socket = %{
+          assigns: %{
+            phase: :race_info
+          }
+        }
+      ) do
+    # Player car initialisation function to be updated to use info from car_selection_tuple!!!
+    race = Race.initialize()
+
+    socket =
+      socket
+      |> assign(:race, race)
+      |> assign(:phase, :countdown)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "green_button_clicked",
+        _params,
+        socket = %{
+          assigns: %{
             race: race,
-            phase: :race
+            phase: :active_race
           }
         }
       ) do
@@ -259,7 +325,7 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             race: race,
-            phase: :race
+            phase: :active_race
           }
         }
       ) do
@@ -276,7 +342,7 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             race: race,
-            phase: :race
+            phase: :active_race
           }
         }
       ) do
@@ -293,7 +359,7 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             race: race,
-            phase: :race
+            phase: :active_race
           }
         }
       ) do
@@ -342,7 +408,7 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             race: race,
-            phase: :race
+            phase: :active_race
           }
         }
       ) do
@@ -359,7 +425,7 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             race: race,
-            phase: :race
+            phase: :active_race
           }
         }
       ) do
@@ -408,7 +474,7 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             race: race,
-            phase: :race
+            phase: :active_race
           }
         }
       ) do
@@ -425,7 +491,7 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             race: race,
-            phase: :race
+            phase: :active_race
           }
         }
       ) do
@@ -436,11 +502,29 @@ defmodule FormulaXWeb.RaceLive do
     {:noreply, socket}
   end
 
-  def handle_event("keydown", %{"key" => _another_key}, socket) do
+  # For every other instances and other keys
+  def handle_event("keydown", %{"key" => _key}, socket) do
     {:noreply, socket}
   end
 
   @impl true
+  # This will be triggered by countdown screen
+  def handle_info(
+        :start_race,
+        socket = %{assigns: %{race: race = %Race{status: :countdown}, phase: :countdown}}
+      ) do
+    updated_race = Race.start(race)
+
+    socket =
+      socket
+      |> assign(:race, updated_race)
+      |> assign(:phase, :active_race)
+
+    RaceEngine.start(race, self())
+
+    {:noreply, socket}
+  end
+
   def handle_info(
         {:update_visuals, race = %Race{status: status}},
         socket

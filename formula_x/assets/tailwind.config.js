@@ -18,6 +18,9 @@ module.exports = {
       },
       fontFamily: {
         'Orbitron': ['Orbitron', 'sans-serif']
+      },
+      listStyleType: {
+        square: 'square'
       }
     },
   },

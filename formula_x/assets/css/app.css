@@ -126,44 +126,127 @@
   @apply font-black;
 }
 
-.race_live .console .race_screen {
+.race_live .console .race_info_screen {
+  @apply flex flex-col;
+}
+
+.race_live .console .race_info_screen .body {
+  flex-basis: 95%;
+  @apply tracking-wider mx-auto;
+}
+
+.race_live .console .race_info_screen .body .title {
+  @apply mt-8 font-bold text-lg;
+}
+
+.race_live .console .race_info_screen .body .instructions_list {
+  @apply flex flex-col gap-5 mt-5 ml-4 w-[30rem] text-base text-justify list-square;
+}
+
+.race_live .console .race_info_screen .footer {
+  flex-basis: 5%;
+  @apply text-center text-xs tracking-widest;
+}
+
+.race_live .console .race_info_screen .green {
+  @apply text-green-700 font-semibold;
+}
+
+.race_live .console .race_info_screen .red {
+  @apply text-red-700 font-semibold;
+}
+
+.race_live .console .race_info_screen .yellow {
+  @apply text-yellow-600 font-semibold;
+}
+
+.race_live .console .race_info_screen .blue {
+  @apply text-blue-700 font-semibold;
+}
+
+.race_live .console .race_info_screen .arrow {
+  @apply font-black;
+}
+
+.race_live .console .countdown_screen {
   @apply grid;
   /* 18rem width along X axis in total for 3 lanes, 6rem(96px) width per lane */
   grid-template-columns: 1fr 18rem 1fr;
 }
 
-.race_live .console .race_screen .background {
+.race_live .console .countdown_screen .background {
   @apply relative;
-  transition: top 1s ease-out;
 }
 
-.race_live .console .race_screen .background .image_container {
+.race_live .console .countdown_screen .background .image_container {
   /* Every image container is 12.5rem(200px) long along Y axis */
   @apply w-full h-[12.5rem] flex items-center justify-center;
 }
 
-.race_live .console .race_screen .background .image_container img {
+.race_live .console .countdown_screen .background .image_container img {
   @apply w-32;
 }
 
-.race_live .console .race_screen .race {
+.race_live .console .countdown_screen .race {
   @apply h-[35rem];
 }
 
-.race_live .console .race_screen .race .lanes {
+.race_live .console .countdown_screen .race .lanes {
   @apply grid gap-1 h-full;
   grid-template-columns: 1fr 1fr 1fr;
 }
 
-.race_live .console .race_screen .race .lanes .lane {
+.race_live .console .countdown_screen .race .lanes .lane {
   @apply bg-gray-50;
 }
 
-.race_live .console .race_screen .race .cars {
+.race_live .console .countdown_screen .race .cars {
   @apply relative;
 }
 
-.race_live .console .race_screen .race .cars img {
+.race_live .console .countdown_screen .race .cars img {
+  @apply w-[55px] absolute;
+  aspect-ratio: 0.5;
+}
+
+.race_live .console .active_race_screen {
+  @apply grid;
+  /* 18rem width along X axis in total for 3 lanes, 6rem(96px) width per lane */
+  grid-template-columns: 1fr 18rem 1fr;
+}
+
+.race_live .console .active_race_screen .background {
+  @apply relative;
+  transition: top 1s ease-out;
+}
+
+.race_live .console .active_race_screen .background .image_container {
+  /* Every image container is 12.5rem(200px) long along Y axis */
+  @apply w-full h-[12.5rem] flex items-center justify-center;
+}
+
+.race_live .console .active_race_screen .background .image_container img {
+  @apply w-32;
+}
+
+.race_live .console .active_race_screen .race {
+  @apply h-[35rem];
+}
+
+.race_live .console .active_race_screen .race .lanes {
+  @apply grid gap-1 h-full;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.race_live .console .active_race_screen .race .lanes .lane {
+  @apply bg-gray-50;
+}
+
+.race_live .console .active_race_screen .race .cars {
+  @apply relative;
+}
+
+.race_live .console .active_race_screen .race .cars img {
   @apply w-[55px] absolute;
   aspect-ratio: 0.5;
   transition: left 1s ease-out, bottom 1s ease-out;
