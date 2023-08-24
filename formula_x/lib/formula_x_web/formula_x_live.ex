@@ -15,18 +15,7 @@ defmodule FormulaXWeb.RaceLive do
     <div class="race_live" phx-window-keydown="keydown">
       <div class="console">
         <.speed_controls/>
-        <div class="screen">
-          <.background images={@race.background.left_side_images} y_position={@race.background.y_position}/>
-          <div class="race">
-            <div class="lanes">
-              <div class="lane"></div>
-              <div class="lane"></div>
-              <div class="lane"></div>
-            </div>
-            <.cars cars={@race.cars}/>
-          </div>
-          <.background images={@race.background.right_side_images} y_position={@race.background.y_position}/>
-        </div>
+        <.screen phase={@phase} race={@race}/>
         <.direction_controls/>
       </div>
     </div>
@@ -36,8 +25,93 @@ defmodule FormulaXWeb.RaceLive do
   defp speed_controls(assigns) do
     ~H"""
     <div class="speed_controls">
-      <a class="top" href="#" phx-click="speedup"></a>
-      <a class="bottom" href="#" phx-click="slowdown"></a>
+      <a class="top" href="#" phx-click="green_button_clicked"></a>
+      <a class="bottom" href="#" phx-click="red_button_clicked"></a>
+    </div>
+    """
+  end
+
+  defp screen(assigns = %{phase: :startup}) do
+    ~H"""
+    <div class="screen startup_screen">
+      <div class="body">
+        <div class="content">
+          <div class="text_container">
+            <h1><span class="title">Formula</span><span class="title_suffix">X</span></h1>
+            <p class="subtitle">Powered by Elixir/Phoenix</p>
+            <p class="subtitle">Built by Rajenth</p>
+          </div>
+        </div>
+      </div>
+      <div class="footer">Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> to proceed</div>
+    </div>
+    """
+  end
+
+  defp screen(assigns = %{phase: :car_selection}) do
+    ~H"""
+    <div class="screen">
+    </div>
+    """
+  end
+
+  defp screen(assigns = %{phase: :game_controls_info}) do
+    ~H"""
+    <div class="screen">
+    </div>
+    """
+  end
+
+  defp screen(assigns = %{phase: :countdown}) do
+    ~H"""
+    <div class="screen">
+    </div>
+    """
+  end
+
+  defp screen(assigns = %{phase: :race}) do
+    ~H"""
+    <div class="screen race_screen">
+      <.background images={@race.background.left_side_images} y_position={@race.background.y_position}/>
+        <div class="race">
+          <.lanes/>
+          <.cars cars={@race.cars}/>
+        </div>
+      <.background images={@race.background.right_side_images} y_position={@race.background.y_position}/>
+    </div>
+    """
+  end
+
+  defp screen(assigns = %{phase: :result}) do
+    ~H"""
+    <div class="screen">
+    </div>
+    """
+  end
+
+  defp screen(assigns = %{phase: :off}) do
+    ~H"""
+    <div class="screen">
+    </div>
+    """
+  end
+
+  defp lanes(assigns) do
+    ~H"""
+    <div class="lanes">
+      <div class="lane"></div>
+      <div class="lane"></div>
+      <div class="lane"></div>
+    </div>
+    """
+  end
+
+  defp cars(assigns) do
+    ~H"""
+    <div class="cars">
+      <%= for car <- @cars do %>
+        <img src={"/images/cars/#{car.image}"} style={car_position_style(car)}/>
+      <% end %>
     </div>
     """
   end
@@ -54,21 +128,11 @@ defmodule FormulaXWeb.RaceLive do
     """
   end
 
-  defp cars(assigns) do
-    ~H"""
-    <div class="cars">
-      <%= for car <- @cars do %>
-        <img src={"/images/cars/#{car.image}"} style={car_position_style(car)}/>
-      <% end %>
-    </div>
-    """
-  end
-
   defp direction_controls(assigns) do
     ~H"""
     <div class="direction_controls">
-      <a class="left" href="#" phx-click="move_left"></a>
-      <a class="right" href="#" phx-click="move_right"></a>
+      <a class="left" href="#" phx-click="yellow_button_clicked"></a>
+      <a class="right" href="#" phx-click="blue_button_clicked"></a>
     </div>
     """
   end
@@ -81,18 +145,34 @@ defmodule FormulaXWeb.RaceLive do
 
     RaceEngine.start(race, self())
 
-    socket = assign(socket, :race, race)
+    socket =
+      socket
+      |> assign(:phase, :startup)
+      |> assign(:race, race)
 
     {:ok, socket}
   end
 
   @impl true
   def handle_event(
-        "speedup",
+        "green_button_clicked",
+        _params,
+        socket = %{
+          assigns: %{phase: :startup}
+        }
+      ) do
+    socket = assign(socket, :phase, :car_selection)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "green_button_clicked",
         _params,
         socket = %{
           assigns: %{
-            race: race
+            race: race,
+            phase: :race
           }
         }
       ) do
@@ -108,7 +188,8 @@ defmodule FormulaXWeb.RaceLive do
         %{"key" => "ArrowUp"},
         socket = %{
           assigns: %{
-            race: race
+            race: race,
+            phase: :race
           }
         }
       ) do
@@ -120,11 +201,12 @@ defmodule FormulaXWeb.RaceLive do
   end
 
   def handle_event(
-        "slowdown",
+        "red_button_clicked",
         _params,
         socket = %{
           assigns: %{
-            race: race
+            race: race,
+            phase: :race
           }
         }
       ) do
@@ -140,7 +222,8 @@ defmodule FormulaXWeb.RaceLive do
         %{"key" => "ArrowDown"},
         socket = %{
           assigns: %{
-            race: race
+            race: race,
+            phase: :race
           }
         }
       ) do
@@ -152,11 +235,12 @@ defmodule FormulaXWeb.RaceLive do
   end
 
   def handle_event(
-        "move_right",
+        "blue_button_clicked",
         _params,
         socket = %{
           assigns: %{
-            race: race
+            race: race,
+            phase: :race
           }
         }
       ) do
@@ -172,7 +256,8 @@ defmodule FormulaXWeb.RaceLive do
         %{"key" => "ArrowRight"},
         socket = %{
           assigns: %{
-            race: race
+            race: race,
+            phase: :race
           }
         }
       ) do
@@ -184,11 +269,12 @@ defmodule FormulaXWeb.RaceLive do
   end
 
   def handle_event(
-        "move_left",
+        "yellow_button_clicked",
         _params,
         socket = %{
           assigns: %{
-            race: race
+            race: race,
+            phase: :race
           }
         }
       ) do
@@ -204,7 +290,8 @@ defmodule FormulaXWeb.RaceLive do
         %{"key" => "ArrowLeft"},
         socket = %{
           assigns: %{
-            race: race
+            race: race,
+            phase: :race
           }
         }
       ) do

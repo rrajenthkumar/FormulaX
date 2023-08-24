@@ -64,12 +64,12 @@ defmodule FormulaX.Race do
   end
 
   @spec abort(Race.t()) :: Race.t()
-  def abort(race = %Race{status: :ongoing}) do
+  def abort(race = %Race{}) do
     %Race{race | status: :aborted}
   end
 
   @spec complete(Race.t()) :: Race.t()
-  def complete(race = %Race{status: :ongoing}) do
+  def complete(race = %Race{}) do
     %Race{race | status: :completed}
   end
 
