@@ -8,6 +8,7 @@ defmodule FormulaXWeb.RaceLive do
   alias FormulaX.Race.Car
   alias FormulaX.Race.Car.Controls
   alias FormulaX.Race.RaceEngine
+  alias FormulaX.Utils
 
   @impl true
   def render(assigns) do
@@ -15,7 +16,7 @@ defmodule FormulaXWeb.RaceLive do
     <div class="race_live" phx-window-keydown="keydown">
       <div class="console">
         <.speed_controls/>
-        <.screen phase={@phase} race={@race}/>
+        <.screen phase={@phase} race={@race} car_selection_tuple={@car_selection_tuple}/>
         <.direction_controls/>
       </div>
     </div>
@@ -50,12 +51,22 @@ defmodule FormulaXWeb.RaceLive do
 
   defp screen(assigns = %{phase: :car_selection}) do
     ~H"""
-    <div class="screen">
+    <div class="screen car_selection_screen">
+      <div class="body">
+        <%= with {current_selection_index, _maximum_index, all_available_cars} <- @car_selection_tuple,
+                  car                                                         <- Enum.at(all_available_cars, current_selection_index) do %>
+          <img src={"/images/cars/#{car}"}/>
+        <% end %>
+      </div>
+      <div class="footer">
+      <p>Browse cars using <span class="yellow">Yellow</span> and <span class="blue">Blue</span> buttons or using <span class="arrow">&#8678</span> and <span class="arrow">&#8680</span></p>
+      <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> to select your car and proceed</p>
+      </div>
     </div>
     """
   end
 
-  defp screen(assigns = %{phase: :game_controls_info}) do
+  defp screen(assigns = %{phase: :race_info}) do
     ~H"""
     <div class="screen">
     </div>
@@ -139,16 +150,17 @@ defmodule FormulaXWeb.RaceLive do
 
   @impl true
   def mount(_params, %{}, socket) do
-    race =
-      Race.initialize()
-      |> Race.start()
-
-    RaceEngine.start(race, self())
+    # race =
+    #   Race.initialize()
+    #   |> Race.start()
 
     socket =
       socket
+      |> assign(:car_selection_tuple, nil)
+      |> assign(:race, nil)
       |> assign(:phase, :startup)
-      |> assign(:race, race)
+
+    # RaceEngine.start(race, self())
 
     {:ok, socket}
   end
@@ -161,7 +173,65 @@ defmodule FormulaXWeb.RaceLive do
           assigns: %{phase: :startup}
         }
       ) do
-    socket = assign(socket, :phase, :car_selection)
+    car_selection_tuple = initialise_car_selection_tuple()
+
+    socket =
+      socket
+      |> assign(:car_selection_tuple, car_selection_tuple)
+      |> assign(:phase, :car_selection)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "keydown",
+        %{"key" => "ArrowUp"},
+        socket = %{
+          assigns: %{
+            phase: :startup
+          }
+        }
+      ) do
+    car_selection_tuple = initialise_car_selection_tuple()
+
+    socket =
+      socket
+      |> assign(:car_selection_tuple, car_selection_tuple)
+      |> assign(:phase, :car_selection)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "green_button_clicked",
+        _params,
+        socket = %{
+          assigns: %{
+            phase: :car_selection,
+            car_selection_tuple: {current_selection_index, _maximum_index, all_available_cars}
+          }
+        }
+      ) do
+    player_car_image = Enum.at(all_available_cars, current_selection_index)
+
+    socket =
+      socket
+      |> assign(:player_car_image, player_car_image)
+      |> assign(:phase, :race_info)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "keydown",
+        %{"key" => "ArrowUp"},
+        socket = %{
+          assigns: %{
+            phase: :car_selection
+          }
+        }
+      ) do
+    socket = assign(socket, :phase, :race_info)
 
     {:noreply, socket}
   end
@@ -239,6 +309,38 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket = %{
           assigns: %{
+            phase: :car_selection,
+            car_selection_tuple: car_selection_tuple
+          }
+        }
+      ) do
+    updated_car_selection_tuple = update_car_selection_tuple(car_selection_tuple, :next)
+    socket = assign(socket, :car_selection_tuple, updated_car_selection_tuple)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "keydown",
+        %{"key" => "ArrowRight"},
+        socket = %{
+          assigns: %{
+            phase: :car_selection,
+            car_selection_tuple: car_selection_tuple
+          }
+        }
+      ) do
+    updated_car_selection_tuple = update_car_selection_tuple(car_selection_tuple, :next)
+    socket = assign(socket, :car_selection_tuple, updated_car_selection_tuple)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "blue_button_clicked",
+        _params,
+        socket = %{
+          assigns: %{
             race: race,
             phase: :race
           }
@@ -264,6 +366,38 @@ defmodule FormulaXWeb.RaceLive do
     race
     |> Controls.move_player_car(:right)
     |> RaceEngine.update()
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "yellow_button_clicked",
+        _params,
+        socket = %{
+          assigns: %{
+            phase: :car_selection,
+            car_selection_tuple: car_selection_tuple
+          }
+        }
+      ) do
+    updated_car_selection_tuple = update_car_selection_tuple(car_selection_tuple, :previous)
+    socket = assign(socket, :car_selection_tuple, updated_car_selection_tuple)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "keydown",
+        %{"key" => "ArrowLeft"},
+        socket = %{
+          assigns: %{
+            phase: :car_selection,
+            car_selection_tuple: car_selection_tuple
+          }
+        }
+      ) do
+    updated_car_selection_tuple = update_car_selection_tuple(car_selection_tuple, :previous)
+    socket = assign(socket, :car_selection_tuple, updated_car_selection_tuple)
 
     {:noreply, socket}
   end
@@ -331,5 +465,41 @@ defmodule FormulaXWeb.RaceLive do
   @spec background_position_style(Car.y_position()) :: String.t()
   defp background_position_style(y_position) when is_integer(y_position) do
     "top: #{y_position}px"
+  end
+
+  defp initialise_car_selection_tuple() do
+    all_available_cars = Utils.get_images("cars")
+
+    count = Enum.count(all_available_cars)
+
+    {_current_selection_index = 0, _maximum_index = count - 1, all_available_cars}
+  end
+
+  @spec update_car_selection_tuple({integer(), integer(), list(String.t())}, :previous | :next) ::
+          {integer(), integer(), list(String.t())}
+  defp update_car_selection_tuple(
+         _car_selection_tuple = {current_selection_index, maximum_index, all_available_cars},
+         _action = :next
+       ) do
+    updated_current_selection_index =
+      case current_selection_index - maximum_index do
+        0 -> 0
+        _ -> current_selection_index + 1
+      end
+
+    {updated_current_selection_index, maximum_index, all_available_cars}
+  end
+
+  defp update_car_selection_tuple(
+         _car_selection_tuple = {current_selection_index, maximum_index, all_available_cars},
+         _action = :previous
+       ) do
+    updated_current_selection_index =
+      case current_selection_index do
+        0 -> maximum_index
+        _ -> current_selection_index - 1
+      end
+
+    {updated_current_selection_index, maximum_index, all_available_cars}
   end
 end
