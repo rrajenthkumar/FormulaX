@@ -20,7 +20,7 @@
   box-shadow: 0 0 30px rgb(197, 197, 197);
 }
 
-.race_live .console .off_screen {
+.race_live .console .switched_off_screen {
   background-color: #353839;
   box-shadow: 0 0 30px #353839;
 }

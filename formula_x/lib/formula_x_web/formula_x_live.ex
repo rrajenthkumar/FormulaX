@@ -29,7 +29,7 @@ defmodule FormulaXWeb.RaceLive do
     socket =
       socket
       |> assign(:race, nil)
-      |> assign(:screen_phase, :off)
+      |> assign(:screen_phase, :switched_off)
       |> assign(:button_clicked, nil)
       |> assign(:car_selection_index, nil)
 
@@ -41,7 +41,7 @@ defmodule FormulaXWeb.RaceLive do
         "green_button_clicked",
         _params,
         socket = %{
-          assigns: %{screen_phase: :off}
+          assigns: %{screen_phase: :switched_off}
         }
       ) do
     socket =
@@ -56,7 +56,7 @@ defmodule FormulaXWeb.RaceLive do
         %{"key" => "ArrowUp"},
         socket = %{
           assigns: %{
-            screen_phase: :off
+            screen_phase: :switched_off
           }
         }
       ) do

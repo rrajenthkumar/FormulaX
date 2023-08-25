@@ -4,9 +4,9 @@ defmodule FormulaXWeb.Screen do
   alias FormulaX.Race.Car
   alias FormulaX.Utils
 
-  def render(assigns = %{screen_phase: :off}) do
+  def render(assigns = %{screen_phase: :switched_off}) do
     ~H"""
-    <div class="screen off_screen">
+    <div class="screen switched_off_screen">
     </div>
     """
   end

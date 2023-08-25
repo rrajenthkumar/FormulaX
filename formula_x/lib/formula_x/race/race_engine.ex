@@ -12,8 +12,8 @@ defmodule FormulaX.Race.RaceEngine do
 
   # API
 
-  def start(race_after_flagoff = %Race{}, race_live_pid) when is_pid(race_live_pid) do
-    initial_state = {race_after_flagoff, race_live_pid}
+  def start(race_after_start = %Race{}, race_live_pid) when is_pid(race_live_pid) do
+    initial_state = {race_after_start, race_live_pid}
     GenServer.start_link(__MODULE__, initial_state, name: __MODULE__)
   end
 
