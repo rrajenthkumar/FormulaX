@@ -1,4 +1,4 @@
-defmodule FormulaX.Race.Car.Controls do
+defmodule FormulaX.Race.Car.CarControls do
   @moduledoc """
   **Car Control context**
   This module is the interface for all controls related to player and autonomous cars

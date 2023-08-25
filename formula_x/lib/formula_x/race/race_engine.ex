@@ -5,7 +5,7 @@ defmodule FormulaX.Race.RaceEngine do
   use GenServer
 
   alias FormulaX.Race
-  alias FormulaX.Race.Car.Controls
+  alias FormulaX.Race.Car.CarControls
 
   # Cars  will be moved forward every 200 milliseconds
   @timeout 200

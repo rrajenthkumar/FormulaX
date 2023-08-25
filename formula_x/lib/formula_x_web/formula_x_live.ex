@@ -5,38 +5,21 @@ defmodule FormulaXWeb.RaceLive do
   use FormulaXWeb, :live_view
 
   alias FormulaX.Race
-  alias FormulaX.Race.Car.Controls
+  alias FormulaX.Race.Car.CarControls
   alias FormulaX.Race.RaceEngine
-  alias FormulaXWeb.Screen
   alias FormulaX.Utils
+  alias FormulaXWeb.Screen
+  alias FormulaXWeb.ConsoleControls
 
   @impl true
   def render(assigns) do
     ~H"""
     <div class="race_live" phx-window-keydown="keydown">
       <div class="console">
-        <.speed_controls/>
-        <Screen.render race={@race} screen_phase={@screen_phase} button_clicked={@button_clicked} car_selection_index={@car_selection_index}/>
-        <.direction_controls/>
+        <ConsoleControls.speed_controls button_clicked={@button_clicked}/>
+        <Screen.render race={@race} screen_phase={@screen_phase} car_selection_index={@car_selection_index}/>
+        <ConsoleControls.direction_controls button_clicked={@button_clicked}/>
       </div>
-    </div>
-    """
-  end
-
-  defp speed_controls(assigns) do
-    ~H"""
-    <div class="speed_controls">
-      <a class="top" href="#" phx-click="green_button_clicked"><span></span></a>
-      <a class="bottom" href="#" phx-click="red_button_clicked"><span></span></a>
-    </div>
-    """
-  end
-
-  defp direction_controls(assigns) do
-    ~H"""
-    <div class="direction_controls">
-      <a class="left" href="#" phx-click="yellow_button_clicked"><span></span></a>
-      <a class="right" href="#" phx-click="blue_button_clicked"><span></span></a>
     </div>
     """
   end
@@ -64,7 +47,6 @@ defmodule FormulaXWeb.RaceLive do
     socket =
       socket
       |> assign(:screen_phase, :startup)
-      |> assign(:button_clicked, :green)
 
     {:noreply, socket}
   end
@@ -83,6 +65,8 @@ defmodule FormulaXWeb.RaceLive do
       |> assign(:screen_phase, :startup)
       |> assign(:button_clicked, :green)
 
+    Process.send_after(self(), :reset_button_clicked_assign, 250)
+
     {:noreply, socket}
   end
 
@@ -96,7 +80,6 @@ defmodule FormulaXWeb.RaceLive do
     socket =
       socket
       |> assign(:screen_phase, :car_selection)
-      |> assign(:button_clicked, :green)
       |> assign(:car_selection_index, 0)
 
     {:noreply, socket}
@@ -117,6 +100,8 @@ defmodule FormulaXWeb.RaceLive do
       |> assign(:button_clicked, :green)
       |> assign(:car_selection_index, 0)
 
+    Process.send_after(self(), :reset_button_clicked_assign, 250)
+
     {:noreply, socket}
   end
 
@@ -132,7 +117,6 @@ defmodule FormulaXWeb.RaceLive do
     socket =
       socket
       |> assign(:screen_phase, :race_info)
-      |> assign(:button_clicked, :green)
 
     {:noreply, socket}
   end
@@ -150,6 +134,8 @@ defmodule FormulaXWeb.RaceLive do
       socket
       |> assign(:screen_phase, :race_info)
       |> assign(:button_clicked, :green)
+
+    Process.send_after(self(), :reset_button_clicked_assign, 250)
 
     {:noreply, socket}
   end
@@ -170,7 +156,6 @@ defmodule FormulaXWeb.RaceLive do
       socket
       |> assign(:race, race)
       |> assign(:screen_phase, :countdown)
-      |> assign(:button_clicked, :green)
 
     {:noreply, socket}
   end
@@ -193,6 +178,8 @@ defmodule FormulaXWeb.RaceLive do
       |> assign(:screen_phase, :countdown)
       |> assign(:button_clicked, :green)
 
+    Process.send_after(self(), :reset_button_clicked_assign, 250)
+
     {:noreply, socket}
   end
 
@@ -206,10 +193,14 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    race
-    |> Controls.change_player_car_speed(:speedup)
-    |> RaceEngine.update()
-    |> assign(:button_clicked, :green)
+    race =
+      race
+      |> CarControls.change_player_car_speed(:speedup)
+      |> RaceEngine.update()
+
+    socket =
+      socket
+      |> assign(:race, race)
 
     {:noreply, socket}
   end
@@ -224,10 +215,17 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    race
-    |> Controls.change_player_car_speed(:speedup)
-    |> RaceEngine.update()
-    |> assign(:button_clicked, :green)
+    race =
+      race
+      |> CarControls.change_player_car_speed(:speedup)
+      |> RaceEngine.update()
+
+    socket =
+      socket
+      |> assign(:race, race)
+      |> assign(:button_clicked, :green)
+
+    Process.send_after(self(), :reset_button_clicked_assign, 250)
 
     {:noreply, socket}
   end
@@ -242,10 +240,14 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    race
-    |> Controls.change_player_car_speed(:slowdown)
-    |> RaceEngine.update()
-    |> assign(:button_clicked, :red)
+    race =
+      race
+      |> CarControls.change_player_car_speed(:slowdown)
+      |> RaceEngine.update()
+
+    socket =
+      socket
+      |> assign(:race, race)
 
     {:noreply, socket}
   end
@@ -260,10 +262,17 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    race
-    |> Controls.change_player_car_speed(:slowdown)
-    |> RaceEngine.update()
-    |> assign(:button_clicked, :red)
+    race =
+      race
+      |> CarControls.change_player_car_speed(:slowdown)
+      |> RaceEngine.update()
+
+    socket =
+      socket
+      |> assign(:race, race)
+      |> assign(:button_clicked, :red)
+
+    Process.send_after(self(), :reset_button_clicked_assign, 250)
 
     {:noreply, socket}
   end
@@ -282,7 +291,6 @@ defmodule FormulaXWeb.RaceLive do
 
     socket =
       socket
-      |> assign(:button_clicked, :blue)
       |> assign(:car_selection_index, updated_car_selection_index)
 
     {:noreply, socket}
@@ -305,6 +313,8 @@ defmodule FormulaXWeb.RaceLive do
       |> assign(:button_clicked, :blue)
       |> assign(:car_selection_index, updated_car_selection_index)
 
+    Process.send_after(self(), :reset_button_clicked_assign, 250)
+
     {:noreply, socket}
   end
 
@@ -319,9 +329,8 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> Controls.move_player_car(:right)
+    |> CarControls.move_player_car(:right)
     |> RaceEngine.update()
-    |> assign(:button_clicked, :blue)
 
     {:noreply, socket}
   end
@@ -337,10 +346,12 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> Controls.move_player_car(:right)
+    |> CarControls.move_player_car(:right)
     |> RaceEngine.update()
     |> assign(:button_clicked, :blue)
 
+    Process.send_after(self(), :reset_button_clicked_assign, 250)
+
     {:noreply, socket}
   end
 
@@ -358,7 +369,6 @@ defmodule FormulaXWeb.RaceLive do
 
     socket =
       socket
-      |> assign(:button_clicked, :yellow)
       |> assign(:car_selection_index, updated_car_selection_index)
 
     {:noreply, socket}
@@ -381,6 +391,8 @@ defmodule FormulaXWeb.RaceLive do
       |> assign(:button_clicked, :yellow)
       |> assign(:car_selection_index, updated_car_selection_index)
 
+    Process.send_after(self(), :reset_button_clicked_assign, 250)
+
     {:noreply, socket}
   end
 
@@ -395,9 +407,8 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> Controls.move_player_car(:left)
+    |> CarControls.move_player_car(:left)
     |> RaceEngine.update()
-    |> assign(:button_clicked, :yellow)
 
     {:noreply, socket}
   end
@@ -413,15 +424,70 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> Controls.move_player_car(:left)
+    |> CarControls.move_player_car(:left)
     |> RaceEngine.update()
     |> assign(:button_clicked, :yellow)
+
+    Process.send_after(self(), :reset_button_clicked_assign, 250)
 
     {:noreply, socket}
   end
 
-  # For every other instances of pressing the 4 arrow keys and when pressing other keys
-  def handle_event("keydown", %{"key" => _key}, socket) do
+  # For every other instances of pressing the 4 arrow keys
+  def handle_event(
+        "keydown",
+        %{"key" => "ArrowUp"},
+        socket
+      ) do
+    socket = assign(socket, :button_clicked, :green)
+
+    Process.send_after(self(), :reset_button_clicked_assign, 250)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "keydown",
+        %{"key" => "ArrowDown"},
+        socket
+      ) do
+    socket = assign(socket, :button_clicked, :red)
+
+    Process.send_after(self(), :reset_button_clicked_assign, 250)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "keydown",
+        %{"key" => "ArrowLeft"},
+        socket
+      ) do
+    socket = assign(socket, :button_clicked, :yellow)
+
+    Process.send_after(self(), :reset_button_clicked_assign, 250)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "keydown",
+        %{"key" => "ArrowRight"},
+        socket
+      ) do
+    socket = assign(socket, :button_clicked, :blue)
+
+    Process.send_after(self(), :reset_button_clicked_assign, 250)
+
+    {:noreply, socket}
+  end
+
+  # When pressing any other key
+  def handle_event(
+        "keydown",
+        %{"key" => _any_other_key},
+        socket
+      ) do
     {:noreply, socket}
   end
 
@@ -431,7 +497,6 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket
       ) do
-    socket = assign(socket, :button_clicked, :green)
     {:noreply, socket}
   end
 
@@ -440,7 +505,6 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket
       ) do
-    socket = assign(socket, :button_clicked, :red)
     {:noreply, socket}
   end
 
@@ -449,7 +513,6 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket
       ) do
-    socket = assign(socket, :button_clicked, :yellow)
     {:noreply, socket}
   end
 
@@ -458,7 +521,6 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket
       ) do
-    socket = assign(socket, :button_clicked, :blue)
     {:noreply, socket}
   end
 
@@ -489,6 +551,15 @@ defmodule FormulaXWeb.RaceLive do
     end
 
     socket = assign(socket, :race, race)
+
+    {:noreply, socket}
+  end
+
+  def handle_info(
+        :reset_button_clicked_assign,
+        socket
+      ) do
+    socket = assign(socket, :button_clicked, nil)
 
     {:noreply, socket}
   end

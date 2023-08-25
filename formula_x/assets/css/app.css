@@ -329,3 +329,67 @@
   @apply block;
   transition: transform 0.25s ease-in-out;
 }
+
+.green_button_clicked,
+.red_button_clicked,
+.yellow_button_clicked,
+.blue_button_clicked {
+  box-shadow: 3px 3px 2px 2px rgb(65, 65, 65);
+  animation-duration: 0.25s;
+}
+
+.green_button_clicked {
+  transform: translateY(-2px);
+  animation-name: green_button_transformation;
+}
+
+.red_button_clicked {
+  transform: translateY(2px);
+  animation-name: red_button_transformation;
+}
+
+.yellow_button_clicked {
+  transform: translateX(-2px);
+  animation-name: yellow_button_transformation;
+}
+
+.blue_button_clicked {
+  transform: translateX(2px);
+  animation-name: blue_button_transformation;
+}
+
+@keyframes green_button_transformation {
+  from {
+    transform: translateY(-2px);
+  }
+  to {
+    transform: translateY(2px);
+  }
+}
+
+@keyframes red_button_transformation {
+  from {
+    transform: translateY(2px);
+  }
+  to {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes yellow_button_transformation {
+  from {
+    transform: translateX(-2px);
+  }
+  to {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes blue_button_transformation {
+  from {
+    transform: translateX(2px);
+  }
+  to {
+    transform: translateX(-2px);
+  }
+}
