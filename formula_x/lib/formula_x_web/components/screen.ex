@@ -2,6 +2,7 @@ defmodule FormulaXWeb.Screen do
   use Phoenix.Component
 
   alias FormulaX.Race.Car
+  alias FormulaX.Utils
 
   def render(assigns = %{phase: :off}) do
     ~H"""
@@ -33,8 +34,7 @@ defmodule FormulaXWeb.Screen do
     ~H"""
     <div class="screen car_selection_screen">
       <div class="body">
-        <%= with {current_selection_index, _maximum_index, all_available_cars} <- @car_selection_tuple,
-                  car                                                         <- Enum.at(all_available_cars, current_selection_index) do %>
+        <%= with car <- Utils.get_images("cars") |> Enum.at(@car_selection_index) do %>
           <img src={"/images/cars/#{car}"}/>
         <% end %>
       </div>

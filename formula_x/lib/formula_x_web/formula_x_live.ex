@@ -16,7 +16,7 @@ defmodule FormulaXWeb.RaceLive do
     <div class="race_live" phx-window-keydown="keydown">
       <div class="console">
         <.speed_controls/>
-        <Screen.render phase={@phase} race={@race} car_selection_tuple={@car_selection_tuple}/>
+        <Screen.render phase={@phase} race={@race} car_selection_index={@car_selection_index}/>
         <.direction_controls/>
       </div>
     </div>
@@ -45,7 +45,7 @@ defmodule FormulaXWeb.RaceLive do
   def mount(_params, %{}, socket) do
     socket =
       socket
-      |> assign(:car_selection_tuple, nil)
+      |> assign(:car_selection_index, nil)
       |> assign(:race, nil)
       |> assign(:phase, :startup)
 
@@ -60,11 +60,9 @@ defmodule FormulaXWeb.RaceLive do
           assigns: %{phase: :startup}
         }
       ) do
-    car_selection_tuple = initialise_car_selection_tuple()
-
     socket =
       socket
-      |> assign(:car_selection_tuple, car_selection_tuple)
+      |> assign(:car_selection_index, 0)
       |> assign(:phase, :car_selection)
 
     {:noreply, socket}
@@ -79,11 +77,9 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    car_selection_tuple = initialise_car_selection_tuple()
-
     socket =
       socket
-      |> assign(:car_selection_tuple, car_selection_tuple)
+      |> assign(:car_selection_index, 0)
       |> assign(:phase, :car_selection)
 
     {:noreply, socket}
@@ -126,7 +122,7 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    # Player car initialisation function to be updated to use info from car_selection_tuple!!!
+    # Player car initialisation function to be updated to use info from car_selection_index!!!
     race = Race.initialize()
 
     socket =
@@ -146,7 +142,7 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    # Player car initialisation function to be updated to use info from car_selection_tuple!!!
+    # Player car initialisation function to be updated to use info from car_selection_index!!!
     race = Race.initialize()
 
     socket =
@@ -231,12 +227,12 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             phase: :car_selection,
-            car_selection_tuple: car_selection_tuple
+            car_selection_index: car_selection_index
           }
         }
       ) do
-    updated_car_selection_tuple = update_car_selection_tuple(car_selection_tuple, :next)
-    socket = assign(socket, :car_selection_tuple, updated_car_selection_tuple)
+    updated_car_selection_index = update_car_selection_index(car_selection_index, :next)
+    socket = assign(socket, :car_selection_index, updated_car_selection_index)
 
     {:noreply, socket}
   end
@@ -247,12 +243,12 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             phase: :car_selection,
-            car_selection_tuple: car_selection_tuple
+            car_selection_index: car_selection_index
           }
         }
       ) do
-    updated_car_selection_tuple = update_car_selection_tuple(car_selection_tuple, :next)
-    socket = assign(socket, :car_selection_tuple, updated_car_selection_tuple)
+    updated_car_selection_index = update_car_selection_index(car_selection_index, :next)
+    socket = assign(socket, :car_selection_index, updated_car_selection_index)
 
     {:noreply, socket}
   end
@@ -297,12 +293,12 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             phase: :car_selection,
-            car_selection_tuple: car_selection_tuple
+            car_selection_index: car_selection_index
           }
         }
       ) do
-    updated_car_selection_tuple = update_car_selection_tuple(car_selection_tuple, :previous)
-    socket = assign(socket, :car_selection_tuple, updated_car_selection_tuple)
+    updated_car_selection_index = update_car_selection_index(car_selection_index, :previous)
+    socket = assign(socket, :car_selection_index, updated_car_selection_index)
 
     {:noreply, socket}
   end
@@ -313,12 +309,12 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             phase: :car_selection,
-            car_selection_tuple: car_selection_tuple
+            car_selection_index: car_selection_index
           }
         }
       ) do
-    updated_car_selection_tuple = update_car_selection_tuple(car_selection_tuple, :previous)
-    socket = assign(socket, :car_selection_tuple, updated_car_selection_tuple)
+    updated_car_selection_index = update_car_selection_index(car_selection_index, :previous)
+    socket = assign(socket, :car_selection_index, updated_car_selection_index)
 
     {:noreply, socket}
   end
@@ -393,39 +389,37 @@ defmodule FormulaXWeb.RaceLive do
     {:noreply, socket}
   end
 
-  defp initialise_car_selection_tuple() do
-    all_available_cars = Utils.get_images("cars")
+  @spec update_car_selection_index(integer(), :previous | :next) ::
+          integer()
 
-    count = Enum.count(all_available_cars)
-
-    {_current_selection_index = 0, _maximum_index = count - 1, all_available_cars}
-  end
-
-  @spec update_car_selection_tuple({integer(), integer(), list(String.t())}, :previous | :next) ::
-          {integer(), integer(), list(String.t())}
-  defp update_car_selection_tuple(
-         _car_selection_tuple = {current_selection_index, maximum_index, all_available_cars},
+  defp update_car_selection_index(
+         car_selection_index,
          _action = :next
-       ) do
-    updated_current_selection_index =
-      case current_selection_index - maximum_index do
-        0 -> 0
-        _ -> current_selection_index + 1
-      end
-
-    {updated_current_selection_index, maximum_index, all_available_cars}
+       )
+       when is_integer(car_selection_index) do
+    case car_selection_index - maximum_car_selection_index() do
+      0 -> 0
+      _ -> car_selection_index + 1
+    end
   end
 
-  defp update_car_selection_tuple(
-         _car_selection_tuple = {current_selection_index, maximum_index, all_available_cars},
+  defp update_car_selection_index(
+         car_selection_index,
          _action = :previous
-       ) do
-    updated_current_selection_index =
-      case current_selection_index do
-        0 -> maximum_index
-        _ -> current_selection_index - 1
-      end
+       )
+       when is_integer(car_selection_index) do
+    case car_selection_index do
+      0 -> maximum_car_selection_index()
+      _ -> car_selection_index - 1
+    end
+  end
 
-    {updated_current_selection_index, maximum_index, all_available_cars}
+  defp maximum_car_selection_index() do
+    number_of_cars =
+      "cars"
+      |> Utils.get_images()
+      |> Enum.count()
+
+    number_of_cars - 1
   end
 end
