@@ -363,7 +363,7 @@
     transform: translateY(-2px);
   }
   to {
-    transform: translateY(2px);
+    transform: translateY(0px);
   }
 }
 
@@ -372,7 +372,7 @@
     transform: translateY(2px);
   }
   to {
-    transform: translateY(-2px);
+    transform: translateY(0px);
   }
 }
 
@@ -381,7 +381,7 @@
     transform: translateX(-2px);
   }
   to {
-    transform: translateX(2px);
+    transform: translateX(0px);
   }
 }
 
@@ -390,6 +390,6 @@
     transform: translateX(2px);
   }
   to {
-    transform: translateX(-2px);
+    transform: translateX(0px);
   }
 }
