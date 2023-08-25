@@ -21,8 +21,8 @@
 }
 
 .race_live .console .off_screen {
-  @apply bg-gray-500;
-  box-shadow: 0 0 30px rgb(107, 114, 128);
+  background-color: #353839;
+  box-shadow: 0 0 30px #353839;
 }
 
 .race_live .console .startup_screen {
