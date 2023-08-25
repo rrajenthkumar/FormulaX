@@ -47,12 +47,38 @@ defmodule FormulaXWeb.RaceLive do
       socket
       |> assign(:car_selection_index, nil)
       |> assign(:race, nil)
-      |> assign(:phase, :startup)
+      |> assign(:phase, :off)
 
     {:ok, socket}
   end
 
   @impl true
+  def handle_event(
+        "green_button_clicked",
+        _params,
+        socket = %{
+          assigns: %{phase: :off}
+        }
+      ) do
+    socket = assign(socket, :phase, :startup)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "keydown",
+        %{"key" => "ArrowUp"},
+        socket = %{
+          assigns: %{
+            phase: :off
+          }
+        }
+      ) do
+    socket = assign(socket, :phase, :startup)
+
+    {:noreply, socket}
+  end
+
   def handle_event(
         "green_button_clicked",
         _params,
@@ -353,8 +379,41 @@ defmodule FormulaXWeb.RaceLive do
     {:noreply, socket}
   end
 
-  # For every other instances and other keys
+  # For every other instances of pressing the 4 arrow keys and when pressing other keys
   def handle_event("keydown", %{"key" => _key}, socket) do
+    {:noreply, socket}
+  end
+
+  # For every other instances of clicking the 4 colour buttons
+  def handle_event(
+        "green_button_clicked",
+        _params,
+        socket
+      ) do
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "red_button_clicked",
+        _params,
+        socket
+      ) do
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "yellow_button_clicked",
+        _params,
+        socket
+      ) do
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "blue_button_clicked",
+        _params,
+        socket
+      ) do
     {:noreply, socket}
   end
 
