@@ -6,7 +6,7 @@ defmodule FormulaXWeb.Screen do
 
   def render(assigns = %{phase: :off}) do
     ~H"""
-    <div class="screen">
+    <div class="screen off_screen">
     </div>
     """
   end
@@ -111,7 +111,7 @@ defmodule FormulaXWeb.Screen do
 
   def render(assigns = %{phase: :result}) do
     ~H"""
-    <div class="screen">
+    <div class="screen result_screen">
     </div>
     """
   end

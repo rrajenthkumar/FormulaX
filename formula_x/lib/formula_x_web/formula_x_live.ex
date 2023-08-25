@@ -26,8 +26,8 @@ defmodule FormulaXWeb.RaceLive do
   defp speed_controls(assigns) do
     ~H"""
     <div class="speed_controls">
-      <a class="top" href="#" phx-click="green_button_clicked"></a>
-      <a class="bottom" href="#" phx-click="red_button_clicked"></a>
+      <a class="top" href="#" phx-click="green_button_clicked"><span></span></a>
+      <a class="bottom" href="#" phx-click="red_button_clicked"><span></span></a>
     </div>
     """
   end
@@ -35,8 +35,8 @@ defmodule FormulaXWeb.RaceLive do
   defp direction_controls(assigns) do
     ~H"""
     <div class="direction_controls">
-      <a class="left" href="#" phx-click="yellow_button_clicked"></a>
-      <a class="right" href="#" phx-click="blue_button_clicked"></a>
+      <a class="left" href="#" phx-click="yellow_button_clicked"><span></span></a>
+      <a class="right" href="#" phx-click="blue_button_clicked"><span></span></a>
     </div>
     """
   end

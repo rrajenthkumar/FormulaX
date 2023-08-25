@@ -15,29 +15,14 @@
   box-shadow: 5px 5px 5px 5px rgb(65, 65, 65);
 }
 
-.race_live .console .speed_controls {
-  @apply flex flex-col gap-2;
-}
-
-.race_live .console .speed_controls .top,
-.race_live .console .speed_controls .bottom {
-  @apply w-64 h-32;
-  box-shadow: 3px 3px 2px 2px rgb(65, 65, 65);
-}
-
-.race_live .console .speed_controls .top {
-  @apply rounded-t-full;
-  background-color: rgba(95, 160, 140, 0.884);
-}
-
-.race_live .console .speed_controls .bottom {
-  @apply rounded-b-full;
-  background-color: indianred;
-}
-
 .race_live .console .screen {
   @apply w-[35rem] h-[35rem] bg-white rounded-md overflow-hidden font-Orbitron;
   box-shadow: 0 0 30px rgb(197, 197, 197);
+}
+
+.race_live .console .off_screen {
+  @apply bg-gray-500;
+  box-shadow: 0 0 30px rgb(107, 114, 128);
 }
 
 .race_live .console .startup_screen {
@@ -252,22 +237,95 @@
   transition: left 1s ease-out, bottom 1s ease-out;
 }
 
+.race_live .console .speed_controls {
+  @apply flex flex-col gap-2;
+}
+
+.race_live .console .speed_controls .top,
+.race_live .console .speed_controls .top span {
+  @apply rounded-t-full;
+}
+
+.race_live .console .speed_controls .top span {
+  background-color: rgba(95, 160, 140, 0.884);
+}
+
+.race_live .console .speed_controls .bottom,
+.race_live .console .speed_controls .bottom span {
+  @apply rounded-b-full;
+}
+
+.race_live .console .speed_controls .bottom span {
+  background-color: indianred;
+}
+
+.race_live .console .speed_controls .top,
+.race_live .console .speed_controls .bottom,
+.race_live .console .speed_controls .top span,
+.race_live .console .speed_controls .bottom span {
+  @apply w-64 h-32;
+}
+
+.race_live .console .speed_controls .top:active span {
+  transform: translateY(-2px);
+}
+
+.race_live .console .speed_controls .bottom:active span {
+  transform: translateY(2px);
+}
+
 .race_live .console .direction_controls {
   @apply flex gap-2;
 }
 
 .race_live .console .direction_controls .left,
-.race_live .console .direction_controls .right {
-  @apply w-32 h-64;
-  box-shadow: 3px 3px 2px 2px rgb(65, 65, 65);
+.race_live .console .direction_controls .left span {
+  @apply rounded-l-full;
 }
 
-.race_live .console .direction_controls .left {
-  @apply rounded-l-full;
+.race_live .console .direction_controls .left span {
   background-color: #ffdb58;
 }
 
-.race_live .console .direction_controls .right {
+.race_live .console .direction_controls .right,
+.race_live .console .direction_controls .right span {
   @apply rounded-r-full;
+}
+
+.race_live .console .direction_controls .right span {
   background-color: #4682b4;
+}
+
+.race_live .console .direction_controls .left,
+.race_live .console .direction_controls .right,
+.race_live .console .direction_controls .left span,
+.race_live .console .direction_controls .right span {
+  @apply w-32 h-64;
+}
+
+.race_live .console .direction_controls .left:active span {
+  transform: translateX(-2px);
+}
+
+.race_live .console .direction_controls .right:active span {
+  transform: translateX(2px);
+}
+
+.race_live .console .speed_controls .top,
+.race_live .console .speed_controls .bottom,
+.race_live .console .direction_controls .left,
+.race_live .console .direction_controls .right,
+.race_live .console .speed_controls .top:active span,
+.race_live .console .speed_controls .bottom:active span,
+.race_live .console .direction_controls .left:active span,
+.race_live .console .direction_controls .right:active span {
+  box-shadow: 3px 3px 2px 2px rgb(65, 65, 65);
+}
+
+.race_live .console .speed_controls .top span,
+.race_live .console .speed_controls .bottom span,
+.race_live .console .direction_controls .left span,
+.race_live .console .direction_controls .right span {
+  @apply block;
+  transition: transform 0.25s ease-in-out;
 }
