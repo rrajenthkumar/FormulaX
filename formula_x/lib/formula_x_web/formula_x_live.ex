@@ -17,7 +17,7 @@ defmodule FormulaXWeb.RaceLive do
     <div class="race_live" phx-window-keydown="keydown">
       <div class="console">
         <ConsoleControls.speed_controls clicked_button={@clicked_button}/>
-        <Screen.render race={@race} screen_state={@screen_state} car_selection_index={@car_selection_index}/>
+        <Screen.render race={@race} screen_state={@screen_state} car_selection_index={@car_selection_index} countdown_count={@countdown_count}/>
         <ConsoleControls.direction_controls clicked_button={@clicked_button}/>
       </div>
     </div>
@@ -32,6 +32,7 @@ defmodule FormulaXWeb.RaceLive do
       |> assign(:screen_state, :switched_off)
       |> assign(:clicked_button, nil)
       |> assign(:car_selection_index, nil)
+      |> assign(:countdown_count, nil)
 
     {:ok, socket}
   end
@@ -97,8 +98,8 @@ defmodule FormulaXWeb.RaceLive do
     socket =
       socket
       |> assign(:screen_state, :car_selection)
-      |> assign(:clicked_button, :green)
       |> assign(:car_selection_index, 0)
+      |> assign(:clicked_button, :green)
 
     Process.send_after(self(), :reset_clicked_button_assign, 250)
 
@@ -114,9 +115,7 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    socket =
-      socket
-      |> assign(:screen_state, :race_info)
+    socket = assign(socket, :screen_state, :race_info)
 
     {:noreply, socket}
   end
@@ -156,6 +155,10 @@ defmodule FormulaXWeb.RaceLive do
       socket
       |> assign(:race, race)
       |> assign(:screen_state, :countdown)
+      |> assign(:clicked_button, :green)
+
+    Process.send_after(self(), :reset_clicked_button_assign, 250)
+    Process.send(self(), {:count_down, _count = 3}, [])
 
     {:noreply, socket}
   end
@@ -179,6 +182,7 @@ defmodule FormulaXWeb.RaceLive do
       |> assign(:clicked_button, :green)
 
     Process.send_after(self(), :reset_clicked_button_assign, 250)
+    Process.send(self(), {:count_down, _count = 3}, [])
 
     {:noreply, socket}
   end
@@ -193,14 +197,9 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    race =
-      race
-      |> CarControls.change_player_car_speed(:speedup)
-      |> RaceEngine.update()
-
-    socket =
-      socket
-      |> assign(:race, race)
+    race
+    |> CarControls.change_player_car_speed(:speedup)
+    |> RaceEngine.update()
 
     {:noreply, socket}
   end
@@ -215,15 +214,11 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    race =
-      race
-      |> CarControls.change_player_car_speed(:speedup)
-      |> RaceEngine.update()
+    race
+    |> CarControls.change_player_car_speed(:speedup)
+    |> RaceEngine.update()
 
-    socket =
-      socket
-      |> assign(:race, race)
-      |> assign(:clicked_button, :green)
+    socket = assign(socket, :clicked_button, :green)
 
     Process.send_after(self(), :reset_clicked_button_assign, 250)
 
@@ -240,14 +235,9 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    race =
-      race
-      |> CarControls.change_player_car_speed(:slowdown)
-      |> RaceEngine.update()
-
-    socket =
-      socket
-      |> assign(:race, race)
+    race
+    |> CarControls.change_player_car_speed(:slowdown)
+    |> RaceEngine.update()
 
     {:noreply, socket}
   end
@@ -262,15 +252,11 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    race =
-      race
-      |> CarControls.change_player_car_speed(:slowdown)
-      |> RaceEngine.update()
+    race
+    |> CarControls.change_player_car_speed(:slowdown)
+    |> RaceEngine.update()
 
-    socket =
-      socket
-      |> assign(:race, race)
-      |> assign(:clicked_button, :red)
+    socket = assign(socket, :clicked_button, :red)
 
     Process.send_after(self(), :reset_clicked_button_assign, 250)
 
@@ -289,9 +275,7 @@ defmodule FormulaXWeb.RaceLive do
       ) do
     updated_car_selection_index = update_car_selection_index(car_selection_index, :next)
 
-    socket =
-      socket
-      |> assign(:car_selection_index, updated_car_selection_index)
+    socket = assign(socket, :car_selection_index, updated_car_selection_index)
 
     {:noreply, socket}
   end
@@ -310,8 +294,8 @@ defmodule FormulaXWeb.RaceLive do
 
     socket =
       socket
+      |> assign(:car_selection_index, updated_car_selection_index)
       |> assign(:clicked_button, :blue)
-      |> assign(:car_selection_index, updated_car_selection_index)
 
     Process.send_after(self(), :reset_clicked_button_assign, 250)
 
@@ -348,7 +332,8 @@ defmodule FormulaXWeb.RaceLive do
     race
     |> CarControls.move_player_car(:right)
     |> RaceEngine.update()
-    |> assign(:clicked_button, :blue)
+
+    socket = assign(socket, :clicked_button, :blue)
 
     Process.send_after(self(), :reset_clicked_button_assign, 250)
 
@@ -367,9 +352,7 @@ defmodule FormulaXWeb.RaceLive do
       ) do
     updated_car_selection_index = update_car_selection_index(car_selection_index, :previous)
 
-    socket =
-      socket
-      |> assign(:car_selection_index, updated_car_selection_index)
+    socket = assign(socket, :car_selection_index, updated_car_selection_index)
 
     {:noreply, socket}
   end
@@ -388,8 +371,8 @@ defmodule FormulaXWeb.RaceLive do
 
     socket =
       socket
+      |> assign(:car_selection_index, updated_car_selection_index)
       |> assign(:clicked_button, :yellow)
-      |> assign(:car_selection_index, updated_car_selection_index)
 
     Process.send_after(self(), :reset_clicked_button_assign, 250)
 
@@ -426,7 +409,8 @@ defmodule FormulaXWeb.RaceLive do
     race
     |> CarControls.move_player_car(:left)
     |> RaceEngine.update()
-    |> assign(:clicked_button, :yellow)
+
+    socket = assign(socket, :clicked_button, :yellow)
 
     Process.send_after(self(), :reset_clicked_button_assign, 250)
 
@@ -525,19 +509,22 @@ defmodule FormulaXWeb.RaceLive do
   end
 
   @impl true
-  # This will be triggered by countdown screen
   def handle_info(
-        :start_race,
+        {:count_down, count},
         socket = %{assigns: %{race: race = %Race{status: :countdown}, screen_state: :countdown}}
       ) do
-    updated_race = Race.start(race)
-
     socket =
-      socket
-      |> assign(:race, updated_race)
-      |> assign(:screen_state, :active_race)
+      if count > 0 do
+        updated_count = count - 1
+        Process.send_after(self(), {:count_down, updated_count}, 1000)
+        assign(socket, :countdown_count, count)
+      else
+        race = Race.start(race)
 
-    RaceEngine.start(race, self())
+        RaceEngine.start(race, self())
+
+        assign(socket, :screen_state, :active_race)
+      end
 
     {:noreply, socket}
   end

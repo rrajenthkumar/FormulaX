@@ -30,9 +30,9 @@ defmodule FormulaX.Race do
     struct!(Race, attrs)
   end
 
-  @spec initialize() :: Race.t()
-  def initialize() do
-    cars = Car.initialize_cars()
+  @spec initialize(integer()) :: Race.t()
+  def initialize(player_car_index) do
+    cars = Car.initialize_cars(player_car_index)
     race_distance = Parameters.race_distance()
     background = Background.initialize(race_distance)
 

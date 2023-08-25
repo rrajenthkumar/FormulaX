@@ -84,7 +84,6 @@ defmodule FormulaXWeb.Screen do
 
   def render(assigns = %{screen_state: :countdown}) do
     ~H"""
-    <%= # Insert countdown screen in this template and once countdown is over send a message ":start_race" to live view. This template should have race initial visual along with countdown div" %>
     <div class="screen countdown_screen">
       <.background images={@race.background.left_side_images} y_position={@race.background.y_position}/>
       <div class="race">
@@ -92,6 +91,9 @@ defmodule FormulaXWeb.Screen do
         <.cars cars={@race.cars}/>
       </div>
       <.background images={@race.background.right_side_images} y_position={@race.background.y_position}/>
+      <div class="countdown_container">
+        <%= @countdown_count %>
+      </div>
     </div>
     """
   end

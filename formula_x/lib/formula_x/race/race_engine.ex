@@ -39,8 +39,8 @@ defmodule FormulaX.Race.RaceEngine do
   def handle_info(:timeout, _state = {race = %Race{}, race_live_pid}) do
     updated_race =
       race
-      |> Controls.move_autonomous_cars_forward()
-      |> Controls.move_player_car(:forward)
+      |> CarControls.move_autonomous_cars_forward()
+      |> CarControls.move_player_car(:forward)
 
     Process.send(race_live_pid, {:update_visuals, updated_race}, [])
     updated_state = {updated_race, race_live_pid}
