@@ -145,12 +145,12 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket = %{
           assigns: %{
-            screen_state: :race_info
+            screen_state: :race_info,
+            car_selection_index: player_car_index
           }
         }
       ) do
-    # Player car initialisation function to be updated to use info from car_selection_index!!!
-    race = Race.initialize()
+    race = Race.initialize(player_car_index)
 
     socket =
       socket
@@ -165,12 +165,12 @@ defmodule FormulaXWeb.RaceLive do
         %{"key" => "ArrowUp"},
         socket = %{
           assigns: %{
-            screen_state: :race_info
+            screen_state: :race_info,
+            car_selection_index: player_car_index
           }
         }
       ) do
-    # Player car initialisation function to be updated to use info from car_selection_index!!!
-    race = Race.initialize()
+    race = Race.initialize(player_car_index)
 
     socket =
       socket

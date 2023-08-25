@@ -36,8 +36,8 @@ defmodule FormulaX.Race.Car do
     struct!(Car, attrs)
   end
 
-  @spec initialize_cars() :: list(Car.t())
-  def initialize_cars() do
+  @spec initialize_cars(integer()) :: list(Car.t())
+  def initialize_cars(player_car_index) do
     possible_ids =
       1..Parameters.number_of_cars()
       |> Enum.to_list()
@@ -45,7 +45,8 @@ defmodule FormulaX.Race.Car do
     player_car_id = Enum.random(possible_ids)
 
     available_car_images = Utils.get_images("cars")
-    player_car_image = Enum.random(available_car_images)
+
+    player_car_image = Enum.at(available_car_images, player_car_index)
 
     player_car = initialize_car(player_car_id, player_car_image, :player)
 
