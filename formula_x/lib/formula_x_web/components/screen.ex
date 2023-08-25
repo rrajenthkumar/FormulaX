@@ -4,14 +4,14 @@ defmodule FormulaXWeb.Screen do
   alias FormulaX.Race.Car
   alias FormulaX.Utils
 
-  def render(assigns = %{phase: :off}) do
+  def render(assigns = %{screen_phase: :off}) do
     ~H"""
     <div class="screen off_screen">
     </div>
     """
   end
 
-  def render(assigns = %{phase: :startup}) do
+  def render(assigns = %{screen_phase: :startup}) do
     ~H"""
     <div class="screen startup_screen">
       <div class="body">
@@ -30,7 +30,7 @@ defmodule FormulaXWeb.Screen do
     """
   end
 
-  def render(assigns = %{phase: :car_selection}) do
+  def render(assigns = %{screen_phase: :car_selection}) do
     ~H"""
     <div class="screen car_selection_screen">
       <div class="body">
@@ -46,7 +46,7 @@ defmodule FormulaXWeb.Screen do
     """
   end
 
-  def render(assigns = %{phase: :race_info}) do
+  def render(assigns = %{screen_phase: :race_info}) do
     ~H"""
     <div class="screen race_info_screen">
       <div class="body">
@@ -82,7 +82,7 @@ defmodule FormulaXWeb.Screen do
     """
   end
 
-  def render(assigns = %{phase: :countdown}) do
+  def render(assigns = %{screen_phase: :countdown}) do
     ~H"""
     <%= # Insert countdown screen in this template and once countdown is over send a message ":start_race" to live view. This template should have race initial visual along with countdown div" %>
     <div class="screen countdown_screen">
@@ -96,7 +96,7 @@ defmodule FormulaXWeb.Screen do
     """
   end
 
-  def render(assigns = %{phase: :active_race}) do
+  def render(assigns = %{screen_phase: :active_race}) do
     ~H"""
     <div class="screen active_race_screen">
       <.background images={@race.background.left_side_images} y_position={@race.background.y_position}/>
@@ -109,7 +109,7 @@ defmodule FormulaXWeb.Screen do
     """
   end
 
-  def render(assigns = %{phase: :result}) do
+  def render(assigns = %{screen_phase: :result}) do
     ~H"""
     <div class="screen result_screen">
     </div>

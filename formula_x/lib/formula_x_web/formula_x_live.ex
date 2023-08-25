@@ -16,7 +16,7 @@ defmodule FormulaXWeb.RaceLive do
     <div class="race_live" phx-window-keydown="keydown">
       <div class="console">
         <.speed_controls/>
-        <Screen.render phase={@phase} race={@race} car_selection_index={@car_selection_index}/>
+        <Screen.render race={@race} screen_phase={@screen_phase} button_clicked={@button_clicked} car_selection_index={@car_selection_index}/>
         <.direction_controls/>
       </div>
     </div>
@@ -45,9 +45,10 @@ defmodule FormulaXWeb.RaceLive do
   def mount(_params, %{}, socket) do
     socket =
       socket
-      |> assign(:car_selection_index, nil)
       |> assign(:race, nil)
-      |> assign(:phase, :off)
+      |> assign(:screen_phase, :off)
+      |> assign(:button_clicked, nil)
+      |> assign(:car_selection_index, nil)
 
     {:ok, socket}
   end
@@ -57,39 +58,13 @@ defmodule FormulaXWeb.RaceLive do
         "green_button_clicked",
         _params,
         socket = %{
-          assigns: %{phase: :off}
-        }
-      ) do
-    socket = assign(socket, :phase, :startup)
-
-    {:noreply, socket}
-  end
-
-  def handle_event(
-        "keydown",
-        %{"key" => "ArrowUp"},
-        socket = %{
-          assigns: %{
-            phase: :off
-          }
-        }
-      ) do
-    socket = assign(socket, :phase, :startup)
-
-    {:noreply, socket}
-  end
-
-  def handle_event(
-        "green_button_clicked",
-        _params,
-        socket = %{
-          assigns: %{phase: :startup}
+          assigns: %{screen_phase: :off}
         }
       ) do
     socket =
       socket
-      |> assign(:car_selection_index, 0)
-      |> assign(:phase, :car_selection)
+      |> assign(:screen_phase, :startup)
+      |> assign(:button_clicked, :green)
 
     {:noreply, socket}
   end
@@ -99,14 +74,14 @@ defmodule FormulaXWeb.RaceLive do
         %{"key" => "ArrowUp"},
         socket = %{
           assigns: %{
-            phase: :startup
+            screen_phase: :off
           }
         }
       ) do
     socket =
       socket
-      |> assign(:car_selection_index, 0)
-      |> assign(:phase, :car_selection)
+      |> assign(:screen_phase, :startup)
+      |> assign(:button_clicked, :green)
 
     {:noreply, socket}
   end
@@ -115,12 +90,14 @@ defmodule FormulaXWeb.RaceLive do
         "green_button_clicked",
         _params,
         socket = %{
-          assigns: %{
-            phase: :car_selection
-          }
+          assigns: %{screen_phase: :startup}
         }
       ) do
-    socket = assign(socket, :phase, :race_info)
+    socket =
+      socket
+      |> assign(:screen_phase, :car_selection)
+      |> assign(:button_clicked, :green)
+      |> assign(:car_selection_index, 0)
 
     {:noreply, socket}
   end
@@ -130,11 +107,15 @@ defmodule FormulaXWeb.RaceLive do
         %{"key" => "ArrowUp"},
         socket = %{
           assigns: %{
-            phase: :car_selection
+            screen_phase: :startup
           }
         }
       ) do
-    socket = assign(socket, :phase, :race_info)
+    socket =
+      socket
+      |> assign(:screen_phase, :car_selection)
+      |> assign(:button_clicked, :green)
+      |> assign(:car_selection_index, 0)
 
     {:noreply, socket}
   end
@@ -144,7 +125,41 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket = %{
           assigns: %{
-            phase: :race_info
+            screen_phase: :car_selection
+          }
+        }
+      ) do
+    socket =
+      socket
+      |> assign(:screen_phase, :race_info)
+      |> assign(:button_clicked, :green)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "keydown",
+        %{"key" => "ArrowUp"},
+        socket = %{
+          assigns: %{
+            screen_phase: :car_selection
+          }
+        }
+      ) do
+    socket =
+      socket
+      |> assign(:screen_phase, :race_info)
+      |> assign(:button_clicked, :green)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "green_button_clicked",
+        _params,
+        socket = %{
+          assigns: %{
+            screen_phase: :race_info
           }
         }
       ) do
@@ -154,7 +169,8 @@ defmodule FormulaXWeb.RaceLive do
     socket =
       socket
       |> assign(:race, race)
-      |> assign(:phase, :countdown)
+      |> assign(:screen_phase, :countdown)
+      |> assign(:button_clicked, :green)
 
     {:noreply, socket}
   end
@@ -164,7 +180,7 @@ defmodule FormulaXWeb.RaceLive do
         %{"key" => "ArrowUp"},
         socket = %{
           assigns: %{
-            phase: :race_info
+            screen_phase: :race_info
           }
         }
       ) do
@@ -174,7 +190,8 @@ defmodule FormulaXWeb.RaceLive do
     socket =
       socket
       |> assign(:race, race)
-      |> assign(:phase, :countdown)
+      |> assign(:screen_phase, :countdown)
+      |> assign(:button_clicked, :green)
 
     {:noreply, socket}
   end
@@ -185,13 +202,14 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             race: race,
-            phase: :active_race
+            screen_phase: :active_race
           }
         }
       ) do
     race
     |> Controls.change_player_car_speed(:speedup)
     |> RaceEngine.update()
+    |> assign(:button_clicked, :green)
 
     {:noreply, socket}
   end
@@ -202,13 +220,14 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             race: race,
-            phase: :active_race
+            screen_phase: :active_race
           }
         }
       ) do
     race
     |> Controls.change_player_car_speed(:speedup)
     |> RaceEngine.update()
+    |> assign(:button_clicked, :green)
 
     {:noreply, socket}
   end
@@ -219,13 +238,14 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             race: race,
-            phase: :active_race
+            screen_phase: :active_race
           }
         }
       ) do
     race
     |> Controls.change_player_car_speed(:slowdown)
     |> RaceEngine.update()
+    |> assign(:button_clicked, :red)
 
     {:noreply, socket}
   end
@@ -236,13 +256,14 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             race: race,
-            phase: :active_race
+            screen_phase: :active_race
           }
         }
       ) do
     race
     |> Controls.change_player_car_speed(:slowdown)
     |> RaceEngine.update()
+    |> assign(:button_clicked, :red)
 
     {:noreply, socket}
   end
@@ -252,13 +273,17 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket = %{
           assigns: %{
-            phase: :car_selection,
+            screen_phase: :car_selection,
             car_selection_index: car_selection_index
           }
         }
       ) do
     updated_car_selection_index = update_car_selection_index(car_selection_index, :next)
-    socket = assign(socket, :car_selection_index, updated_car_selection_index)
+
+    socket =
+      socket
+      |> assign(:button_clicked, :blue)
+      |> assign(:car_selection_index, updated_car_selection_index)
 
     {:noreply, socket}
   end
@@ -268,13 +293,17 @@ defmodule FormulaXWeb.RaceLive do
         %{"key" => "ArrowRight"},
         socket = %{
           assigns: %{
-            phase: :car_selection,
+            screen_phase: :car_selection,
             car_selection_index: car_selection_index
           }
         }
       ) do
     updated_car_selection_index = update_car_selection_index(car_selection_index, :next)
-    socket = assign(socket, :car_selection_index, updated_car_selection_index)
+
+    socket =
+      socket
+      |> assign(:button_clicked, :blue)
+      |> assign(:car_selection_index, updated_car_selection_index)
 
     {:noreply, socket}
   end
@@ -285,13 +314,14 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             race: race,
-            phase: :active_race
+            screen_phase: :active_race
           }
         }
       ) do
     race
     |> Controls.move_player_car(:right)
     |> RaceEngine.update()
+    |> assign(:button_clicked, :blue)
 
     {:noreply, socket}
   end
@@ -302,13 +332,14 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             race: race,
-            phase: :active_race
+            screen_phase: :active_race
           }
         }
       ) do
     race
     |> Controls.move_player_car(:right)
     |> RaceEngine.update()
+    |> assign(:button_clicked, :blue)
 
     {:noreply, socket}
   end
@@ -318,13 +349,17 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket = %{
           assigns: %{
-            phase: :car_selection,
+            screen_phase: :car_selection,
             car_selection_index: car_selection_index
           }
         }
       ) do
     updated_car_selection_index = update_car_selection_index(car_selection_index, :previous)
-    socket = assign(socket, :car_selection_index, updated_car_selection_index)
+
+    socket =
+      socket
+      |> assign(:button_clicked, :yellow)
+      |> assign(:car_selection_index, updated_car_selection_index)
 
     {:noreply, socket}
   end
@@ -334,13 +369,17 @@ defmodule FormulaXWeb.RaceLive do
         %{"key" => "ArrowLeft"},
         socket = %{
           assigns: %{
-            phase: :car_selection,
+            screen_phase: :car_selection,
             car_selection_index: car_selection_index
           }
         }
       ) do
     updated_car_selection_index = update_car_selection_index(car_selection_index, :previous)
-    socket = assign(socket, :car_selection_index, updated_car_selection_index)
+
+    socket =
+      socket
+      |> assign(:button_clicked, :yellow)
+      |> assign(:car_selection_index, updated_car_selection_index)
 
     {:noreply, socket}
   end
@@ -351,13 +390,14 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             race: race,
-            phase: :active_race
+            screen_phase: :active_race
           }
         }
       ) do
     race
     |> Controls.move_player_car(:left)
     |> RaceEngine.update()
+    |> assign(:button_clicked, :yellow)
 
     {:noreply, socket}
   end
@@ -368,13 +408,14 @@ defmodule FormulaXWeb.RaceLive do
         socket = %{
           assigns: %{
             race: race,
-            phase: :active_race
+            screen_phase: :active_race
           }
         }
       ) do
     race
     |> Controls.move_player_car(:left)
     |> RaceEngine.update()
+    |> assign(:button_clicked, :yellow)
 
     {:noreply, socket}
   end
@@ -390,6 +431,7 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket
       ) do
+    socket = assign(socket, :button_clicked, :green)
     {:noreply, socket}
   end
 
@@ -398,6 +440,7 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket
       ) do
+    socket = assign(socket, :button_clicked, :red)
     {:noreply, socket}
   end
 
@@ -406,6 +449,7 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket
       ) do
+    socket = assign(socket, :button_clicked, :yellow)
     {:noreply, socket}
   end
 
@@ -414,6 +458,7 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket
       ) do
+    socket = assign(socket, :button_clicked, :blue)
     {:noreply, socket}
   end
 
@@ -421,14 +466,14 @@ defmodule FormulaXWeb.RaceLive do
   # This will be triggered by countdown screen
   def handle_info(
         :start_race,
-        socket = %{assigns: %{race: race = %Race{status: :countdown}, phase: :countdown}}
+        socket = %{assigns: %{race: race = %Race{status: :countdown}, screen_phase: :countdown}}
       ) do
     updated_race = Race.start(race)
 
     socket =
       socket
       |> assign(:race, updated_race)
-      |> assign(:phase, :active_race)
+      |> assign(:screen_phase, :active_race)
 
     RaceEngine.start(race, self())
 
