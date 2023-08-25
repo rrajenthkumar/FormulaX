@@ -4,12 +4,12 @@ defmodule FormulaXWeb.ConsoleControls do
   def speed_controls(assigns) do
     ~H"""
     <div class="speed_controls">
-      <%= if @button_clicked == :green do %>
+      <%= if @clicked_button == :green do %>
         <a class="top" href="#" phx-click="green_button_clicked"><span class="green_button_clicked"></span></a>
       <% else %>
         <a class="top" href="#" phx-click="green_button_clicked"><span></span></a>
       <% end %>
-      <%= if @button_clicked == :red do %>
+      <%= if @clicked_button == :red do %>
         <a class="bottom" href="#" phx-click="red_button_clicked"><span class="red_button_clicked"></span></a>
       <% else %>
         <a class="bottom" href="#" phx-click="red_button_clicked"><span></span></a>
@@ -21,12 +21,12 @@ defmodule FormulaXWeb.ConsoleControls do
   def direction_controls(assigns) do
     ~H"""
     <div class="direction_controls">
-      <%= if @button_clicked == :yellow do %>
+      <%= if @clicked_button == :yellow do %>
         <a class="left" href="#" phx-click="yellow_button_clicked"><span class="yellow_button_clicked"></span></a>
       <% else %>
         <a class="left" href="#" phx-click="yellow_button_clicked"><span></span></a>
       <% end %>
-      <%= if @button_clicked == :blue do %>
+      <%= if @clicked_button == :blue do %>
         <a class="right" href="#" phx-click="blue_button_clicked"><span class="blue_button_clicked"></span></a>
       <% else %>
         <a class="right" href="#" phx-click="blue_button_clicked"><span></span></a>
