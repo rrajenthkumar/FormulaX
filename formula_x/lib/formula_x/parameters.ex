@@ -1,4 +1,4 @@
-defmodule FormulaX.Race.Parameters do
+defmodule FormulaX.Parameters do
   @moduledoc """
   All the racing game related parameters are defined here.
   !!! Keep all the values in this module as factors of 5 to be in sync with position_range_step() fn !!!

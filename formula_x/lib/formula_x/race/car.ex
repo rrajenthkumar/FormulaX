@@ -6,7 +6,7 @@ defmodule FormulaX.Race.Car do
 
   alias __MODULE__
   alias FormulaX.Race
-  alias FormulaX.Race.Parameters
+  alias FormulaX.Parameters
   alias FormulaX.Utils
 
   @type car_id :: integer()
@@ -145,8 +145,8 @@ defmodule FormulaX.Race.Car do
   @doc """
   Function to position computer controlled cars correctly on the screen.
   """
-  @spec update_autonomous_car_y_position(Car.t(), Race.t()) :: Car.t()
-  def update_autonomous_car_y_position(
+  @spec adapt_autonomous_car_y_position(Car.t(), Race.t()) :: Car.t()
+  def adapt_autonomous_car_y_position(
         car = %Car{
           distance_travelled: distance_travelled_by_autonomous_car,
           controller: :computer

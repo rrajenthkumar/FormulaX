@@ -5,7 +5,7 @@ defmodule FormulaX.CarControls.CrashDetection do
   """
   alias FormulaX.Race
   alias FormulaX.Race.Car
-  alias FormulaX.Race.Parameters
+  alias FormulaX.Parameters
 
   @car_width Parameters.car_dimensions().width
   @car_length Parameters.car_dimensions().length
@@ -163,7 +163,7 @@ defmodule FormulaX.CarControls.CrashDetection do
           case querying_car_controller do
             :computer ->
               Car.move(querying_car, movement_direction)
-              |> Car.update_autonomous_car_y_position(race)
+              |> Car.adapt_autonomous_car_y_position(race)
 
             :player ->
               Car.move(querying_car, movement_direction)

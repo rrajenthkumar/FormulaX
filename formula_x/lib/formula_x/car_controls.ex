@@ -54,7 +54,7 @@ defmodule FormulaX.CarControls do
         updated_car =
           car
           |> Car.move(direction)
-          |> Car.update_autonomous_car_y_position(race)
+          |> Car.adapt_autonomous_car_y_position(race)
 
         Race.update_car(race, updated_car)
     end

@@ -4,7 +4,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap");
 
 /* This file is for your main application CSS */
-/* Keep console screen, lane, car dimensions same as in FormulaX.Race.Parameters module */
+/* Keep console screen, lane, car dimensions same as in FormulaX.Parameters module */
 .race_live {
   @apply flex justify-center items-center h-[calc(100vh-2.5rem)] pt-10;
   background-color: #fffff0d4;

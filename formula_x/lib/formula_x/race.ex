@@ -7,7 +7,7 @@ defmodule FormulaX.Race do
   alias __MODULE__
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
-  alias FormulaX.Race.Parameters
+  alias FormulaX.Parameters
 
   @type cars :: list(Car.t())
   @typedoc """

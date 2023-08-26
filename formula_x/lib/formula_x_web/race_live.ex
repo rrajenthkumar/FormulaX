@@ -8,8 +8,8 @@ defmodule FormulaXWeb.RaceLive do
   alias FormulaX.CarControls
   alias FormulaX.RaceEngine
   alias FormulaX.Utils
-  alias FormulaXWeb.Screen
-  alias FormulaXWeb.ConsoleControls
+  alias FormulaXWeb.RaceLive.Screen
+  alias FormulaXWeb.RaceLive.ConsoleControls
 
   @impl true
   def render(assigns) do

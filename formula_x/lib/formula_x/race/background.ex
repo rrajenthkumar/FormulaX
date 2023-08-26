@@ -7,7 +7,7 @@ defmodule FormulaX.Race.Background do
 
   alias __MODULE__
   alias FormulaX.Utils
-  alias FormulaX.Race.Parameters
+  alias FormulaX.Parameters
 
   @type filename :: String.t()
   @type filenames :: list(filename())

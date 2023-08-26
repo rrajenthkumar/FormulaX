@@ -1,4 +1,4 @@
-defmodule FormulaXWeb.Screen do
+defmodule FormulaXWeb.RaceLive.Screen do
   use Phoenix.Component
 
   alias FormulaX.Race.Car

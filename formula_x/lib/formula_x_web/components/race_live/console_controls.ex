@@ -1,4 +1,4 @@
-defmodule FormulaXWeb.ConsoleControls do
+defmodule FormulaXWeb.RaceLive.ConsoleControls do
   use Phoenix.Component
 
   def speed_controls(assigns) do
