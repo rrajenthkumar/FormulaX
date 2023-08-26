@@ -148,7 +148,8 @@ defmodule FormulaX.Race.Car do
   @spec update_autonomous_car_y_position(Car.t(), Race.t()) :: Car.t()
   def update_autonomous_car_y_position(
         car = %Car{
-          distance_travelled: distance_travelled_by_autonomous_car
+          distance_travelled: distance_travelled_by_autonomous_car,
+          controller: :computer
         },
         race = %Race{}
       ) do

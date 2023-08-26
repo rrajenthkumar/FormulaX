@@ -1,4 +1,4 @@
-defmodule FormulaX.Race.CrashDetection do
+defmodule FormulaX.CarControls.CrashDetection do
   @moduledoc """
   **Crash detection context**
   This module is used by the Car Controls module to detect crash between cars or between a car and a background item outside the lanes

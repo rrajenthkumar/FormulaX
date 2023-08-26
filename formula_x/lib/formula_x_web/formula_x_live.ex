@@ -5,8 +5,8 @@ defmodule FormulaXWeb.RaceLive do
   use FormulaXWeb, :live_view
 
   alias FormulaX.Race
-  alias FormulaX.Race.Car.CarControls
-  alias FormulaX.Race.RaceEngine
+  alias FormulaX.CarControls
+  alias FormulaX.RaceEngine
   alias FormulaX.Utils
   alias FormulaXWeb.Screen
   alias FormulaXWeb.ConsoleControls
@@ -45,9 +45,7 @@ defmodule FormulaXWeb.RaceLive do
           assigns: %{screen_state: :switched_off}
         }
       ) do
-    socket =
-      socket
-      |> assign(:screen_state, :startup)
+    socket = assign(socket, :screen_state, :startup)
 
     {:noreply, socket}
   end
@@ -273,9 +271,9 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    updated_car_selection_index = update_car_selection_index(car_selection_index, :next)
+    car_selection_index = update_car_selection_index(car_selection_index, :next)
 
-    socket = assign(socket, :car_selection_index, updated_car_selection_index)
+    socket = assign(socket, :car_selection_index, car_selection_index)
 
     {:noreply, socket}
   end
@@ -290,11 +288,11 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    updated_car_selection_index = update_car_selection_index(car_selection_index, :next)
+    car_selection_index = update_car_selection_index(car_selection_index, :next)
 
     socket =
       socket
-      |> assign(:car_selection_index, updated_car_selection_index)
+      |> assign(:car_selection_index, car_selection_index)
       |> assign(:clicked_button, :blue)
 
     Process.send_after(self(), :reset_clicked_button_assign, 250)
@@ -350,9 +348,9 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    updated_car_selection_index = update_car_selection_index(car_selection_index, :previous)
+    car_selection_index = update_car_selection_index(car_selection_index, :previous)
 
-    socket = assign(socket, :car_selection_index, updated_car_selection_index)
+    socket = assign(socket, :car_selection_index, car_selection_index)
 
     {:noreply, socket}
   end
@@ -367,11 +365,11 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    updated_car_selection_index = update_car_selection_index(car_selection_index, :previous)
+    car_selection_index = update_car_selection_index(car_selection_index, :previous)
 
     socket =
       socket
-      |> assign(:car_selection_index, updated_car_selection_index)
+      |> assign(:car_selection_index, car_selection_index)
       |> assign(:clicked_button, :yellow)
 
     Process.send_after(self(), :reset_clicked_button_assign, 250)

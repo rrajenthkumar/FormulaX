@@ -1,11 +1,11 @@
-defmodule FormulaX.Race.RaceEngine do
+defmodule FormulaX.RaceEngine do
   @moduledoc """
   GenServer module that drives all cars
   """
   use GenServer
 
   alias FormulaX.Race
-  alias FormulaX.Race.Car.CarControls
+  alias FormulaX.CarControls
 
   # Cars  will be moved forward every 200 milliseconds
   @timeout 200

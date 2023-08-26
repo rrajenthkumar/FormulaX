@@ -1,4 +1,4 @@
-defmodule FormulaX.Race.Car.CarControls do
+defmodule FormulaX.CarControls do
   @moduledoc """
   **Car Control context**
   This module is the interface for all controls related to player and autonomous cars
@@ -6,7 +6,7 @@ defmodule FormulaX.Race.Car.CarControls do
   alias FormulaX.Race
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
-  alias FormulaX.Race.CrashDetection
+  alias FormulaX.CarControls.CrashDetection
 
   @doc """
   In case of forward movement of the player car the Background is moved in opposite direction to simulate movement
