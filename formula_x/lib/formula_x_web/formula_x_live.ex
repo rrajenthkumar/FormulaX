@@ -16,7 +16,7 @@ defmodule FormulaXWeb.RaceLive do
     ~H"""
     <div class="race_live" phx-window-keydown="keydown">
       <div class="console">
-        <ConsoleControls.speed_controls clicked_button={@clicked_button}/>
+        <ConsoleControls.speed_controls screen_state={@screen_state} clicked_button={@clicked_button}/>
         <Screen.render race={@race} screen_state={@screen_state} car_selection_index={@car_selection_index} countdown_count={@countdown_count}/>
         <ConsoleControls.direction_controls clicked_button={@clicked_button}/>
       </div>

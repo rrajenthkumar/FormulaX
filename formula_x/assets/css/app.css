@@ -294,30 +294,36 @@
   transition: transform 0.25s ease-in-out;
 }
 
-.green_button_clicked,
-.red_button_clicked,
-.yellow_button_clicked,
-.blue_button_clicked {
+.race_live .console .speed_controls .top .green_button_clicked,
+.race_live .console .speed_controls .bottom .red_button_clicked,
+.race_live .console .direction_controls .left .yellow_button_clicked,
+.race_live .console .direction_controls .right .blue_button_clicked {
   box-shadow: 3px 3px 2px 2px rgb(65, 65, 65);
   animation-duration: 0.25s;
+  animation-timing-function: ease-in-out;
 }
 
-.green_button_clicked {
+.race_live .console .speed_controls .top .green_button_clicked {
   transform: translateY(-2px);
   animation-name: green_button_transformation;
 }
 
-.red_button_clicked {
+.race_live .console .speed_controls .top .jumping_button {
+  animation: jumping_button_transformation 0.25s ease-in-out 0s infinite
+    alternate;
+}
+
+.race_live .console .speed_controls .bottom .red_button_clicked {
   transform: translateY(2px);
   animation-name: red_button_transformation;
 }
 
-.yellow_button_clicked {
+.race_live .console .direction_controls .left .yellow_button_clicked {
   transform: translateX(-2px);
   animation-name: yellow_button_transformation;
 }
 
-.blue_button_clicked {
+.race_live .console .direction_controls .right .blue_button_clicked {
   transform: translateX(2px);
   animation-name: blue_button_transformation;
 }
@@ -328,6 +334,17 @@
   }
   to {
     transform: translateY(0px);
+  }
+}
+
+@keyframes jumping_button_transformation {
+  from {
+    transform: translateY(-2px);
+    background-color: rgb(95, 160, 140);
+  }
+  to {
+    transform: translateY(0px);
+    background-color: rgba(95, 160, 140, 0.884);
   }
 }
 

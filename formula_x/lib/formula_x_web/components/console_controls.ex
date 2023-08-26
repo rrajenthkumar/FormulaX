@@ -4,16 +4,14 @@ defmodule FormulaXWeb.ConsoleControls do
   def speed_controls(assigns) do
     ~H"""
     <div class="speed_controls">
-      <%= if @clicked_button == :green do %>
-        <a class="top" href="#" phx-click="green_button_clicked"><span class="green_button_clicked"></span></a>
-      <% else %>
-        <a class="top" href="#" phx-click="green_button_clicked"><span></span></a>
-      <% end %>
-      <%= if @clicked_button == :red do %>
-        <a class="bottom" href="#" phx-click="red_button_clicked"><span class="red_button_clicked"></span></a>
-      <% else %>
-        <a class="bottom" href="#" phx-click="red_button_clicked"><span></span></a>
-      <% end %>
+      <a class="top" href="#" phx-click="green_button_clicked">
+        <%= with animation_class <- if @screen_state == :switched_off, do: "jumping_button", else: get_button_animation_class(@clicked_button) do %>
+          <span class={animation_class}></span>
+        <% end %>
+      </a>
+      <a class="bottom" href="#" phx-click="red_button_clicked">
+        <span class={get_button_animation_class(@clicked_button)}></span>
+      </a>
     </div>
     """
   end
@@ -21,17 +19,34 @@ defmodule FormulaXWeb.ConsoleControls do
   def direction_controls(assigns) do
     ~H"""
     <div class="direction_controls">
-      <%= if @clicked_button == :yellow do %>
-        <a class="left" href="#" phx-click="yellow_button_clicked"><span class="yellow_button_clicked"></span></a>
-      <% else %>
-        <a class="left" href="#" phx-click="yellow_button_clicked"><span></span></a>
-      <% end %>
-      <%= if @clicked_button == :blue do %>
-        <a class="right" href="#" phx-click="blue_button_clicked"><span class="blue_button_clicked"></span></a>
-      <% else %>
-        <a class="right" href="#" phx-click="blue_button_clicked"><span></span></a>
-      <% end %>
+      <a class="left" href="#" phx-click="yellow_button_clicked">
+        <span class={get_button_animation_class(@clicked_button)}></span>
+      </a>
+      <a class="right" href="#" phx-click="blue_button_clicked">
+        <span class={get_button_animation_class(@clicked_button)}></span>
+      </a>
     </div>
     """
+  end
+
+  @spec get_button_animation_class(:green | :red | :yellow | :blue) :: String.t()
+  defp get_button_animation_class(_clicked_button = :green) do
+    "green_button_clicked"
+  end
+
+  defp get_button_animation_class(_clicked_button = :red) do
+    "red_button_clicked"
+  end
+
+  defp get_button_animation_class(__clicked_button = :yellow) do
+    "yellow_button_clicked"
+  end
+
+  defp get_button_animation_class(_clicked_button = :blue) do
+    "blue_button_clicked"
+  end
+
+  defp get_button_animation_class(_clicked_button) do
+    ""
   end
 end
