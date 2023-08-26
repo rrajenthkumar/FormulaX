@@ -34,7 +34,7 @@ defmodule FormulaXWeb.Screen do
     ~H"""
     <div class="screen car_selection_screen">
       <div class="body">
-        <%= with car <- Utils.get_images("cars") |> Enum.at(@car_selection_index) do %>
+        <%= with car <- get_car_image(@car_selection_index) do %>
           <img src={"/images/cars/#{car}"}/>
         <% end %>
       </div>
@@ -84,14 +84,9 @@ defmodule FormulaXWeb.Screen do
 
   def render(assigns = %{screen_state: :countdown}) do
     ~H"""
-    <div class="screen countdown_screen">
-      <.background images={@race.background.left_side_images} y_position={@race.background.y_position}/>
-      <div class="race">
-        <.lanes/>
-        <.cars cars={@race.cars}/>
-      </div>
-      <.background images={@race.background.right_side_images} y_position={@race.background.y_position}/>
-      <div class="countdown_container">
+    <div class="screen race_screen">
+      <.race_setup race={@race}/>
+      <div class="countdown">
         <%= @countdown_count %>
       </div>
     </div>
@@ -100,13 +95,8 @@ defmodule FormulaXWeb.Screen do
 
   def render(assigns = %{screen_state: :active_race}) do
     ~H"""
-    <div class="screen active_race_screen">
-      <.background images={@race.background.left_side_images} y_position={@race.background.y_position}/>
-      <div class="race">
-        <.lanes/>
-        <.cars cars={@race.cars}/>
-      </div>
-      <.background images={@race.background.right_side_images} y_position={@race.background.y_position}/>
+    <div class="screen race_screen">
+      <.race_setup race={@race}/>
     </div>
     """
   end
@@ -114,6 +104,29 @@ defmodule FormulaXWeb.Screen do
   def render(assigns = %{screen_state: :result}) do
     ~H"""
     <div class="screen result_screen">
+    </div>
+    """
+  end
+
+  defp race_setup(assigns) do
+    ~H"""
+    <.background images={@race.background.left_side_images} y_position={@race.background.y_position}/>
+    <div class="race">
+      <.lanes/>
+      <.cars cars={@race.cars}/>
+    </div>
+    <.background images={@race.background.right_side_images} y_position={@race.background.y_position}/>
+    """
+  end
+
+  defp background(assigns) do
+    ~H"""
+    <div class="background" style={background_position_style(@y_position)}>
+      <%= for image <- @images do %>
+        <div class="image_container">
+          <img src={"/images/backgrounds/#{image}"} />
+        </div>
+      <% end %>
     </div>
     """
   end
@@ -138,18 +151,6 @@ defmodule FormulaXWeb.Screen do
     """
   end
 
-  defp background(assigns) do
-    ~H"""
-    <div class="background" style={background_position_style(@y_position)}>
-      <%= for image <- @images do %>
-        <div class="image_container">
-          <img src={"/images/backgrounds/#{image}"} />
-        </div>
-      <% end %>
-    </div>
-    """
-  end
-
   @spec car_position_style(Car.t()) :: String.t()
   defp car_position_style(%Car{
          x_position: x_position,
@@ -161,5 +162,12 @@ defmodule FormulaXWeb.Screen do
   @spec background_position_style(Car.y_position()) :: String.t()
   defp background_position_style(y_position) when is_integer(y_position) do
     "top: #{y_position}px"
+  end
+
+  @spec get_car_image(integer()) :: Car.filename()
+  defp get_car_image(index) when is_integer(index) do
+    "cars"
+    |> Utils.get_images()
+    |> Enum.at(index)
   end
 end
