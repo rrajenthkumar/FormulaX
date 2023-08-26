@@ -514,7 +514,9 @@ defmodule FormulaXWeb.RaceLive do
     socket =
       if count > 0 do
         updated_count = count - 1
+
         Process.send_after(self(), {:count_down, updated_count}, 1000)
+
         assign(socket, :countdown_count, count)
       else
         race = Race.start(race)
@@ -551,7 +553,6 @@ defmodule FormulaXWeb.RaceLive do
 
   @spec update_car_selection_index(integer(), :previous | :next) ::
           integer()
-
   defp update_car_selection_index(
          car_selection_index,
          _action = :next
