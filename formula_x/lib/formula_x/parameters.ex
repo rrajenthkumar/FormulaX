@@ -36,7 +36,7 @@ defmodule FormulaX.Parameters do
   """
   @spec race_distance() :: Race.distance()
   def race_distance() do
-    100_000
+    20000
   end
 
   @doc """
@@ -68,7 +68,7 @@ defmodule FormulaX.Parameters do
   """
   @spec car_initial_positions() :: list(Car.coordinates())
   def car_initial_positions() do
-    [{20, 0}, {20, 115}, {115, 0}, {115, 115}, {210, 0}, {210, 115}]
+    [{20, 5}, {20, 120}, {115, 5}, {115, 120}, {210, 5}, {210, 120}]
   end
 
   @spec number_of_cars() :: integer()
