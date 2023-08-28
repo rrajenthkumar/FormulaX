@@ -159,6 +159,11 @@
   grid-template-columns: 1fr 18rem 1fr;
 }
 
+.race_live .console .race_screen .countdown {
+  @apply absolute z-20 flex items-center justify-center w-[35rem] h-[35rem] text-black bg-white opacity-70;
+  font-size: 16rem;
+}
+
 .race_live .console .race_screen .background {
   @apply relative;
   transition: top 1s ease-out;
@@ -174,7 +179,7 @@
 }
 
 .race_live .console .race_screen .race {
-  @apply h-[35rem];
+  @apply h-[35rem] relative;
 }
 
 .race_live .console .race_screen .race .lanes {
@@ -186,23 +191,25 @@
   @apply bg-gray-50;
 }
 
-.race_live .console .race_screen .race .cars {
-  @apply relative;
-}
-
 .race_live .console .race_screen .race .cars img {
-  @apply w-[55px] absolute;
+  @apply w-[55px] absolute z-10;
   aspect-ratio: 0.5;
   transition: left 1s ease-out, bottom 1s ease-out;
 }
 
-.race_live .console .race_screen .countdown {
-  @apply absolute z-10 flex items-center justify-center w-[35rem] h-[35rem] text-black bg-white opacity-70;
-  font-size: 16rem;
+.race_live .console .race_screen .race .finish_line {
+  @apply grid absolute;
+  grid-template-columns: repeat(12, 1.5rem);
+  grid-template-rows: repeat(6, 1.5rem);
+  transition: bottom 1s ease-out;
 }
 
-.race_live .console .speed_controls {
-  @apply flex flex-col gap-2;
+.race_live .console .race_screen .race .finish_line .white {
+  background-color: white;
+}
+
+.race_live .console .race_screen .race .finish_line .black {
+  background-color: black;
 }
 
 .race_live .console .speed_controls .top,

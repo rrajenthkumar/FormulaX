@@ -30,15 +30,12 @@ defmodule FormulaX.Race.Background do
     left_side_images = get_side_images(available_background_images, race_distance)
     right_side_images = get_side_images(available_background_images, race_distance)
 
-    # In the beginning, background DIVs are positioned in Y direction, w.r.t the top of console screen.
-    # The following is done to position them in Y direction with the same reference as that of cars (bottom of console screen)
-    console_screen_height = Parameters.console_screen_height()
-    y_position = console_screen_height - race_distance
-
     new(%{
       left_side_images: left_side_images,
       right_side_images: right_side_images,
-      y_position: y_position
+      # Background DIVs get positioned initially in Y direction, w.r.t the top of console screen.
+      # The following is done to position them in Y direction with the same reference as that of cars (bottom of console screen)
+      y_position: -race_distance
     })
   end
 
@@ -55,7 +52,9 @@ defmodule FormulaX.Race.Background do
   defp get_side_images(available_background_images, race_distance)
        when is_integer(race_distance) and is_list(available_background_images) do
     image_container_height = Parameters.background_image_container_height()
-    number_of_images_required = div(race_distance, image_container_height)
+
+    number_of_images_required =
+      div(race_distance + Parameters.console_screen_height(), image_container_height)
 
     Enum.map(1..number_of_images_required, fn _grid_number ->
       Enum.random(available_background_images)

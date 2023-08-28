@@ -152,7 +152,7 @@ defmodule FormulaXWeb.RaceLive do
     socket =
       socket
       |> assign(:race, race)
-      |> assign(:screen_state, :countdown)
+      |> assign(:screen_state, :active_race)
       |> assign(:clicked_button, :green)
 
     Process.send_after(self(), :reset_clicked_button_assign, 250)
@@ -176,7 +176,7 @@ defmodule FormulaXWeb.RaceLive do
     socket =
       socket
       |> assign(:race, race)
-      |> assign(:screen_state, :countdown)
+      |> assign(:screen_state, :active_race)
       |> assign(:clicked_button, :green)
 
     Process.send_after(self(), :reset_clicked_button_assign, 250)
@@ -509,7 +509,7 @@ defmodule FormulaXWeb.RaceLive do
   @impl true
   def handle_info(
         {:count_down, count},
-        socket = %{assigns: %{race: race = %Race{status: :countdown}, screen_state: :countdown}}
+        socket = %{assigns: %{race: race = %Race{status: :countdown}, screen_state: :active_race}}
       ) do
     socket =
       if count > 0 do
@@ -523,7 +523,7 @@ defmodule FormulaXWeb.RaceLive do
 
         RaceEngine.start(race, self())
 
-        assign(socket, :screen_state, :active_race)
+        assign(socket, :countdown_count, nil)
       end
 
     {:noreply, socket}
@@ -533,12 +533,21 @@ defmodule FormulaXWeb.RaceLive do
         {:update_visuals, race = %Race{status: status}},
         socket
       ) do
-    if status == :aborted do
-      RaceEngine.stop()
-    end
+    socket =
+      cond do
+        status == :aborted ->
+          RaceEngine.stop()
+          socket
+
+        Race.player_car_past_finish?(race) ->
+          RaceEngine.stop()
+          socket
+
+        true ->
+          socket
+      end
 
     socket = assign(socket, :race, race)
-
     {:noreply, socket}
   end
 

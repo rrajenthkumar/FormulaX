@@ -14,27 +14,28 @@ defmodule FormulaX.CarControls do
   @spec move_player_car(Race.t(), :left | :right | :forward) :: Race.t()
   def move_player_car(race = %Race{background: background}, direction = :forward) do
     %Car{speed: speed} =
-      updated_player_car =
+      player_car =
       race
       |> Race.get_player_car()
       |> Car.move(direction)
+      |> Car.add_completion_time_if_finished(race)
 
-    updated_background = Background.move(background, speed)
+    background = Background.move(background, speed)
 
     race
-    |> update_race_based_on_crash_check(updated_player_car, direction)
-    |> Race.update_background(updated_background)
+    |> update_race_based_on_crash_check(player_car, direction)
+    |> Race.update_background(background)
   end
 
   # Left or right side movement
   def move_player_car(race = %Race{}, direction) do
-    updated_player_car =
+    player_car =
       race
       |> Race.get_player_car()
       |> Car.move(direction)
 
     race
-    |> update_race_based_on_crash_check(updated_player_car, direction)
+    |> update_race_based_on_crash_check(player_car, direction)
   end
 
   @spec move_autonomous_cars_forward(Race.t()) :: Race.t()
@@ -51,12 +52,13 @@ defmodule FormulaX.CarControls do
         race
 
       false ->
-        updated_car =
+        car =
           car
           |> Car.move(direction)
           |> Car.adapt_autonomous_car_y_position(race)
+          |> Car.add_completion_time_if_finished(race)
 
-        Race.update_car(race, updated_car)
+        Race.update_car(race, car)
     end
   end
 
@@ -67,21 +69,21 @@ defmodule FormulaX.CarControls do
         race
 
       false ->
-        updated_car = Car.move(car, direction)
+        car = Car.move(car, direction)
 
         race
-        |> Race.update_car(updated_car)
+        |> Race.update_car(car)
     end
   end
 
   @spec change_player_car_speed(Race.t(), :speedup | :slowdown) :: Race.t()
   def change_player_car_speed(race = %Race{}, action) do
-    updated_player_car =
+    player_car =
       race
       |> Race.get_player_car()
       |> Car.change_speed(action)
 
-    Race.update_car(race, updated_player_car)
+    Race.update_car(race, player_car)
   end
 
   @spec update_race_based_on_crash_check(Race.t(), Car.t(), :left | :right | :forward) :: Race.t()
@@ -92,10 +94,10 @@ defmodule FormulaX.CarControls do
        ) do
     case CrashDetection.crash?(race, player_car, direction) do
       true ->
-        updated_player_car = Car.stop(player_car)
+        player_car = Car.stop(player_car)
 
         race
-        |> Race.update_car(updated_player_car)
+        |> Race.update_car(player_car)
         |> Race.abort()
 
       false ->
@@ -116,8 +118,8 @@ defmodule FormulaX.CarControls do
          _autonomous_cars = [car | remaining_cars],
          race = %Race{}
        ) do
-    updated_race = move_autonomous_car(race, car, :forward)
-    move_autonomous_cars_forward(remaining_cars, updated_race)
+    race = move_autonomous_car(race, car, :forward)
+    move_autonomous_cars_forward(remaining_cars, race)
   end
 
   @spec get_autonomous_cars(Race.t()) :: list(Car.t())

@@ -155,6 +155,22 @@ defmodule FormulaX.Race.Car do
     %Car{car | y_position: updated_y_position}
   end
 
+  @spec add_completion_time_if_finished(Car.t(), Race.t()) :: Car.t()
+  def add_completion_time_if_finished(car, race) do
+    case finished?(car, race) do
+      true -> %Car{car | completion_time: Time.utc_now()}
+      false -> car
+    end
+  end
+
+  @spec finished?(Car.t(), Race.t()) :: boolean()
+  defp finished?(
+         %Car{distance_travelled: distance_travelled_by_car},
+         %Race{distance: race_distance}
+       ) do
+    distance_travelled_by_car >= race_distance
+  end
+
   @spec initialize_autonomous_cars(list(integer()), list(filename())) :: list(Car.t())
   defp initialize_autonomous_cars([car_id], car_images) when is_list(car_images) do
     car_image = Enum.random(car_images)

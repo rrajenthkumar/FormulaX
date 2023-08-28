@@ -83,4 +83,21 @@ defmodule FormulaX.Race do
   def get_player_car(%Race{cars: cars}) do
     Enum.find(cars, fn car -> car.controller == :player end)
   end
+
+  @spec player_car_past_finish?(Race.t()) :: boolean
+  def player_car_past_finish?(race = %Race{distance: race_distance}) do
+    %Car{distance_travelled: distance_travelled_by_player_car} = get_player_car(race)
+
+    distance_travelled_by_player_car >
+      race_distance
+  end
+
+  @spec get_player_car_finish_position(Race.t()) :: integer()
+  def get_player_car_finish_position(%Race{cars: cars}) do
+    player_car_index_after_finish =
+      Enum.sort_by(cars, & &1.completion_time, Time)
+      |> Enum.find_index(fn car -> car.controller == :player end)
+
+    player_car_index_after_finish + 1
+  end
 end
