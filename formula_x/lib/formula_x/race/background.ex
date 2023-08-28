@@ -11,13 +11,12 @@ defmodule FormulaX.Race.Background do
 
   @type filename :: String.t()
   @type filenames :: list(filename())
-  @type y_position :: integer()
 
   @typedoc "Background struct"
   typedstruct do
     field(:left_side_images, filenames(), enforce: true)
     field(:right_side_images, filenames(), enforce: true)
-    field(:y_position, y_position(), enforce: true)
+    field(:y_position, Parameters.pixel(), enforce: true)
   end
 
   @spec new(map()) :: Background.t()
@@ -25,7 +24,7 @@ defmodule FormulaX.Race.Background do
     struct!(Background, attrs)
   end
 
-  @spec initialize(Race.distance()) :: Background.t()
+  @spec initialize(Parameters.pixel()) :: Background.t()
   def initialize(race_distance) when is_integer(race_distance) do
     available_background_images = Utils.get_images("backgrounds")
     left_side_images = get_side_images(available_background_images, race_distance)
@@ -52,7 +51,7 @@ defmodule FormulaX.Race.Background do
     %Background{background | y_position: updated_y_position}
   end
 
-  @spec get_side_images(filenames(), Race.distance()) :: filenames()
+  @spec get_side_images(filenames(), Parameters.pixel()) :: filenames()
   defp get_side_images(available_background_images, race_distance)
        when is_integer(race_distance) and is_list(available_background_images) do
     image_container_height = Parameters.background_image_container_height()

@@ -9,25 +9,20 @@ defmodule FormulaX.Race.Car do
   alias FormulaX.Parameters
   alias FormulaX.Utils
 
-  @type car_id :: integer()
   @type filename :: String.t()
   @type controller :: :player | :computer
-  @typedoc "Position on screen in pixels where the car appears along the X direction"
-  @type x_position :: integer()
-  @typedoc "Position on screen in pixels where the car appears along the Y direction"
-  @type y_position :: integer()
   @type speed :: :rest | :low | :moderate | :high
-  @type coordinates :: {x_position(), y_position()}
+  @type coordinates :: {Parameters.pixel(), Parameters.pixel()}
 
   @typedoc "Car struct"
   typedstruct do
-    field(:car_id, car_id(), enforce: true)
+    field(:car_id, integer(), enforce: true)
     field(:image, filename(), enforce: true)
     field(:controller, controller(), enforce: true)
-    field(:x_position, x_position(), enforce: true)
-    field(:y_position, y_position(), enforce: true)
+    field(:x_position, Parameters.pixel(), enforce: true)
+    field(:y_position, Parameters.pixel(), enforce: true)
     field(:speed, speed(), enforce: true)
-    field(:distance_travelled, Race.distance(), default: 0)
+    field(:distance_travelled, Parameters.pixel(), default: 0)
     field(:completion_time, Time.t(), default: nil)
   end
 
@@ -160,7 +155,7 @@ defmodule FormulaX.Race.Car do
     %Car{car | y_position: updated_y_position}
   end
 
-  @spec initialize_autonomous_cars(list(car_id()), list(filename())) :: list(Car.t())
+  @spec initialize_autonomous_cars(list(integer()), list(filename())) :: list(Car.t())
   defp initialize_autonomous_cars([car_id], car_images) when is_list(car_images) do
     car_image = Enum.random(car_images)
 
@@ -178,7 +173,7 @@ defmodule FormulaX.Race.Car do
     [car] ++ initialize_autonomous_cars(tail, remaining_car_images)
   end
 
-  @spec initialize_car(car_id(), filename(), controller()) :: Car.t()
+  @spec initialize_car(integer(), filename(), controller()) :: Car.t()
   defp initialize_car(car_id, image, controller = :player)
        when is_integer(car_id) and is_binary(image) do
     {x_position, y_position} = get_starting_x_and_y_positions(car_id)
@@ -209,7 +204,7 @@ defmodule FormulaX.Race.Car do
     })
   end
 
-  @spec get_starting_x_and_y_positions(car_id()) :: coordinates()
+  @spec get_starting_x_and_y_positions(integer()) :: coordinates()
   defp get_starting_x_and_y_positions(car_id) do
     Parameters.car_initial_positions()
     |> Enum.at(car_id - 1)

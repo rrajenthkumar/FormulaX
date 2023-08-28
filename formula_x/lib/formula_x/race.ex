@@ -10,10 +10,6 @@ defmodule FormulaX.Race do
   alias FormulaX.Parameters
 
   @type cars :: list(Car.t())
-  @typedoc """
-  Distance refers to number of pixels of the screen, cars have to traverse in a race in total, in Y direction.
-  """
-  @type distance :: integer()
   @type status :: :countdown | :ongoing | :aborted | :completed
 
   @typedoc "Race struct"
@@ -21,7 +17,7 @@ defmodule FormulaX.Race do
     field(:cars, cars(), enforce: true)
     field(:background, Background.t(), enforce: true)
     field(:start_time, Time.t(), default: nil)
-    field(:distance, distance(), enforce: true)
+    field(:distance, Parameters.pixel(), enforce: true)
     field(:status, status(), default: :countdown)
   end
 
@@ -73,7 +69,7 @@ defmodule FormulaX.Race do
     %Race{race | status: :completed}
   end
 
-  @spec get_car_by_id(Race.t(), Car.car_id()) :: {:ok, Car.t()} | {:error, String.t()}
+  @spec get_car_by_id(Race.t(), integer()) :: {:ok, Car.t()} | {:error, String.t()}
   def get_car_by_id(%Race{cars: cars}, car_id) when is_integer(car_id) do
     result = Enum.find(cars, fn car -> car.car_id == car_id end)
 

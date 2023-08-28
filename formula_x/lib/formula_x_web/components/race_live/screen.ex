@@ -159,7 +159,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
     "left: #{x_position}px; bottom: #{y_position}px;"
   end
 
-  @spec background_position_style(Car.y_position()) :: String.t()
+  @spec background_position_style(Parameters.pixel()) :: String.t()
   defp background_position_style(y_position) when is_integer(y_position) do
     "top: #{y_position}px"
   end
