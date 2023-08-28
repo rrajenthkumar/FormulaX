@@ -309,7 +309,7 @@
 }
 
 .race_live .console .speed_controls .top .jumping_button {
-  animation: jumping_button_transformation 0.25s ease-in-out 0s infinite
+  animation: jumping_button_transformation 0.5s ease-in-out 0s infinite
     alternate;
 }
 
