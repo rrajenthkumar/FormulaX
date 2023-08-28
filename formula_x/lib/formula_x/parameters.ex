@@ -4,7 +4,6 @@ defmodule FormulaX.Parameters do
   TO DO: When it makes sense the important values defined in this module should be defined as environment variables or read from a yaml file
   """
 
-  alias FormulaX.Race
   alias FormulaX.Race.Car
 
   @typedoc "Dimension on screen in X or Y direction measured in pixels"

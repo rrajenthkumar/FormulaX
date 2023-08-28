@@ -84,12 +84,15 @@ defmodule FormulaX.Race do
     Enum.find(cars, fn car -> car.controller == :player end)
   end
 
+  @doc """
+   This function is used in RaceLive module to check and stop the RaceEngine after the player car crosses the finish line.
+  """
   @spec player_car_past_finish?(Race.t()) :: boolean
   def player_car_past_finish?(race = %Race{distance: race_distance}) do
     %Car{distance_travelled: distance_travelled_by_player_car} = get_player_car(race)
 
-    distance_travelled_by_player_car >
-      race_distance
+    # To check if the player car has travelled a distance of half the console screen height beyond the finish line (for cosmetic purpose)
+    distance_travelled_by_player_car > race_distance + div(Parameters.console_screen_height(), 2)
   end
 
   @spec get_player_car_finish_position(Race.t()) :: integer()
