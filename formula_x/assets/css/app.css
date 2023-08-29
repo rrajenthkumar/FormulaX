@@ -260,6 +260,10 @@
   background-color: black;
 }
 
+.race_live .console .speed_controls {
+  @apply flex flex-col gap-2;
+}
+
 .race_live .console .speed_controls .top,
 .race_live .console .speed_controls .top span {
   @apply rounded-t-full;
@@ -322,23 +326,19 @@
   @apply w-32 h-64;
 }
 
+.race_live .console .speed_controls .top,
+.race_live .console .speed_controls .bottom,
+.race_live .console .direction_controls .left,
+.race_live .console .direction_controls .right {
+  box-shadow: 3px 3px 2px 2px rgb(65, 65, 65);
+}
+
 .race_live .console .direction_controls .left:active span {
   transform: translateX(-2px);
 }
 
 .race_live .console .direction_controls .right:active span {
   transform: translateX(2px);
-}
-
-.race_live .console .speed_controls .top,
-.race_live .console .speed_controls .bottom,
-.race_live .console .direction_controls .left,
-.race_live .console .direction_controls .right,
-.race_live .console .speed_controls .top:active span,
-.race_live .console .speed_controls .bottom:active span,
-.race_live .console .direction_controls .left:active span,
-.race_live .console .direction_controls .right:active span {
-  box-shadow: 3px 3px 2px 2px rgb(65, 65, 65);
 }
 
 .race_live .console .speed_controls .top span,
@@ -392,17 +392,6 @@
   }
 }
 
-@keyframes jumping_button_transformation {
-  from {
-    transform: translateY(-2px);
-    background-color: rgb(95, 160, 140);
-  }
-  to {
-    transform: translateY(0px);
-    background-color: rgba(95, 160, 140, 0.884);
-  }
-}
-
 @keyframes red_button_transformation {
   from {
     transform: translateY(2px);
@@ -427,5 +416,15 @@
   }
   to {
     transform: translateX(0px);
+  }
+}
+@keyframes jumping_button_transformation {
+  from {
+    transform: translateY(-2px);
+    background-color: rgb(95, 160, 140);
+  }
+  to {
+    transform: translateY(0px);
+    background-color: rgba(95, 160, 140, 0.884);
   }
 }

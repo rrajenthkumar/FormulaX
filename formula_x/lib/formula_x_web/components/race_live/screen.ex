@@ -318,7 +318,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
         <table>
           <tr class="title_row">
             <th>Car</th>
-            <th>Status</th>
+            <th>Result</th>
             <th>Position</th>
             <th>Duration</th>
           </tr>
