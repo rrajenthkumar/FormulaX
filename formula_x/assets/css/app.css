@@ -166,7 +166,7 @@
 
 .race_live .console .race_screen .crash_info,
 .race_live .console .race_screen .result {
-  @apply absolute z-20 flex flex-col justify-center w-[35rem] h-[35rem] text-black bg-white opacity-70 text-sm;
+  @apply absolute z-20 flex flex-col justify-center w-[35rem] h-[35rem] text-black bg-white opacity-80 text-sm;
 }
 
 .race_live .console .race_screen .crash_info .body,
@@ -201,7 +201,7 @@
 }
 
 .race_live .console .race_screen .result .body table .title_row th {
-  @apply font-bold w-14 bg-gray-500 text-white py-2;
+  @apply font-bold w-14 bg-gray-600 text-white py-2;
 }
 
 .race_live .console .race_screen .result .body table tr td {
