@@ -317,17 +317,17 @@ defmodule FormulaXWeb.RaceLive.Screen do
       <div class="body">
         <table>
           <tr class="title_row">
-            <th>Car</th>
+            <th></th>
             <th>Result</th>
             <th>Position</th>
-            <th>Duration</th>
+            <th>Time</th>
           </tr>
           <%= for result <- @last_5_results do%>
             <tr>
               <td><img src={"/images/cars/#{result.car}"}/></td>
               <td><%= result.status%></td>
               <td><%= result.position%></td>
-              <td><%= "#{result.duration} s"%></td>
+              <td><%= "#{result.time} s"%></td>
             </tr>
           <% end %>
         </table>

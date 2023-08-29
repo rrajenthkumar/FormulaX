@@ -143,6 +143,7 @@ defmodule FormulaX.Race.Car do
   @spec adapt_autonomous_car_y_position(Car.t(), Race.t()) :: Car.t()
   def adapt_autonomous_car_y_position(
         car = %Car{
+          car_id: car_id,
           distance_travelled: distance_travelled_by_autonomous_car,
           controller: :computer
         },
@@ -150,7 +151,12 @@ defmodule FormulaX.Race.Car do
       ) do
     %Car{distance_travelled: distance_travelled_by_player_car} = Race.get_player_car(race)
 
-    updated_y_position = distance_travelled_by_autonomous_car - distance_travelled_by_player_car
+    {_, starting_y_position} = get_starting_x_and_y_positions(car_id)
+
+    updated_y_position =
+      starting_y_position +
+        distance_travelled_by_autonomous_car -
+        distance_travelled_by_player_car
 
     %Car{car | y_position: updated_y_position}
   end

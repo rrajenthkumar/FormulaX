@@ -14,7 +14,7 @@ defmodule FormulaX.Race.Result do
   typedstruct do
     field(:car, Car.image(), enforce: true)
     field(:status, status(), default: :crash)
-    field(:duration, Time.t(), default: nil)
+    field(:time, Time.t(), default: nil)
     field(:position, integer(), default: nil)
   end
 
@@ -38,12 +38,12 @@ defmodule FormulaX.Race.Result do
 
     player_car_position = player_car_index_after_finish + 1
 
-    player_car_duration = Time.diff(player_car_completion_time, race_start_time, :second)
+    player_car_time_duration = Time.diff(player_car_completion_time, race_start_time, :second)
 
     %{
       car: player_car_image,
       status: race_status,
-      duration: player_car_duration,
+      time: player_car_time_duration,
       position: player_car_position
     }
     |> Result.new()
