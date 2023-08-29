@@ -133,23 +133,23 @@
   @apply text-center text-xs tracking-widest;
 }
 
-.race_live .console .race_info_screen .green {
+.race_live .console .race_info_screen .footer .green {
   @apply text-green-700 font-semibold;
 }
 
-.race_live .console .race_info_screen .red {
+.race_live .console .race_info_screen .footer .red {
   @apply text-red-700 font-semibold;
 }
 
-.race_live .console .race_info_screen .yellow {
+.race_live .console .race_info_screen .footer .yellow {
   @apply text-yellow-600 font-semibold;
 }
 
-.race_live .console .race_info_screen .blue {
+.race_live .console .race_info_screen .footer .blue {
   @apply text-blue-700 font-semibold;
 }
 
-.race_live .console .race_info_screen .arrow {
+.race_live .console .race_info_screen .footer .arrow {
   @apply font-black;
 }
 
@@ -162,6 +162,54 @@
 .race_live .console .race_screen .countdown {
   @apply absolute z-20 flex items-center justify-center w-[35rem] h-[35rem] text-black bg-white opacity-70;
   font-size: 16rem;
+}
+
+.race_live .console .race_screen .crash_info,
+.race_live .console .race_screen .result {
+  @apply absolute z-20 flex flex-col justify-center w-[35rem] h-[35rem] text-black bg-white opacity-70 text-sm;
+}
+
+.race_live .console .race_screen .crash_info .body,
+.race_live .console .race_screen .result .body {
+  flex-basis: 95%;
+  @apply tracking-wider flex items-center justify-center w-full;
+}
+
+.race_live .console .race_screen .crash_info .footer,
+.race_live .console .race_screen .result .footer {
+  flex-basis: 5%;
+  @apply text-center text-xs tracking-widest pb-3;
+}
+
+.race_live .console .race_screen .crash_info .footer .green,
+.race_live .console .race_screen .result .footer .green {
+  @apply text-green-700 font-semibold;
+}
+
+.race_live .console .race_screen .crash_info .footer .red,
+.race_live .console .race_screen .result .footer .red {
+  @apply text-red-700 font-semibold;
+}
+
+.race_live .console .race_screen .crash_info .footer .arrow,
+.race_live .console .race_screen .result .footer .arrow {
+  @apply font-black;
+}
+
+.race_live .console .race_screen .result .body table {
+  @apply w-3/4;
+}
+
+.race_live .console .race_screen .result .body table .title_row th {
+  @apply font-bold w-14 bg-gray-500 text-white py-2;
+}
+
+.race_live .console .race_screen .result .body table tr td {
+  @apply text-center bg-gray-200;
+}
+
+.race_live .console .race_screen .result .body table tr td img {
+  @apply w-4 rotate-90 inline-block;
 }
 
 .race_live .console .race_screen .background {

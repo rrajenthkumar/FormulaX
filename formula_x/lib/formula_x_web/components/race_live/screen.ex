@@ -93,13 +93,12 @@ defmodule FormulaXWeb.RaceLive.Screen do
           <%= @countdown_count %>
         </div>
       <% end %>
-    </div>
-    """
-  end
-
-  def render(assigns = %{screen_state: :result}) do
-    ~H"""
-    <div class="screen result_screen">
+      <%= if @race.status == :crash do %>
+        <.crash_info/>
+      <% end %>
+      <%= if Race.player_car_past_finish?(@race) do %>
+        <.result last_5_results={@last_5_results}/>
+      <% end %>
     </div>
     """
   end
@@ -296,6 +295,48 @@ defmodule FormulaXWeb.RaceLive.Screen do
         <div class="black">
         </div>
       </div>
+    """
+  end
+
+  defp crash_info(assigns) do
+    ~H"""
+    <div class="crash_info">
+      <div class="body">
+      </div>
+      <div class="footer">
+        <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to start a new race</p>
+        <p>Press <span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch the console off</p>
+      </div>
+    </div>
+    """
+  end
+
+  defp result(assigns) do
+    ~H"""
+    <div class="result">
+      <div class="body">
+        <table>
+          <tr class="title_row">
+            <th>Car</th>
+            <th>Status</th>
+            <th>Position</th>
+            <th>Duration</th>
+          </tr>
+          <%= for result <- @last_5_results do%>
+            <tr>
+              <td><img src={"/images/cars/#{result.car}"}/></td>
+              <td><%= result.status%></td>
+              <td><%= result.position%></td>
+              <td><%= "#{result.duration} s"%></td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+      <div class="footer">
+        <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to start a new race</p>
+        <p>Press <span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch the console off</p>
+      </div>
+    </div>
     """
   end
 

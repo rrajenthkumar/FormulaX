@@ -10,7 +10,7 @@ defmodule FormulaX.Race do
   alias FormulaX.Parameters
 
   @type cars :: list(Car.t())
-  @type status :: :countdown | :ongoing | :aborted | :completed
+  @type status :: :countdown | :ongoing | :crash | :completed
 
   @typedoc "Race struct"
   typedstruct do
@@ -59,14 +59,19 @@ defmodule FormulaX.Race do
     %Race{race | cars: updated_cars}
   end
 
-  @spec abort(Race.t()) :: Race.t()
-  def abort(race = %Race{}) do
-    %Race{race | status: :aborted}
+  @spec record_crash(Race.t()) :: Race.t()
+  def record_crash(race = %Race{}) do
+    %Race{race | status: :crash}
   end
 
-  @spec complete(Race.t()) :: Race.t()
-  def complete(race = %Race{}) do
-    %Race{race | status: :completed}
+  @spec end_if_completed(Race.t()) :: boolean()
+  def end_if_completed(race = %Race{}) do
+    %Car{completion_time: player_car_completion_time} = get_player_car(race)
+
+    cond do
+      is_nil(player_car_completion_time) -> race
+      true -> %Race{race | status: :completed}
+    end
   end
 
   @spec get_car_by_id(Race.t(), integer()) :: {:ok, Car.t()} | {:error, String.t()}
@@ -85,7 +90,7 @@ defmodule FormulaX.Race do
   end
 
   @doc """
-   This function is used in RaceLive module to check and stop the RaceEngine after the player car crosses the finish line.
+   This function is used in RaceLive module to check and stop the RaceEngine.
   """
   @spec player_car_past_finish?(Race.t()) :: boolean
   def player_car_past_finish?(race = %Race{distance: race_distance}) do
@@ -93,14 +98,5 @@ defmodule FormulaX.Race do
 
     # To check if the player car has travelled a distance of half the console screen height beyond the finish line (for cosmetic purpose)
     distance_travelled_by_player_car > race_distance + div(Parameters.console_screen_height(), 2)
-  end
-
-  @spec get_player_car_finish_position(Race.t()) :: integer()
-  def get_player_car_finish_position(%Race{cars: cars}) do
-    player_car_index_after_finish =
-      Enum.sort_by(cars, & &1.completion_time, Time)
-      |> Enum.find_index(fn car -> car.controller == :player end)
-
-    player_car_index_after_finish + 1
   end
 end

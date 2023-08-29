@@ -193,7 +193,6 @@ defmodule FormulaX.Race.Car do
   defp initialize_car(car_id, image, controller = :player)
        when is_integer(car_id) and is_binary(image) do
     {x_position, y_position} = get_starting_x_and_y_positions(car_id)
-    speed = :rest
 
     new(%{
       car_id: car_id,
@@ -201,7 +200,7 @@ defmodule FormulaX.Race.Car do
       controller: controller,
       x_position: x_position,
       y_position: y_position,
-      speed: speed
+      speed: :rest
     })
   end
 
