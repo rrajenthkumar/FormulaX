@@ -4,7 +4,7 @@ defmodule FormulaXWeb.RaceLive do
   """
   use FormulaXWeb, :live_view
 
-  alias FormulaX.CarControls
+  alias FormulaX.CarControl
   alias FormulaX.Race
 
   alias FormulaX.RaceEngine
@@ -284,7 +284,7 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> CarControls.change_player_car_speed(:speedup)
+    |> CarControl.change_player_car_speed(:speedup)
     |> RaceEngine.update()
 
     {:noreply, socket}
@@ -301,7 +301,7 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> CarControls.change_player_car_speed(:speedup)
+    |> CarControl.change_player_car_speed(:speedup)
     |> RaceEngine.update()
 
     updated_socket = assign(socket, :clicked_button, :green)
@@ -412,7 +412,7 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> CarControls.change_player_car_speed(:slowdown)
+    |> CarControl.change_player_car_speed(:slowdown)
     |> RaceEngine.update()
 
     {:noreply, socket}
@@ -429,7 +429,7 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> CarControls.change_player_car_speed(:slowdown)
+    |> CarControl.change_player_car_speed(:slowdown)
     |> RaceEngine.update()
 
     updated_socket = assign(socket, :clicked_button, :red)
@@ -489,7 +489,7 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> CarControls.steer_player_car(:right)
+    |> CarControl.steer_player_car(:right)
     |> RaceEngine.update()
 
     {:noreply, socket}
@@ -506,7 +506,7 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> CarControls.steer_player_car(:right)
+    |> CarControl.steer_player_car(:right)
     |> RaceEngine.update()
 
     updated_socket = assign(socket, :clicked_button, :blue)
@@ -566,7 +566,7 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> CarControls.steer_player_car(:left)
+    |> CarControl.steer_player_car(:left)
     |> RaceEngine.update()
 
     {:noreply, socket}
@@ -583,7 +583,7 @@ defmodule FormulaXWeb.RaceLive do
         }
       ) do
     race
-    |> CarControls.steer_player_car(:left)
+    |> CarControl.steer_player_car(:left)
     |> RaceEngine.update()
 
     updated_socket = assign(socket, :clicked_button, :yellow)

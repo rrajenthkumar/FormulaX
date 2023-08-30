@@ -1,9 +1,9 @@
-defmodule FormulaX.CarControls do
+defmodule FormulaX.CarControl do
   @moduledoc """
   **Car Control context**
   This module is the interface for all controls related to player and autonomous cars
   """
-  alias FormulaX.CarControls.CrashDetection
+  alias FormulaX.CarControl.CrashDetection
   alias FormulaX.Race
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
@@ -36,36 +36,39 @@ defmodule FormulaX.CarControls do
       |> Race.get_player_car()
       |> Car.steer(direction)
 
-    race
-    |> update_race_based_on_crash_check_result(updated_player_car, _crash_check_side = direction)
+    update_race_based_on_crash_check_result(
+      race,
+      updated_player_car,
+      _crash_check_side = direction
+    )
   end
 
   @spec steer_autonomous_car(Race.t(), Car.t(), :left | :right) :: Race.t()
   def steer_autonomous_car(race = %Race{}, car = %Car{}, direction) do
-    case CrashDetection.crash?(race, car, _crash_check_side = direction) do
+    updated_car = Car.steer(car, direction)
+
+    case CrashDetection.crash?(race, updated_car, _crash_check_side = direction) do
       true ->
         race
 
       false ->
-        updated_car = Car.steer(car, direction)
-
-        race
-        |> Race.update_car(updated_car)
+        Race.update_car(race, updated_car)
     end
   end
 
   @spec drive_autonomous_car(Race.t(), Car.t()) :: Race.t()
   defp drive_autonomous_car(race = %Race{}, car = %Car{}) do
-    case CrashDetection.crash?(race, car, _crash_check_side = :front) do
+    updated_car =
+      car
+      |> Car.drive()
+      |> Car.adapt_autonomous_car_y_position(race)
+
+    case CrashDetection.crash?(race, updated_car, _crash_check_side = :front) do
       true ->
         race
 
       false ->
-        updated_car =
-          car
-          |> Car.drive()
-          |> Car.adapt_autonomous_car_y_position(race)
-          |> Car.add_completion_time_if_finished(race)
+        updated_car = Car.add_completion_time_if_finished(updated_car, race)
 
         Race.update_car(race, updated_car)
     end
@@ -105,7 +108,6 @@ defmodule FormulaX.CarControls do
          updated_player_car = %Car{controller: :player},
          crash_check_side = :front
        ) do
-    # We need this step so that all the other cars are at the correct position w.r.t the updated player car
     race_updated_for_check =
       race
       |> Race.update_car(updated_player_car)
@@ -113,9 +115,7 @@ defmodule FormulaX.CarControls do
 
     case CrashDetection.crash?(race_updated_for_check, updated_player_car, crash_check_side) do
       true ->
-        race
-        |> Race.update_car(updated_player_car)
-        |> Race.record_crash()
+        Race.record_crash(race_updated_for_check)
 
       false ->
         race_updated_for_check
@@ -134,8 +134,7 @@ defmodule FormulaX.CarControls do
         |> Race.record_crash()
 
       false ->
-        race
-        |> Race.update_car(updated_player_car)
+        Race.update_car(race, updated_player_car)
     end
   end
 
