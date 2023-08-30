@@ -1,7 +1,7 @@
 defmodule FormulaX.CarControl.CrashDetection do
   @moduledoc """
   **Crash detection context**
-  This module is used by the Car Controls module to detect crash between cars or between a car and a background item outside the lanes
+  This module is used by the Car Control module to detect crashes between cars, with background items and with obstacles
   """
   alias FormulaX.Race
   alias FormulaX.Race.Car
@@ -14,14 +14,9 @@ defmodule FormulaX.CarControl.CrashDetection do
   @spec crash?(Race.t(), Car.t(), :front | :left | :right) :: boolean()
   def crash?(
         race = %Race{},
-        querying_car = %Car{
-          x_position: querying_car_x_position,
-          y_position: querying_car_y_position
-        },
+        querying_car = %Car{x_position: querying_car_x_position},
         crash_check_side = :left
       ) do
-    lanes_and_cars_map = get_lanes_and_cars_map(race)
-
     querying_car_lane = Car.get_lane(querying_car)
 
     case querying_car_lane do
@@ -29,7 +24,8 @@ defmodule FormulaX.CarControl.CrashDetection do
       1 ->
         %{x_start: x_start} = get_lane_limits(querying_car_lane)
 
-        if querying_car_x_position <= x_start do
+        # car_steering_step() is subtracted to make sure the car is far enough outside the lane
+        if querying_car_x_position - Parameters.car_steering_step() <= x_start do
           true
         else
           false
@@ -37,24 +33,15 @@ defmodule FormulaX.CarControl.CrashDetection do
 
       # Lane 2 or 3
       # Possibility of crash with a car on the left side
-      lane ->
-        left_lane_cars = Map.get(lanes_and_cars_map, lane - 1, [])
-
-        # We search for cars in the left side lane region whose Y direction midpoint lies between half the car length behind the querying car to half the car length in front of the querying car.
-        # The origin point of a car is at its left bottom edge.
-
-        y_positions_for_vicinity_check =
-          (querying_car_y_position - div(@car_length, 2))..(querying_car_y_position + @car_length +
-                                                              div(@car_length, 2))//@position_range_step
-
+      querying_car_lane ->
         left_lane_cars_in_the_vicinity =
-          Enum.filter(left_lane_cars, fn %Car{y_position: left_lane_car_y_position} ->
-            Enum.member?(
-              y_positions_for_vicinity_check,
-              left_lane_car_y_position +
-                div(@car_length, 2)
-            )
-          end)
+          race
+          |> get_lanes_and_cars_map()
+          |> Map.get(querying_car_lane - 1, [])
+          |> get_cars_in_vicinity(
+            querying_car,
+            crash_check_side
+          )
 
         Enum.any?(left_lane_cars_in_the_vicinity, fn left_lane_car ->
           crash_between_cars?(
@@ -68,14 +55,9 @@ defmodule FormulaX.CarControl.CrashDetection do
 
   def crash?(
         race = %Race{},
-        querying_car = %Car{
-          x_position: querying_car_x_position,
-          y_position: querying_car_y_position
-        },
+        querying_car = %Car{x_position: querying_car_x_position},
         crash_check_side = :right
       ) do
-    lanes_and_cars_map = get_lanes_and_cars_map(race)
-
     querying_car_lane = Car.get_lane(querying_car)
 
     case querying_car_lane do
@@ -83,7 +65,8 @@ defmodule FormulaX.CarControl.CrashDetection do
       3 ->
         %{x_end: x_end} = get_lane_limits(querying_car_lane)
 
-        if x_end - querying_car_x_position <= 0 do
+        # car_steering_step() is subtracted to make sure the car is far enough outside the lane
+        if x_end - (querying_car_x_position - Parameters.car_steering_step()) <= 0 do
           true
         else
           false
@@ -91,23 +74,15 @@ defmodule FormulaX.CarControl.CrashDetection do
 
       # Lane 1 or 2
       # Possibility of crash with a car on the right side
-      lane ->
-        right_lane_cars = Map.get(lanes_and_cars_map, lane + 1, [])
-
-        # We search for cars in the right side lane region whose Y direction midpoint lies between half the car length behind the querying car to half the car length in front of the querying car
-
-        y_positions_for_vicinity_check =
-          (querying_car_y_position - div(@car_length, 2))..(querying_car_y_position + @car_length +
-                                                              div(@car_length, 2))//@position_range_step
-
+      querying_car_lane ->
         right_lane_cars_in_the_vicinity =
-          Enum.filter(right_lane_cars, fn %Car{y_position: right_lane_car_y_position} ->
-            Enum.member?(
-              y_positions_for_vicinity_check,
-              right_lane_car_y_position +
-                div(@car_length, 2)
-            )
-          end)
+          race
+          |> get_lanes_and_cars_map()
+          |> Map.get(querying_car_lane + 1, [])
+          |> get_cars_in_vicinity(
+            querying_car,
+            crash_check_side
+          )
 
         Enum.any?(right_lane_cars_in_the_vicinity, fn right_lane_car ->
           crash_between_cars?(
@@ -122,26 +97,73 @@ defmodule FormulaX.CarControl.CrashDetection do
   def crash?(
         race = %Race{},
         querying_car = %Car{
-          car_id: querying_car_id,
-          y_position: querying_car_y_position
+          car_id: querying_car_id
         },
         crash_check_side = :front
       ) do
-    lanes_and_cars_map = get_lanes_and_cars_map(race)
-
     querying_car_lane = Car.get_lane(querying_car)
 
-    same_lane_cars =
-      Map.get(lanes_and_cars_map, querying_car_lane, [])
-      |> Enum.reject(fn car -> car.car_id == querying_car_id end)
-      |> Enum.reject(fn car -> car.y_position < querying_car_y_position end)
-
-    Enum.any?(same_lane_cars, fn same_lane_car ->
-      crash_between_cars?(
+    cars_in_front =
+      race
+      |> get_lanes_and_cars_map()
+      |> Map.get(querying_car_lane, [])
+      |> Enum.reject(fn same_lane_car -> same_lane_car.car_id == querying_car_id end)
+      |> get_cars_in_vicinity(
         querying_car,
-        same_lane_car,
         crash_check_side
       )
+
+    case cars_in_front do
+      [] ->
+        false
+
+      front_cars ->
+        Enum.any?(front_cars, fn front_car ->
+          crash_between_cars?(
+            querying_car,
+            front_car,
+            crash_check_side
+          )
+        end)
+    end
+  end
+
+  @spec get_cars_in_vicinity(list(Car.t()), Car.t(), :left | :right | :front) :: list(Car.t())
+  defp get_cars_in_vicinity(
+         same_lane_cars,
+         _querying_car = %Car{y_position: querying_car_y_position},
+         _crash_check_side = :front
+       ) do
+    # We get the same lane cars within a distance of one car length in front of querying car if any.
+    y_position_lower_limit_for_vicinity_check = querying_car_y_position + @car_length
+
+    y_position_upper_limit_for_vicinity_check = querying_car_y_position + 2 * @car_length
+
+    Enum.reject(same_lane_cars, fn same_lane_car ->
+      same_lane_car.y_position >= y_position_lower_limit_for_vicinity_check and
+        same_lane_car.y_position <= y_position_upper_limit_for_vicinity_check
+    end)
+  end
+
+  defp get_cars_in_vicinity(
+         adjacent_lane_cars,
+         _querying_car = %Car{y_position: querying_car_y_position},
+         _crash_check_side
+       ) do
+    # We search for cars in the left side lane region whose Y direction midpoint lies between half the car length behind the querying car to half the car length in front of the querying car.
+    y_position_lower_limit_for_vicinity_check = querying_car_y_position - div(@car_length, 2)
+
+    y_position_upper_limit_for_vicinity_check =
+      querying_car_y_position + @car_length +
+        div(@car_length, 2)
+
+    Enum.filter(adjacent_lane_cars, fn %Car{y_position: adjacent_lane_car_y_position} ->
+      adjacent_lane_car_midpoint_y_cordinate =
+        adjacent_lane_car_y_position +
+          div(@car_length, 2)
+
+      adjacent_lane_car_midpoint_y_cordinate >= y_position_lower_limit_for_vicinity_check and
+        adjacent_lane_car_midpoint_y_cordinate <= y_position_upper_limit_for_vicinity_check
     end)
   end
 

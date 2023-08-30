@@ -195,6 +195,7 @@ defmodule FormulaX.Race.Car do
     [car] ++ initialize_autonomous_cars(tail, remaining_car_images)
   end
 
+  # Please note that the origin point of every car is at its left bottom edge.
   @spec initialize_car(integer(), filename(), controller()) :: Car.t()
   defp initialize_car(car_id, image, controller = :player)
        when is_integer(car_id) and is_binary(image) do
