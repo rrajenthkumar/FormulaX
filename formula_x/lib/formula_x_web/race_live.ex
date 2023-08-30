@@ -8,7 +8,7 @@ defmodule FormulaXWeb.RaceLive do
   alias FormulaX.Race
 
   alias FormulaX.RaceEngine
-  alias FormulaX.Race.Result
+  alias FormulaX.Result
   alias FormulaX.Utils
   alias FormulaXWeb.RaceLive.Screen
   alias FormulaXWeb.RaceLive.ConsoleControls

@@ -1,4 +1,4 @@
-defmodule FormulaX.Race.Result do
+defmodule FormulaX.Result do
   @moduledoc """
   **Result context**
   """
