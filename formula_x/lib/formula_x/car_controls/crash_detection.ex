@@ -20,7 +20,9 @@ defmodule FormulaX.CarControls.CrashDetection do
         },
         movement_direction = :left
       ) do
-    {lanes_and_cars_map, querying_car_lane} = get_lane_info(race, querying_car)
+    lanes_and_cars_map = get_lanes_and_cars_map(race)
+
+    querying_car_lane = Car.get_lane(querying_car)
 
     case querying_car_lane do
       # Possibility of crash with a background item ouside the leftmost lane
@@ -38,7 +40,7 @@ defmodule FormulaX.CarControls.CrashDetection do
       lane ->
         left_lane_cars = Map.get(lanes_and_cars_map, lane - 1, [])
 
-        # We search for cars in the left side lane region starting from half the car length behind the querying car to half the car length in front of the querying car.
+        # We search for cars in the left side lane region whose Y direction midpoint lies between half the car length behind the querying car to half the car length in front of the querying car.
         # The origin point of a car is at its left bottom edge.
 
         y_positions_for_vicinity_check =
@@ -54,11 +56,9 @@ defmodule FormulaX.CarControls.CrashDetection do
             )
           end)
 
-        querying_car_after_moving_left = Car.move(querying_car, movement_direction)
-
         Enum.any?(left_lane_cars_in_the_vicinity, fn left_lane_car ->
           crash_between_cars?(
-            querying_car_after_moving_left,
+            querying_car,
             left_lane_car,
             movement_direction
           )
@@ -74,7 +74,9 @@ defmodule FormulaX.CarControls.CrashDetection do
         },
         movement_direction = :right
       ) do
-    {lanes_and_cars_map, querying_car_lane} = get_lane_info(race, querying_car)
+    lanes_and_cars_map = get_lanes_and_cars_map(race)
+
+    querying_car_lane = Car.get_lane(querying_car)
 
     case querying_car_lane do
       # Possibility of crash with a background item ouside the rightmost lane
@@ -92,7 +94,7 @@ defmodule FormulaX.CarControls.CrashDetection do
       lane ->
         right_lane_cars = Map.get(lanes_and_cars_map, lane + 1, [])
 
-        # We search for cars in the right side lane region starting from half the car length behind the querying car to half the car length in front of the querying car
+        # We search for cars in the right side lane region whose Y direction midpoint lies between half the car length behind the querying car to half the car length in front of the querying car
 
         y_positions_for_vicinity_check =
           (querying_car_y_position - div(@car_length, 2))..(querying_car_y_position + @car_length +
@@ -107,11 +109,9 @@ defmodule FormulaX.CarControls.CrashDetection do
             )
           end)
 
-        querying_car_after_moving_right = Car.move(querying_car, movement_direction)
-
         Enum.any?(right_lane_cars_in_the_vicinity, fn right_lane_car ->
           crash_between_cars?(
-            querying_car_after_moving_right,
+            querying_car,
             right_lane_car,
             movement_direction
           )
@@ -122,59 +122,27 @@ defmodule FormulaX.CarControls.CrashDetection do
   def crash?(
         race = %Race{},
         querying_car = %Car{
-          y_position: querying_car_y_position,
-          speed: querying_car_speed,
-          controller: querying_car_controller
+          car_id: querying_car_id,
+          y_position: querying_car_y_position
         },
         movement_direction = :forward
       ) do
-    {lanes_and_cars_map, querying_car_lane} = get_lane_info(race, querying_car)
+    lanes_and_cars_map = get_lanes_and_cars_map(race)
 
-    same_lane_cars = Map.get(lanes_and_cars_map, querying_car_lane, []) -- [querying_car]
+    querying_car_lane = Car.get_lane(querying_car)
 
-    # We search for cars in the same lane in the region starting from front tip of the car to car forward movement step value in front of the querying car
+    same_lane_cars =
+      Map.get(lanes_and_cars_map, querying_car_lane, [])
+      |> Enum.reject(fn car -> car.car_id == querying_car_id end)
+      |> Enum.reject(fn car -> car.y_position < querying_car_y_position end)
 
-    y_positions_for_vicinity_check =
-      case querying_car_speed do
-        :rest ->
-          []
-
-        _others ->
-          car_forward_movement_step = Parameters.car_forward_movement_step(querying_car_speed)
-
-          (querying_car_y_position + @car_length)..(querying_car_y_position + @car_length +
-                                                      car_forward_movement_step)//@position_range_step
-      end
-
-    result =
-      Enum.filter(same_lane_cars, fn %Car{y_position: same_lane_car_y_position} ->
-        Enum.member?(
-          y_positions_for_vicinity_check,
-          same_lane_car_y_position
-        )
-      end)
-
-    case result do
-      [] ->
-        false
-
-      [car_in_the_front] ->
-        querying_car_after_moving_forward =
-          case querying_car_controller do
-            :computer ->
-              Car.move(querying_car, movement_direction)
-              |> Car.adapt_autonomous_car_y_position(race)
-
-            :player ->
-              Car.move(querying_car, movement_direction)
-          end
-
-        crash_between_cars?(
-          querying_car_after_moving_forward,
-          car_in_the_front,
-          movement_direction
-        )
-    end
+    Enum.any?(same_lane_cars, fn same_lane_car ->
+      crash_between_cars?(
+        querying_car,
+        same_lane_car,
+        movement_direction
+      )
+    end)
   end
 
   @spec crash_between_cars?(Car.t(), Car.t(), :left | :right | :forward) :: boolean()
@@ -270,12 +238,9 @@ defmodule FormulaX.CarControls.CrashDetection do
     end)
   end
 
-  @spec get_lane_info(Race.t(), Car.t()) :: {map(), integer()}
-  defp get_lane_info(%Race{cars: cars}, querying_car) do
-    lanes_and_cars_map = Enum.group_by(cars, &Car.get_lane/1, & &1)
-    querying_car_lane = Car.get_lane(querying_car)
-
-    {lanes_and_cars_map, querying_car_lane}
+  @spec get_lanes_and_cars_map(Race.t()) :: map()
+  defp get_lanes_and_cars_map(%Race{cars: cars}) do
+    Enum.group_by(cars, &Car.get_lane/1, & &1)
   end
 
   @spec get_lane_limits(integer()) :: map()
