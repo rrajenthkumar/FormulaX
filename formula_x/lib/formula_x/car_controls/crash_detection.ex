@@ -11,14 +11,14 @@ defmodule FormulaX.CarControls.CrashDetection do
   @car_length Parameters.car_dimensions().length
   @position_range_step Parameters.position_range_step()
 
-  @spec crash?(Race.t(), Car.t(), :forward | :left | :right) :: boolean()
+  @spec crash?(Race.t(), Car.t(), :front | :left | :right) :: boolean()
   def crash?(
         race = %Race{},
         querying_car = %Car{
           x_position: querying_car_x_position,
           y_position: querying_car_y_position
         },
-        movement_direction = :left
+        crash_check_side = :left
       ) do
     lanes_and_cars_map = get_lanes_and_cars_map(race)
 
@@ -60,7 +60,7 @@ defmodule FormulaX.CarControls.CrashDetection do
           crash_between_cars?(
             querying_car,
             left_lane_car,
-            movement_direction
+            crash_check_side
           )
         end)
     end
@@ -72,7 +72,7 @@ defmodule FormulaX.CarControls.CrashDetection do
           x_position: querying_car_x_position,
           y_position: querying_car_y_position
         },
-        movement_direction = :right
+        crash_check_side = :right
       ) do
     lanes_and_cars_map = get_lanes_and_cars_map(race)
 
@@ -113,7 +113,7 @@ defmodule FormulaX.CarControls.CrashDetection do
           crash_between_cars?(
             querying_car,
             right_lane_car,
-            movement_direction
+            crash_check_side
           )
         end)
     end
@@ -125,7 +125,7 @@ defmodule FormulaX.CarControls.CrashDetection do
           car_id: querying_car_id,
           y_position: querying_car_y_position
         },
-        movement_direction = :forward
+        crash_check_side = :front
       ) do
     lanes_and_cars_map = get_lanes_and_cars_map(race)
 
@@ -140,12 +140,12 @@ defmodule FormulaX.CarControls.CrashDetection do
       crash_between_cars?(
         querying_car,
         same_lane_car,
-        movement_direction
+        crash_check_side
       )
     end)
   end
 
-  @spec crash_between_cars?(Car.t(), Car.t(), :left | :right | :forward) :: boolean()
+  @spec crash_between_cars?(Car.t(), Car.t(), :left | :right | :front) :: boolean()
   defp crash_between_cars?(querying_car = %Car{}, left_car = %Car{}, :left) do
     querying_car_all_except_right_border_coordinates =
       get_car_border_coordinates(querying_car, :front) ++
@@ -182,7 +182,7 @@ defmodule FormulaX.CarControls.CrashDetection do
     end)
   end
 
-  defp crash_between_cars?(querying_car = %Car{}, car_in_the_front = %Car{}, :forward) do
+  defp crash_between_cars?(querying_car = %Car{}, car_in_the_front = %Car{}, :front) do
     querying_car_all_except_rear_border_coordinates =
       get_car_border_coordinates(querying_car, :front) ++
         get_car_border_coordinates(querying_car, :left) ++

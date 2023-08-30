@@ -7,7 +7,7 @@ defmodule FormulaX.RaceEngine do
   alias FormulaX.Race
   alias FormulaX.CarControls
 
-  # Cars  will be moved forward every 200 milliseconds
+  # Cars  will be driven forward every 200 milliseconds
   @timeout 200
 
   # API
@@ -34,13 +34,13 @@ defmodule FormulaX.RaceEngine do
 
   @impl true
   @doc """
-  This callback moves all cars forward periodically
+  This callback moves all drives cars forward periodically
   """
   def handle_info(:timeout, _state = {race = %Race{}, race_live_pid}) do
     updated_race =
       race
-      |> CarControls.move_autonomous_cars_forward()
-      |> CarControls.move_player_car(:forward)
+      |> CarControls.drive_autonomous_cars()
+      |> CarControls.drive_player_car()
 
     Process.send(race_live_pid, {:update_visuals, updated_race}, [])
     updated_state = {updated_race, race_live_pid}

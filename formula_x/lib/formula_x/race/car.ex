@@ -53,25 +53,25 @@ defmodule FormulaX.Race.Car do
     autonomous_cars ++ [player_car]
   end
 
-  @spec move(Car.t(), :left | :right | :forward) :: Car.t()
-  def move(car = %Car{x_position: x_position}, :left) do
-    %Car{car | x_position: x_position - Parameters.car_sideward_movement_step()}
+  @spec steer(Car.t(), :left | :right) :: Car.t()
+  def steer(car = %Car{x_position: x_position}, :left) do
+    %Car{car | x_position: x_position - Parameters.car_steering_step()}
   end
 
-  def move(car = %Car{x_position: x_position}, :right) do
-    %Car{car | x_position: x_position + Parameters.car_sideward_movement_step()}
+  def steer(car = %Car{x_position: x_position}, :right) do
+    %Car{car | x_position: x_position + Parameters.car_steering_step()}
   end
 
-  def move(
+  @spec drive(Car.t()) :: Car.t()
+  def drive(
         car = %Car{
           speed: speed,
           distance_travelled: distance_travelled
-        },
-        :forward
+        }
       ) do
     %Car{
       car
-      | distance_travelled: distance_travelled + Parameters.car_forward_movement_step(speed)
+      | distance_travelled: distance_travelled + Parameters.car_drive_step(speed)
     }
   end
 

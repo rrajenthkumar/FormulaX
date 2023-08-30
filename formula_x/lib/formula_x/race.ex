@@ -84,7 +84,7 @@ defmodule FormulaX.Race do
     end
   end
 
-  @spec get_car(Race.t()) :: Car.t()
+  @spec get_car(Race.t(), integer()) :: Car.t()
   def get_car(%Race{cars: cars}, car_id) do
     Enum.find(cars, fn car -> car.car_id == car_id end)
   end
@@ -95,7 +95,7 @@ defmodule FormulaX.Race do
   end
 
   @spec get_all_autonomous_cars(Race.t()) :: list(Car.t())
-  defp get_all_autonomous_cars(%Race{cars: cars}) do
+  def get_all_autonomous_cars(%Race{cars: cars}) do
     Enum.reject(cars, fn %Car{controller: controller} -> controller == :player end)
   end
 

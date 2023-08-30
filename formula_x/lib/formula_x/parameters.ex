@@ -91,25 +91,25 @@ defmodule FormulaX.Parameters do
     |> Enum.count()
   end
 
-  @spec car_forward_movement_step(:rest | :low | :moderate | :high) :: pixel()
-  def car_forward_movement_step(_speed = :rest) do
+  @spec car_drive_step(:rest | :low | :moderate | :high) :: pixel()
+  def car_drive_step(_speed = :rest) do
     0
   end
 
-  def car_forward_movement_step(_speed = :low) do
+  def car_drive_step(_speed = :low) do
     10 * unit()
   end
 
-  def car_forward_movement_step(_speed = :moderate) do
+  def car_drive_step(_speed = :moderate) do
     15 * unit()
   end
 
-  def car_forward_movement_step(_speed = :high) do
+  def car_drive_step(_speed = :high) do
     20 * unit()
   end
 
-  @spec car_sideward_movement_step() :: pixel()
-  def car_sideward_movement_step() do
+  @spec car_steering_step() :: pixel()
+  def car_steering_step() do
     1 * unit()
   end
 

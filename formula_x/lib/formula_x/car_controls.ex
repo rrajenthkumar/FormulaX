@@ -9,62 +9,61 @@ defmodule FormulaX.CarControls do
   alias FormulaX.Race.Car
 
   @doc """
-  In case of forward movement of the player car, the car remains at same position and only the Background is moved in opposite direction
+  When the player car is driven, the car remains at same position and only the Background is moved in opposite direction
   # to give an illusion of forward movement. Also all other cars positions are adapted based on this movement of the player car.
   """
-  @spec move_player_car(Race.t(), :left | :right | :forward) :: Race.t()
-  def move_player_car(race = %Race{background: background}, direction = :forward) do
+  @spec drive_player_car(Race.t()) :: Race.t()
+  def drive_player_car(race = %Race{background: background}) do
     %Car{speed: speed} =
       updated_player_car =
       race
       |> Race.get_player_car()
-      |> Car.move(direction)
+      |> Car.drive()
       |> Car.add_completion_time_if_finished(race)
 
     updated_background = Background.move(background, speed)
 
     race
-    |> update_race_based_on_crash_check_result(updated_player_car, direction)
+    |> update_race_based_on_crash_check_result(updated_player_car, _crash_check_side = :front)
     |> Race.update_background(updated_background)
     |> Race.end_if_completed()
   end
 
-  # Left or right side movement
-  def move_player_car(race = %Race{}, direction) do
+  @spec steer_player_car(Race.t(), :left | :right) :: Race.t()
+  def steer_player_car(race = %Race{}, direction) do
     updated_player_car =
       race
       |> Race.get_player_car()
-      |> Car.move(direction)
+      |> Car.steer(direction)
 
     race
-    |> update_race_based_on_crash_check_result(updated_player_car, direction)
+    |> update_race_based_on_crash_check_result(updated_player_car, _crash_check_side = direction)
   end
 
-  @spec move_autonomous_car(Race.t(), Car.t(), :left | :right | :forward) :: Race.t()
-
-  # Left or right side movement
-  def move_autonomous_car(race = %Race{}, car = %Car{}, direction) do
-    case CrashDetection.crash?(race, car, direction) do
+  @spec steer_autonomous_car(Race.t(), Car.t(), :left | :right) :: Race.t()
+  def steer_autonomous_car(race = %Race{}, car = %Car{}, direction) do
+    case CrashDetection.crash?(race, car, _crash_check_side = direction) do
       true ->
         race
 
       false ->
-        updated_car = Car.move(car, direction)
+        updated_car = Car.steer(car, direction)
 
         race
         |> Race.update_car(updated_car)
     end
   end
 
-  defp move_autonomous_car(race = %Race{}, car = %Car{}, direction = :forward) do
-    case CrashDetection.crash?(race, car, direction) do
+  @spec drive_autonomous_car(Race.t(), Car.t()) :: Race.t()
+  defp drive_autonomous_car(race = %Race{}, car = %Car{}) do
+    case CrashDetection.crash?(race, car, _crash_check_side = :front) do
       true ->
         race
 
       false ->
         updated_car =
           car
-          |> Car.move(direction)
+          |> Car.drive()
           |> Car.adapt_autonomous_car_y_position(race)
           |> Car.add_completion_time_if_finished(race)
 
@@ -72,11 +71,11 @@ defmodule FormulaX.CarControls do
     end
   end
 
-  @spec move_autonomous_cars_forward(Race.t()) :: Race.t()
-  def move_autonomous_cars_forward(race = %Race{}) do
+  @spec drive_autonomous_cars(Race.t()) :: Race.t()
+  def drive_autonomous_cars(race = %Race{}) do
     race
     |> Race.get_all_autonomous_cars()
-    |> move_autonomous_cars_forward(race)
+    |> drive_autonomous_cars(race)
   end
 
   @spec change_player_car_speed(Race.t(), :speedup | :slowdown) :: Race.t()
@@ -90,7 +89,7 @@ defmodule FormulaX.CarControls do
   end
 
   @spec change_car_speed(Race.t(), Car.t(), :speedup | :slowdown) :: Race.t()
-  def change_car_speed(race = %Race{}, car = %Car{car_id: car_id}, action) do
+  def change_car_speed(race = %Race{}, %Car{car_id: car_id}, action) do
     updated_car =
       race
       |> Race.get_car(car_id)
@@ -99,12 +98,12 @@ defmodule FormulaX.CarControls do
     Race.update_car(race, updated_car)
   end
 
-  @spec update_race_based_on_crash_check_result(Race.t(), Car.t(), :left | :right | :forward) ::
+  @spec update_race_based_on_crash_check_result(Race.t(), Car.t(), :left | :right | :front) ::
           Race.t()
   defp update_race_based_on_crash_check_result(
          race = %Race{},
          updated_player_car = %Car{controller: :player},
-         direction = :forward
+         crash_check_side = :front
        ) do
     # We need this step so that all the other cars are at the correct position w.r.t the updated player car
     race_updated_for_check =
@@ -112,7 +111,7 @@ defmodule FormulaX.CarControls do
       |> Race.update_car(updated_player_car)
       |> adapt_autonomous_cars_y_position()
 
-    case CrashDetection.crash?(race_updated_for_check, updated_player_car, direction) do
+    case CrashDetection.crash?(race_updated_for_check, updated_player_car, crash_check_side) do
       true ->
         race
         |> Race.update_car(updated_player_car)
@@ -126,9 +125,9 @@ defmodule FormulaX.CarControls do
   defp update_race_based_on_crash_check_result(
          race = %Race{},
          updated_player_car = %Car{controller: :player},
-         direction
+         crash_check_side
        ) do
-    case CrashDetection.crash?(race, updated_player_car, direction) do
+    case CrashDetection.crash?(race, updated_player_car, crash_check_side) do
       true ->
         race
         |> Race.update_car(updated_player_car)
@@ -165,19 +164,19 @@ defmodule FormulaX.CarControls do
     adapt_autonomous_cars_y_position(remaining_cars, updated_race)
   end
 
-  @spec move_autonomous_cars_forward(list(Car.t()), Race.t()) :: Race.t()
-  defp move_autonomous_cars_forward(
+  @spec drive_autonomous_cars(list(Car.t()), Race.t()) :: Race.t()
+  defp drive_autonomous_cars(
          _autonomous_cars = [car],
          race = %Race{}
        ) do
-    move_autonomous_car(race, car, :forward)
+    drive_autonomous_car(race, car)
   end
 
-  defp move_autonomous_cars_forward(
+  defp drive_autonomous_cars(
          _autonomous_cars = [car | remaining_cars],
          race = %Race{}
        ) do
-    updated_race = move_autonomous_car(race, car, :forward)
-    move_autonomous_cars_forward(remaining_cars, updated_race)
+    updated_race = drive_autonomous_car(race, car)
+    drive_autonomous_cars(remaining_cars, updated_race)
   end
 end
