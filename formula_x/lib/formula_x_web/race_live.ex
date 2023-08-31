@@ -285,7 +285,6 @@ defmodule FormulaXWeb.RaceLive do
       ) do
     race
     |> CarControl.change_player_car_speed(:speedup)
-    |> RaceEngine.update()
 
     {:noreply, socket}
   end
@@ -302,7 +301,6 @@ defmodule FormulaXWeb.RaceLive do
       ) do
     race
     |> CarControl.change_player_car_speed(:speedup)
-    |> RaceEngine.update()
 
     updated_socket = assign(socket, :clicked_button, :green)
 
@@ -413,7 +411,6 @@ defmodule FormulaXWeb.RaceLive do
       ) do
     race
     |> CarControl.change_player_car_speed(:slowdown)
-    |> RaceEngine.update()
 
     {:noreply, socket}
   end
@@ -430,7 +427,6 @@ defmodule FormulaXWeb.RaceLive do
       ) do
     race
     |> CarControl.change_player_car_speed(:slowdown)
-    |> RaceEngine.update()
 
     updated_socket = assign(socket, :clicked_button, :red)
 
@@ -490,7 +486,6 @@ defmodule FormulaXWeb.RaceLive do
       ) do
     race
     |> CarControl.steer_player_car(:right)
-    |> RaceEngine.update()
 
     {:noreply, socket}
   end
@@ -507,7 +502,6 @@ defmodule FormulaXWeb.RaceLive do
       ) do
     race
     |> CarControl.steer_player_car(:right)
-    |> RaceEngine.update()
 
     updated_socket = assign(socket, :clicked_button, :blue)
 
@@ -567,7 +561,6 @@ defmodule FormulaXWeb.RaceLive do
       ) do
     race
     |> CarControl.steer_player_car(:left)
-    |> RaceEngine.update()
 
     {:noreply, socket}
   end
@@ -584,7 +577,6 @@ defmodule FormulaXWeb.RaceLive do
       ) do
     race
     |> CarControl.steer_player_car(:left)
-    |> RaceEngine.update()
 
     updated_socket = assign(socket, :clicked_button, :yellow)
 

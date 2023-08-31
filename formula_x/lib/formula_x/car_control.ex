@@ -7,6 +7,7 @@ defmodule FormulaX.CarControl do
   alias FormulaX.Race
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
+  alias FormulaX.RaceEngine
 
   @doc """
   When the player car is driven, the car remains at same position and only the Background is moved in opposite direction
@@ -29,18 +30,28 @@ defmodule FormulaX.CarControl do
     |> Race.end_if_completed()
   end
 
-  @spec steer_player_car(Race.t(), :left | :right) :: Race.t()
+  @spec steer_player_car(Race.t(), :left | :right) :: :ok
   def steer_player_car(race = %Race{}, direction) do
     updated_player_car =
       race
       |> Race.get_player_car()
       |> Car.steer(direction)
 
-    update_race_based_on_crash_check_result(
-      race,
-      updated_player_car,
-      _crash_check_side = direction
-    )
+    race
+    |> update_race_based_on_crash_check_result(updated_player_car, _crash_check_side = direction)
+    |> RaceEngine.update()
+  end
+
+  @spec change_player_car_speed(Race.t(), :speedup | :slowdown) :: :ok
+  def change_player_car_speed(race = %Race{}, action) do
+    updated_player_car =
+      race
+      |> Race.get_player_car()
+      |> Car.change_speed(action)
+
+    race
+    |> Race.update_car(updated_player_car)
+    |> RaceEngine.update()
   end
 
   @spec steer_autonomous_car(Race.t(), Car.t(), :left | :right) :: Race.t()
@@ -79,16 +90,6 @@ defmodule FormulaX.CarControl do
     race
     |> Race.get_all_autonomous_cars()
     |> drive_autonomous_cars(race)
-  end
-
-  @spec change_player_car_speed(Race.t(), :speedup | :slowdown) :: Race.t()
-  def change_player_car_speed(race = %Race{}, action) do
-    updated_player_car =
-      race
-      |> Race.get_player_car()
-      |> Car.change_speed(action)
-
-    Race.update_car(race, updated_player_car)
   end
 
   @spec change_car_speed(Race.t(), Car.t(), :speedup | :slowdown) :: Race.t()

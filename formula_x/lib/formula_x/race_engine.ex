@@ -12,15 +12,18 @@ defmodule FormulaX.RaceEngine do
 
   # API
 
+  @spec start(Race.t(), pid()) :: {:ok, pid()} | {:error, {:already_started, pid()}}
   def start(race_after_start = %Race{}, race_live_pid) when is_pid(race_live_pid) do
     initial_state = {race_after_start, race_live_pid}
     GenServer.start_link(__MODULE__, initial_state, name: __MODULE__)
   end
 
+  @spec update(Race.t()) :: :ok
   def update(updated_race = %Race{}) do
     GenServer.cast(__MODULE__, {:update, updated_race})
   end
 
+  @spec update(Race.t()) :: :ok
   def stop() do
     GenServer.cast(__MODULE__, :stop)
   end
