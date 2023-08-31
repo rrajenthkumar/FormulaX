@@ -96,6 +96,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
       <% end %>
       <%= if @race.status == :crash do %>
         <.crash_info/>
+        <.result last_5_results={@last_5_results}/>
       <% end %>
       <%= if Race.player_car_past_finish?(@race) do %>
         <.result last_5_results={@last_5_results}/>
@@ -302,12 +303,6 @@ defmodule FormulaXWeb.RaceLive.Screen do
   defp crash_info(assigns) do
     ~H"""
     <div class="crash_info">
-      <div class="body">
-      </div>
-      <div class="footer">
-        <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to start a new race</p>
-        <p>Press <span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch the console off</p>
-      </div>
     </div>
     """
   end
@@ -380,7 +375,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
       :decline -> "&#8681"
       :good_start -> "&#128079"
       :same -> "&#128528"
-      :crash -> "&#128555"
+      :bad -> "&#128555"
       :first -> "&#127942"
     end
   end

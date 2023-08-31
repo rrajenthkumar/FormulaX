@@ -703,17 +703,9 @@ defmodule FormulaXWeb.RaceLive do
         {:update_visuals, race = %Race{status: status}},
         socket
       ) do
-    cond do
-      status == :crash ->
-        Process.send(self(), :result, [])
-        RaceEngine.stop()
-
-      Race.player_car_past_finish?(race) ->
-        Process.send(self(), :result, [])
-        RaceEngine.stop()
-
-      true ->
-        nil
+    if Race.player_car_past_finish?(race) or status == :crash do
+      Process.send(self(), :result, [])
+      RaceEngine.stop()
     end
 
     updated_socket = assign(socket, :race, race)
