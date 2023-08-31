@@ -105,20 +105,6 @@ defmodule FormulaX.CarControl do
     end
   end
 
-  # @spec steer_autonomous_car(Race.t(), Car.t(), :left | :right) :: Race.t()
-  # defp steer_autonomous_car(race = %Race{}, car = %Car{}, direction) do
-  #   updated_car = Car.steer(car, direction)
-
-  #   # Crash check needed? We have already checked if cars in vicinity is 0
-  #   case CrashDetection.crash?(race, updated_car, _crash_check_side = direction) do
-  #     true ->
-  #       race
-
-  #     false ->
-  #       Race.update_car(race, updated_car)
-  #   end
-  # end
-
   @spec steer_autonomous_car(Race.t(), Car.t(), :left | :right) :: Race.t()
   defp steer_autonomous_car(race = %Race{}, car = %Car{}, direction) do
     updated_car = Car.steer(car, direction)
