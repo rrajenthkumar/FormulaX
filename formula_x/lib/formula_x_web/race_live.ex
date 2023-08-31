@@ -705,6 +705,7 @@ defmodule FormulaXWeb.RaceLive do
       ) do
     cond do
       status == :crash ->
+        Process.send(self(), :result, [])
         RaceEngine.stop()
 
       Race.player_car_past_finish?(race) ->
@@ -723,7 +724,7 @@ defmodule FormulaXWeb.RaceLive do
         :result,
         socket = %{
           assigns: %{
-            race: race = %Race{status: :completed},
+            race: race = %Race{},
             screen_state: :active_race,
             last_5_results: last_5_results
           }

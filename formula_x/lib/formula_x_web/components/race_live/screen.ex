@@ -1,5 +1,6 @@
 defmodule FormulaXWeb.RaceLive.Screen do
   use Phoenix.Component
+  use Phoenix.HTML
 
   alias FormulaX.Parameters
   alias FormulaX.Race
@@ -321,6 +322,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
             <th>Result</th>
             <th>Position</th>
             <th>Time</th>
+            <th></th>
           </tr>
           <%= for result <- @last_5_results do%>
             <tr>
@@ -328,6 +330,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
               <td><%= result.status%></td>
               <td><%= result.position%></td>
               <td><%= "#{result.time} s"%></td>
+              <td class={review_class(result.review)}><%= show_review_icon(result.review) |> raw %></td>
             </tr>
           <% end %>
         </table>
@@ -368,5 +371,31 @@ defmodule FormulaXWeb.RaceLive.Screen do
     "cars"
     |> Utils.get_images()
     |> Enum.at(index)
+  end
+
+  @spec show_review_icon(atom()) :: String.t()
+  defp show_review_icon(review) when is_atom(review) do
+    case review do
+      :improvement -> "&#8679"
+      :decline -> "&#8681"
+      :good_start -> "&#128079"
+      :same -> "&#128528"
+      :crash -> "&#128555"
+      :first -> "&#127942"
+    end
+  end
+
+  @spec review_class(atom()) :: String.t()
+  defp review_class(review) when is_atom(review) do
+    case review do
+      :improvement ->
+        "text-green-700"
+
+      :decline ->
+        "text-red-700"
+
+      _ ->
+        ""
+    end
   end
 end

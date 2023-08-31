@@ -9,13 +9,15 @@ defmodule FormulaX.Result do
   alias FormulaX.Race.Car
 
   @type status :: :crash | :completed
+  @type review :: :first | :good_start | :bad | :same | :improvement | :decline
 
   @typedoc "Result struct"
   typedstruct do
     field(:car, Car.image(), enforce: true)
-    field(:status, status(), default: :crash)
+    field(:status, status(), default: nil, enforce: true)
     field(:time, Time.t(), default: nil)
     field(:position, integer(), default: nil)
+    field(:review, review(), default: nil)
   end
 
   @spec new(map()) :: Result.t()
@@ -24,9 +26,17 @@ defmodule FormulaX.Result do
   end
 
   @spec get_player_car_result(Race.t()) :: Result.t()
-  def get_player_car_result(
-        race = %Race{cars: cars, start_time: race_start_time, status: race_status}
-      ) do
+  def get_player_car_result(race = %Race{status: :crash}) do
+    %Car{image: player_car_image} = Race.get_player_car(race)
+
+    %{
+      car: player_car_image,
+      status: :crash
+    }
+    |> Result.new()
+  end
+
+  def get_player_car_result(race = %Race{cars: cars, start_time: race_start_time, status: status}) do
     %Car{completion_time: player_car_completion_time, image: player_car_image} =
       Race.get_player_car(race)
 
@@ -42,7 +52,7 @@ defmodule FormulaX.Result do
 
     %{
       car: player_car_image,
-      status: race_status,
+      status: status,
       time: player_car_time_duration,
       position: player_car_position
     }
@@ -61,5 +71,34 @@ defmodule FormulaX.Result do
       results_count < 5 ->
         [new_result] ++ last_5_results
     end
+    |> update_review
+  end
+
+  defp update_review(_last_5_results = [last_result]) do
+    review =
+      cond do
+        last_result.status == :crash -> :bad
+        last_result.position == 1 -> :first
+        true -> :good_start
+      end
+
+    [%Result{last_result | review: review}]
+  end
+
+  defp update_review(_last_5_results = [last_result | other_results]) do
+    [last_but_one_result | _other_results] = other_results
+
+    review =
+      cond do
+        last_result.status == :crash -> :bad
+        last_result.position == 1 -> :first
+        last_result.position < last_but_one_result.position -> :improvement
+        last_result.position > last_but_one_result.position -> :decline
+        last_result.position == last_but_one_result.position -> :same
+        last_but_one_result.position == nil -> :improvement
+      end
+
+    updated_last_result = %Result{last_result | review: review}
+    [updated_last_result] ++ other_results
   end
 end
