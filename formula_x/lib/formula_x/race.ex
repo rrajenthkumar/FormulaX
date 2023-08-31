@@ -9,6 +9,9 @@ defmodule FormulaX.Race do
   alias FormulaX.Race.Car
   alias FormulaX.Parameters
 
+  @race_distance Parameters.race_distance()
+  @console_screen_height Parameters.console_screen_height()
+
   @type cars :: list(Car.t())
   @type status :: :countdown | :ongoing | :crash | :completed
 
@@ -29,10 +32,9 @@ defmodule FormulaX.Race do
   @spec initialize(integer()) :: Race.t()
   def initialize(player_car_index) do
     cars = Car.initialize_cars(player_car_index)
-    race_distance = Parameters.race_distance()
-    background = Background.initialize(race_distance)
+    background = Background.initialize(@race_distance)
 
-    new(%{cars: cars, background: background, distance: race_distance})
+    new(%{cars: cars, background: background, distance: @race_distance})
   end
 
   @spec start(Race.t()) :: Race.t()
@@ -107,6 +109,11 @@ defmodule FormulaX.Race do
     %Car{distance_travelled: distance_travelled_by_player_car} = get_player_car(race)
 
     # To check if the player car has travelled a distance of half the console screen height beyond the finish line (for cosmetic purpose)
-    distance_travelled_by_player_car > race_distance + div(Parameters.console_screen_height(), 2)
+    distance_travelled_by_player_car > race_distance + div(@console_screen_height, 2)
+  end
+
+  @spec get_lanes_and_cars_map(Race.t()) :: map()
+  def get_lanes_and_cars_map(%Race{cars: cars}) do
+    Enum.group_by(cars, &Car.get_lane/1, & &1)
   end
 end

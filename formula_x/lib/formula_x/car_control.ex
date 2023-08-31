@@ -8,6 +8,9 @@ defmodule FormulaX.CarControl do
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
   alias FormulaX.RaceEngine
+  alias FormulaX.Parameters
+
+  @car_length Parameters.car_dimensions().length
 
   @doc """
   When the player car is driven, the car remains at same position and only the Background is moved in opposite direction
@@ -54,17 +57,27 @@ defmodule FormulaX.CarControl do
     |> RaceEngine.update()
   end
 
-  @spec steer_autonomous_car(Race.t(), Car.t(), :left | :right) :: Race.t()
-  def steer_autonomous_car(race = %Race{}, car = %Car{}, direction) do
-    updated_car = Car.steer(car, direction)
+  @spec drive_autonomous_cars(Race.t()) :: Race.t()
+  def drive_autonomous_cars(race = %Race{}) do
+    race
+    |> Race.get_all_autonomous_cars()
+    |> drive_autonomous_cars(race)
+  end
 
-    case CrashDetection.crash?(race, updated_car, _crash_check_side = direction) do
-      true ->
-        race
+  @spec drive_autonomous_cars(list(Car.t()), Race.t()) :: Race.t()
+  defp drive_autonomous_cars(
+         _autonomous_cars = [car],
+         race = %Race{}
+       ) do
+    drive_autonomous_car(race, car)
+  end
 
-      false ->
-        Race.update_car(race, updated_car)
-    end
+  defp drive_autonomous_cars(
+         _autonomous_cars = [car | remaining_cars],
+         race = %Race{}
+       ) do
+    updated_race = drive_autonomous_car(race, car)
+    drive_autonomous_cars(remaining_cars, updated_race)
   end
 
   @spec drive_autonomous_car(Race.t(), Car.t()) :: Race.t()
@@ -76,7 +89,14 @@ defmodule FormulaX.CarControl do
 
     case CrashDetection.crash?(race, updated_car, _crash_check_side = :front) do
       true ->
-        race
+        direction =
+          race
+          |> get_autonomous_car_steering_direction(updated_car)
+
+        case direction do
+          :noop -> race
+          direction -> steer_autonomous_car(race, updated_car, direction)
+        end
 
       false ->
         updated_car = Car.add_completion_time_if_finished(updated_car, race)
@@ -85,11 +105,95 @@ defmodule FormulaX.CarControl do
     end
   end
 
-  @spec drive_autonomous_cars(Race.t()) :: Race.t()
-  def drive_autonomous_cars(race = %Race{}) do
-    race
-    |> Race.get_all_autonomous_cars()
-    |> drive_autonomous_cars(race)
+  # @spec steer_autonomous_car(Race.t(), Car.t(), :left | :right) :: Race.t()
+  # defp steer_autonomous_car(race = %Race{}, car = %Car{}, direction) do
+  #   updated_car = Car.steer(car, direction)
+
+  #   # Crash check needed? We have already checked if cars in vicinity is 0
+  #   case CrashDetection.crash?(race, updated_car, _crash_check_side = direction) do
+  #     true ->
+  #       race
+
+  #     false ->
+  #       Race.update_car(race, updated_car)
+  #   end
+  # end
+
+  @spec steer_autonomous_car(Race.t(), Car.t(), :left | :right) :: Race.t()
+  defp steer_autonomous_car(race = %Race{}, car = %Car{}, direction) do
+    updated_car = Car.steer(car, direction)
+    Race.update_car(race, updated_car)
+  end
+
+  @spec get_autonomous_car_steering_direction(Race.t(), Car.t()) :: :left | :right | :noop
+  defp get_autonomous_car_steering_direction(
+         race = %Race{},
+         querying_car = %Car{}
+       ) do
+    lanes_cars_map = Race.get_lanes_and_cars_map(race)
+
+    case Car.get_lane(querying_car) do
+      1 ->
+        number_of_cars_in_vicinity_in_lane_2 =
+          number_of_adjacent_lane_cars_in_vicinity(lanes_cars_map, querying_car, 2)
+
+        case number_of_cars_in_vicinity_in_lane_2 do
+          0 -> :right
+          _others -> :noop
+        end
+
+      2 ->
+        number_of_cars_in_vicinity_in_lane_1 =
+          number_of_adjacent_lane_cars_in_vicinity(lanes_cars_map, querying_car, 1)
+
+        number_of_cars_in_vicinity_in_lane_3 =
+          number_of_adjacent_lane_cars_in_vicinity(lanes_cars_map, querying_car, 3)
+
+        cond do
+          number_of_cars_in_vicinity_in_lane_1 == 0 -> :left
+          number_of_cars_in_vicinity_in_lane_3 == 0 -> :right
+          true -> :noop
+        end
+
+      3 ->
+        number_of_cars_in_vicinity_in_lane_2 =
+          number_of_adjacent_lane_cars_in_vicinity(lanes_cars_map, querying_car, 2)
+
+        case number_of_cars_in_vicinity_in_lane_2 do
+          0 -> :left
+          _others -> :noop
+        end
+    end
+  end
+
+  @spec number_of_adjacent_lane_cars_in_vicinity(map(), Car.t(), integer()) :: integer()
+  defp number_of_adjacent_lane_cars_in_vicinity(lanes_cars_map, querying_car, adjacent_lane) do
+    lanes_cars_map
+    |> Map.get(adjacent_lane, [])
+    |> adjacent_lane_cars_in_vicinity(querying_car)
+    |> length()
+  end
+
+  @spec adjacent_lane_cars_in_vicinity(list(Car.t()), Car.t()) :: list(Car.t())
+  defp adjacent_lane_cars_in_vicinity(
+         adjacent_lane_cars,
+         _querying_car = %Car{y_position: querying_car_y_position}
+       ) do
+    # We search for cars in the adjacent lane whose Y direction midpoint lies between half the car length behind the querying car to half the car length in front of the querying car.
+    y_position_lower_limit_for_vicinity_check = querying_car_y_position - div(@car_length, 2)
+
+    y_position_upper_limit_for_vicinity_check =
+      querying_car_y_position + @car_length +
+        div(@car_length, 2)
+
+    Enum.filter(adjacent_lane_cars, fn %Car{y_position: adjacent_lane_car_y_position} ->
+      adjacent_lane_car_midpoint_y_cordinate =
+        adjacent_lane_car_y_position +
+          div(@car_length, 2)
+
+      adjacent_lane_car_midpoint_y_cordinate >= y_position_lower_limit_for_vicinity_check and
+        adjacent_lane_car_midpoint_y_cordinate <= y_position_upper_limit_for_vicinity_check
+    end)
   end
 
   @spec change_car_speed(Race.t(), Car.t(), :speedup | :slowdown) :: Race.t()
@@ -162,21 +266,5 @@ defmodule FormulaX.CarControl do
     adapted_car = Car.adapt_autonomous_car_y_position(car, race)
     updated_race = Race.update_car(race, adapted_car)
     adapt_autonomous_cars_y_position(remaining_cars, updated_race)
-  end
-
-  @spec drive_autonomous_cars(list(Car.t()), Race.t()) :: Race.t()
-  defp drive_autonomous_cars(
-         _autonomous_cars = [car],
-         race = %Race{}
-       ) do
-    drive_autonomous_car(race, car)
-  end
-
-  defp drive_autonomous_cars(
-         _autonomous_cars = [car | remaining_cars],
-         race = %Race{}
-       ) do
-    updated_race = drive_autonomous_car(race, car)
-    drive_autonomous_cars(remaining_cars, updated_race)
   end
 end

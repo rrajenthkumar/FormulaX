@@ -40,7 +40,7 @@ defmodule FormulaX.Parameters do
   """
   @spec race_distance() :: pixel()
   def race_distance() do
-    500 * unit()
+    1000 * unit()
   end
 
   @doc """
@@ -110,7 +110,7 @@ defmodule FormulaX.Parameters do
 
   @spec car_steering_step() :: pixel()
   def car_steering_step() do
-    1 * unit()
+    19 * unit()
   end
 
   @doc """

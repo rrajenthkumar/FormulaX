@@ -9,6 +9,12 @@ defmodule FormulaX.Race.Car do
   alias FormulaX.Parameters
   alias FormulaX.Utils
 
+  @car_width Parameters.car_dimensions().width
+  @car_length Parameters.car_dimensions().length
+  @number_of_cars Parameters.number_of_cars()
+  @position_range_step Parameters.position_range_step()
+  @car_steering_step Parameters.car_steering_step()
+
   @type filename :: String.t()
   @type controller :: :player | :computer
   @type speed :: :rest | :low | :moderate | :high
@@ -34,7 +40,7 @@ defmodule FormulaX.Race.Car do
   @spec initialize_cars(integer()) :: list(Car.t())
   def initialize_cars(player_car_index) do
     possible_ids =
-      1..Parameters.number_of_cars()
+      1..@number_of_cars
       |> Enum.to_list()
 
     player_car_id = Enum.random(possible_ids)
@@ -55,11 +61,11 @@ defmodule FormulaX.Race.Car do
 
   @spec steer(Car.t(), :left | :right) :: Car.t()
   def steer(car = %Car{x_position: x_position}, :left) do
-    %Car{car | x_position: x_position - Parameters.car_steering_step()}
+    %Car{car | x_position: x_position - @car_steering_step}
   end
 
   def steer(car = %Car{x_position: x_position}, :right) do
-    %Car{car | x_position: x_position + Parameters.car_steering_step()}
+    %Car{car | x_position: x_position + @car_steering_step}
   end
 
   @spec drive(Car.t()) :: Car.t()
@@ -135,6 +141,44 @@ defmodule FormulaX.Race.Car do
       end
     )
     |> Map.fetch!(:lane_number)
+  end
+
+  @spec get_side_coordinates(Car.t(), :front | :rear | :left | :right) ::
+          list(Car.coordinates())
+  def get_side_coordinates(
+        %Car{x_position: car_edge_x, y_position: car_edge_y},
+        _side = :front
+      ) do
+    Enum.map(car_edge_x..(car_edge_x + @car_width)//@position_range_step, fn x ->
+      {x, car_edge_y + @car_length}
+    end)
+  end
+
+  def get_side_coordinates(
+        %Car{x_position: car_edge_x, y_position: car_edge_y},
+        _side = :rear
+      ) do
+    Enum.map(car_edge_x..(car_edge_x + @car_width)//@position_range_step, fn x ->
+      {x, car_edge_y}
+    end)
+  end
+
+  def get_side_coordinates(
+        %Car{x_position: car_edge_x, y_position: car_edge_y},
+        _side = :left
+      ) do
+    Enum.map(car_edge_y..(car_edge_y + @car_length)//@position_range_step, fn y ->
+      {car_edge_x, y}
+    end)
+  end
+
+  def get_side_coordinates(
+        %Car{x_position: car_edge_x, y_position: car_edge_y},
+        _side = :right
+      ) do
+    Enum.map(car_edge_y..(car_edge_y + @car_length)//@position_range_step, fn y ->
+      {car_edge_x + @car_width, y}
+    end)
   end
 
   @doc """

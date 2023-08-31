@@ -9,6 +9,9 @@ defmodule FormulaX.Race.Background do
   alias FormulaX.Utils
   alias FormulaX.Parameters
 
+  @console_screen_height Parameters.console_screen_height()
+  @background_image_container_height Parameters.background_image_container_height()
+
   @type filename :: String.t()
   @type filenames :: list(filename())
 
@@ -31,9 +34,9 @@ defmodule FormulaX.Race.Background do
     right_side_images = get_side_images(available_background_images, race_distance)
 
     # The origins of left and right side Background DIVs which are at their top left edges are initially aligned to the top of console screen.
-    # After the below correction the bottom of these Background DIVs will be at a distance of 'Parameters.console_screen_height()' beyond the top of console screen.
+    # After the below correction the bottom of these Background DIVs will be at a distance of '@console_screen_height' beyond the top of console screen.
     # This is done to ensure that we can add few more background images to the bottom of the DIVs to show after the finish line
-    y_position = -Parameters.console_screen_height() - race_distance
+    y_position = -@console_screen_height - race_distance
 
     new(%{
       left_side_images: left_side_images,
@@ -54,11 +57,9 @@ defmodule FormulaX.Race.Background do
   @spec get_side_images(filenames(), Parameters.pixel()) :: filenames()
   defp get_side_images(available_background_images, race_distance)
        when is_integer(race_distance) and is_list(available_background_images) do
-    image_container_height = Parameters.background_image_container_height()
-
-    # 2 * Parameters.console_screen_height() is added to race length here to have few more background images to be shown after the finish line as explained earlier
+    # 2 * @console_screen_height is added to race length here to have few more background images to be shown after the finish line as explained earlier
     number_of_images_required =
-      div(race_distance + 2 * Parameters.console_screen_height(), image_container_height)
+      div(race_distance + 2 * @console_screen_height, @background_image_container_height)
 
     Enum.map(1..number_of_images_required, fn _grid_number ->
       Enum.random(available_background_images)
