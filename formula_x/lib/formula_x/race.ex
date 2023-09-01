@@ -48,10 +48,10 @@ defmodule FormulaX.Race do
   end
 
   @spec update_car(Race.t(), Car.t()) :: Race.t()
-  def update_car(race = %Race{cars: cars}, updated_car = %Car{car_id: updated_car_id}) do
+  def update_car(race = %Race{cars: cars}, updated_car = %Car{id: updated_car_id}) do
     updated_cars =
       Enum.map(cars, fn car ->
-        if car.car_id == updated_car_id do
+        if car.id == updated_car_id do
           updated_car
         else
           car
@@ -78,7 +78,7 @@ defmodule FormulaX.Race do
 
   @spec get_car_by_id(Race.t(), integer()) :: {:ok, Car.t()} | {:error, String.t()}
   def get_car_by_id(%Race{cars: cars}, car_id) when is_integer(car_id) do
-    result = Enum.find(cars, fn car -> car.car_id == car_id end)
+    result = Enum.find(cars, fn car -> car.id == car_id end)
 
     case result do
       nil -> {:error, "car not found"}
@@ -88,7 +88,7 @@ defmodule FormulaX.Race do
 
   @spec get_car(Race.t(), integer()) :: Car.t()
   def get_car(%Race{cars: cars}, car_id) do
-    Enum.find(cars, fn car -> car.car_id == car_id end)
+    Enum.find(cars, fn car -> car.id == car_id end)
   end
 
   @spec get_player_car(Race.t()) :: Car.t()

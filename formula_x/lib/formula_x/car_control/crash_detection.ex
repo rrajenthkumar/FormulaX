@@ -93,7 +93,7 @@ defmodule FormulaX.CarControl.CrashDetection do
   def crash?(
         race = %Race{},
         querying_car = %Car{
-          car_id: querying_car_id
+          id: querying_car_id
         },
         crash_check_side = :front
       ) do
@@ -103,7 +103,7 @@ defmodule FormulaX.CarControl.CrashDetection do
       race
       |> Race.get_lanes_and_cars_map()
       |> Map.get(querying_car_lane, [])
-      |> Enum.reject(fn same_lane_car -> same_lane_car.car_id == querying_car_id end)
+      |> Enum.reject(fn same_lane_car -> same_lane_car.id == querying_car_id end)
       |> get_cars_in_vicinity(
         querying_car,
         crash_check_side

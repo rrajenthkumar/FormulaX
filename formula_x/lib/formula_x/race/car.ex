@@ -22,7 +22,7 @@ defmodule FormulaX.Race.Car do
 
   @typedoc "Car struct"
   typedstruct do
-    field(:car_id, integer(), enforce: true)
+    field(:id, integer(), enforce: true)
     field(:image, filename(), enforce: true)
     field(:controller, controller(), enforce: true)
     field(:x_position, Parameters.pixel(), enforce: true)
@@ -187,7 +187,7 @@ defmodule FormulaX.Race.Car do
   @spec adapt_autonomous_car_y_position(Car.t(), Race.t()) :: Car.t()
   def adapt_autonomous_car_y_position(
         car = %Car{
-          car_id: car_id,
+          id: car_id,
           distance_travelled: distance_travelled_by_autonomous_car,
           controller: :computer
         },
@@ -250,7 +250,7 @@ defmodule FormulaX.Race.Car do
     {x_position, y_position} = get_starting_x_and_y_positions(car_id)
 
     new(%{
-      car_id: car_id,
+      id: car_id,
       image: image,
       controller: controller,
       x_position: x_position,
@@ -265,7 +265,7 @@ defmodule FormulaX.Race.Car do
     speed = Enum.random([:low, :moderate, :high])
 
     new(%{
-      car_id: car_id,
+      id: car_id,
       image: image,
       controller: controller,
       x_position: x_position,
