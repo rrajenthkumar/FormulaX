@@ -38,7 +38,7 @@ defmodule FormulaX.Race.Car do
   end
 
   @spec initialize_cars(integer()) :: list(Car.t())
-  def initialize_cars(player_car_index) do
+  def initialize_cars(player_car_index) when is_integer(player_car_index) do
     possible_ids =
       1..@number_of_cars
       |> Enum.to_list()
@@ -206,11 +206,15 @@ defmodule FormulaX.Race.Car do
   end
 
   @spec add_completion_time_if_finished(Car.t(), Race.t()) :: Car.t()
-  def add_completion_time_if_finished(car, race) do
+  def add_completion_time_if_finished(car = %Car{completion_time: nil}, race = %Race{}) do
     case finished?(car, race) do
       true -> %Car{car | completion_time: Time.utc_now()}
       false -> car
     end
+  end
+
+  def add_completion_time_if_finished(car = %Car{}, %Race{}) do
+    car
   end
 
   @spec finished?(Car.t(), Race.t()) :: boolean()
@@ -271,7 +275,7 @@ defmodule FormulaX.Race.Car do
   end
 
   @spec get_starting_x_and_y_positions(integer()) :: coordinates()
-  defp get_starting_x_and_y_positions(car_id) do
+  defp get_starting_x_and_y_positions(car_id) when is_integer(car_id) do
     Parameters.car_initial_positions()
     |> Enum.at(car_id - 1)
   end
