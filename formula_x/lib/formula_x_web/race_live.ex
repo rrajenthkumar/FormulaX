@@ -200,7 +200,6 @@ defmodule FormulaXWeb.RaceLive do
     updated_socket =
       socket
       |> assign(:screen_state, :car_selection)
-      |> assign(:car_selection_index, 0)
       |> assign(:race, nil)
       |> assign(:countdown_count, nil)
 
@@ -220,7 +219,6 @@ defmodule FormulaXWeb.RaceLive do
     updated_socket =
       socket
       |> assign(:screen_state, :car_selection)
-      |> assign(:car_selection_index, 0)
       |> assign(:race, nil)
       |> assign(:countdown_count, nil)
       |> assign(:clicked_button, :green)
@@ -243,7 +241,6 @@ defmodule FormulaXWeb.RaceLive do
     updated_socket =
       socket
       |> assign(:screen_state, :car_selection)
-      |> assign(:car_selection_index, 0)
       |> assign(:race, nil)
       |> assign(:countdown_count, nil)
 
@@ -263,7 +260,6 @@ defmodule FormulaXWeb.RaceLive do
     updated_socket =
       socket
       |> assign(:screen_state, :car_selection)
-      |> assign(:car_selection_index, 0)
       |> assign(:race, nil)
       |> assign(:countdown_count, nil)
       |> assign(:clicked_button, :green)
