@@ -7,6 +7,8 @@ defmodule FormulaXWeb.RaceLive.Screen do
   alias FormulaX.Race.Car
   alias FormulaX.Utils
 
+  @car_width Parameters.car_dimensions().width
+
   def render(assigns = %{screen_state: :switched_off}) do
     ~H"""
     <div class="screen switched_off_screen">
@@ -85,7 +87,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
     """
   end
 
-  def render(assigns = %{screen_state: :active_race}) do
+  def render(assigns = %{screen_state: :race}) do
     ~H"""
     <div class="screen race_screen">
       <.race_setup race={@race}/>
@@ -94,13 +96,57 @@ defmodule FormulaXWeb.RaceLive.Screen do
           <%= @countdown_count %>
         </div>
       <% end %>
-      <%= if @race.status == :crash do %>
-        <.crash_info/>
-        <.result last_5_results={@last_5_results}/>
-      <% end %>
-      <%= if Race.player_car_past_finish?(@race) do %>
-        <.result last_5_results={@last_5_results}/>
-      <% end %>
+    </div>
+    """
+  end
+
+  def render(assigns = %{screen_state: :crash}) do
+    ~H"""
+    <div class="screen crash_screen">
+      <.race_setup race={@race}/>
+      <div class="crash_info">
+        <div class="body">
+          <p>GAME OVER</p>
+        </div>
+        <div class="footer">
+          <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to start a new race</p>
+          <p>Press <span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch the console off</p>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  def render(assigns = %{screen_state: :result}) do
+    ~H"""
+    <div class="screen result_screen">
+      <.race_setup race={@race}/>
+      <div class="result">
+        <div class="body">
+          <table>
+            <tr class="title_row">
+              <th></th>
+              <th>Result</th>
+              <th>Position</th>
+              <th>Time</th>
+              <th></th>
+            </tr>
+            <%= for result <- @last_5_results do%>
+              <tr>
+                <td><img src={"/images/cars/#{result.car}"}/></td>
+                <td><%= result.status%></td>
+                <td><%= result.position%></td>
+                <td><%= "#{result.time} s"%></td>
+                <td class={review_class(result.review)}><%= show_review_icon(result.review) |> raw %></td>
+              </tr>
+            <% end %>
+          </table>
+        </div>
+        <div class="footer">
+          <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to start a new race</p>
+          <p>Press <span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch the console off</p>
+        </div>
+      </div>
     </div>
     """
   end
@@ -110,7 +156,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
     <.background images={@race.background.left_side_images} y_position={@race.background.y_position}/>
     <div class="race">
       <.lanes/>
-      <.cars cars={@race.cars}/>
+      <.cars status={@race.status} cars={@race.cars}/>
       <.finish_line race={@race}/>
     </div>
     <.background images={@race.background.right_side_images} y_position={@race.background.y_position}/>
@@ -142,8 +188,20 @@ defmodule FormulaXWeb.RaceLive.Screen do
   defp cars(assigns) do
     ~H"""
     <div class="cars">
-      <%= for car <- @cars do %>
-        <img src={"/images/cars/#{car.image}"} style={car_position_style(car)}/>
+      <%= for car = %Car{image: image, controller: controller} <- @cars do %>
+      <%= case controller do%>
+        <% :computer -> %>
+          <img class="car" src={"/images/cars/#{image}"} style={car_position_style(car)}/>
+        <% :player -> %>
+          <img class="car" src={"/images/cars/#{image}"} style={car_position_style(car)}/>
+          <%=if @status == :crash do %>
+            <audio controls autoplay>
+              <source src="/sounds/car_crash.mp3" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+            <img class="bang" src={"/images/misc/bang.png"} style={crash_illustration_position_style(car)}>
+          <% end %>
+        <% end %>
       <% end %>
     </div>
     """
@@ -300,44 +358,6 @@ defmodule FormulaXWeb.RaceLive.Screen do
     """
   end
 
-  defp crash_info(assigns) do
-    ~H"""
-    <div class="crash_info">
-    </div>
-    """
-  end
-
-  defp result(assigns) do
-    ~H"""
-    <div class="result">
-      <div class="body">
-        <table>
-          <tr class="title_row">
-            <th></th>
-            <th>Result</th>
-            <th>Position</th>
-            <th>Time</th>
-            <th></th>
-          </tr>
-          <%= for result <- @last_5_results do%>
-            <tr>
-              <td><img src={"/images/cars/#{result.car}"}/></td>
-              <td><%= result.status%></td>
-              <td><%= result.position%></td>
-              <td><%= "#{result.time} s"%></td>
-              <td class={review_class(result.review)}><%= show_review_icon(result.review) |> raw %></td>
-            </tr>
-          <% end %>
-        </table>
-      </div>
-      <div class="footer">
-        <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to start a new race</p>
-        <p>Press <span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch the console off</p>
-      </div>
-    </div>
-    """
-  end
-
   @spec car_position_style(Car.t()) :: String.t()
   defp car_position_style(%Car{
          x_position: x_position,
@@ -349,6 +369,15 @@ defmodule FormulaXWeb.RaceLive.Screen do
   @spec background_position_style(Parameters.pixel()) :: String.t()
   defp background_position_style(y_position) when is_integer(y_position) do
     "top: #{y_position}px"
+  end
+
+  @spec crash_illustration_position_style(Car.t()) :: String.t()
+  defp crash_illustration_position_style(%Car{
+         x_position: player_car_x_position,
+         y_position: player_car_y_position
+       })
+       when is_integer(player_car_x_position) and is_integer(player_car_y_position) do
+    "left: #{player_car_x_position - @car_width / 2}px; bottom: #{player_car_y_position}px;"
   end
 
   @spec finish_line_position_style(Car.t()) :: String.t()
