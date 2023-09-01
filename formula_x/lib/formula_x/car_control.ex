@@ -64,6 +64,78 @@ defmodule FormulaX.CarControl do
     |> drive_autonomous_cars(race)
   end
 
+  @spec change_car_speed(Race.t(), Car.t(), :speedup | :slowdown) :: Race.t()
+  def change_car_speed(race = %Race{}, %Car{car_id: car_id}, action) do
+    updated_car =
+      race
+      |> Race.get_car(car_id)
+      |> Car.change_speed(action)
+
+    Race.update_car(race, updated_car)
+  end
+
+  @spec update_race_based_on_crash_check_result(Race.t(), Car.t(), :left | :right | :front) ::
+          Race.t()
+  defp update_race_based_on_crash_check_result(
+         race = %Race{},
+         updated_player_car = %Car{controller: :player},
+         crash_check_side = :front
+       ) do
+    race_updated_for_check =
+      race
+      |> Race.update_car(updated_player_car)
+      |> adapt_autonomous_cars_y_position()
+
+    case CrashDetection.crash?(race_updated_for_check, updated_player_car, crash_check_side) do
+      true ->
+        Race.record_crash(race_updated_for_check)
+
+      false ->
+        race_updated_for_check
+    end
+  end
+
+  defp update_race_based_on_crash_check_result(
+         race = %Race{},
+         updated_player_car = %Car{controller: :player},
+         crash_check_side
+       ) do
+    case CrashDetection.crash?(race, updated_player_car, crash_check_side) do
+      true ->
+        race
+        |> Race.update_car(updated_player_car)
+        |> Race.record_crash()
+
+      false ->
+        Race.update_car(race, updated_player_car)
+    end
+  end
+
+  @spec adapt_autonomous_cars_y_position(Race.t()) :: Race.t()
+  defp adapt_autonomous_cars_y_position(race = %Race{}) do
+    race
+    |> Race.get_all_autonomous_cars()
+    |> adapt_autonomous_cars_y_position(race)
+  end
+
+  @spec adapt_autonomous_cars_y_position(list(Car.t()), Race.t()) :: Race.t()
+  defp adapt_autonomous_cars_y_position(
+         _autonomous_cars = [car],
+         race = %Race{}
+       ) do
+    adapted_car = Car.adapt_autonomous_car_y_position(car, race)
+    Race.update_car(race, adapted_car)
+  end
+
+  defp adapt_autonomous_cars_y_position(
+         _autonomous_cars = [car | remaining_cars],
+         race = %Race{}
+       ) do
+    adapted_car = Car.adapt_autonomous_car_y_position(car, race)
+    updated_race = Race.update_car(race, adapted_car)
+    adapt_autonomous_cars_y_position(remaining_cars, updated_race)
+  end
+
   @spec drive_autonomous_cars(list(Car.t()), Race.t()) :: Race.t()
   defp drive_autonomous_cars(
          _autonomous_cars = [car],
@@ -89,14 +161,7 @@ defmodule FormulaX.CarControl do
 
     case CrashDetection.crash?(race, updated_car, _crash_check_side = :front) do
       true ->
-        direction =
-          race
-          |> get_autonomous_car_steering_direction(updated_car)
-
-        case direction do
-          :noop -> race
-          direction -> steer_autonomous_car(race, updated_car, direction)
-        end
+        steer_autonomous_car(race, car)
 
       false ->
         updated_car = Car.add_completion_time_if_finished(updated_car, race)
@@ -105,10 +170,18 @@ defmodule FormulaX.CarControl do
     end
   end
 
-  @spec steer_autonomous_car(Race.t(), Car.t(), :left | :right) :: Race.t()
-  defp steer_autonomous_car(race = %Race{}, car = %Car{}, direction) do
-    updated_car = Car.steer(car, direction)
-    Race.update_car(race, updated_car)
+  @spec steer_autonomous_car(Race.t(), Car.t()) :: Race.t()
+  defp steer_autonomous_car(race = %Race{}, car = %Car{}) do
+    direction = get_autonomous_car_steering_direction(race, car)
+
+    case direction do
+      :noop ->
+        race
+
+      direction ->
+        updated_car = Car.steer(car, direction)
+        Race.update_car(race, updated_car)
+    end
   end
 
   @spec get_autonomous_car_steering_direction(Race.t(), Car.t()) :: :left | :right | :noop
@@ -180,77 +253,5 @@ defmodule FormulaX.CarControl do
       adjacent_lane_car_midpoint_y_cordinate >= y_position_lower_limit_for_vicinity_check and
         adjacent_lane_car_midpoint_y_cordinate <= y_position_upper_limit_for_vicinity_check
     end)
-  end
-
-  @spec change_car_speed(Race.t(), Car.t(), :speedup | :slowdown) :: Race.t()
-  def change_car_speed(race = %Race{}, %Car{car_id: car_id}, action) do
-    updated_car =
-      race
-      |> Race.get_car(car_id)
-      |> Car.change_speed(action)
-
-    Race.update_car(race, updated_car)
-  end
-
-  @spec update_race_based_on_crash_check_result(Race.t(), Car.t(), :left | :right | :front) ::
-          Race.t()
-  defp update_race_based_on_crash_check_result(
-         race = %Race{},
-         updated_player_car = %Car{controller: :player},
-         crash_check_side = :front
-       ) do
-    race_updated_for_check =
-      race
-      |> Race.update_car(updated_player_car)
-      |> adapt_autonomous_cars_y_position()
-
-    case CrashDetection.crash?(race_updated_for_check, updated_player_car, crash_check_side) do
-      true ->
-        Race.record_crash(race_updated_for_check)
-
-      false ->
-        race_updated_for_check
-    end
-  end
-
-  defp update_race_based_on_crash_check_result(
-         race = %Race{},
-         updated_player_car = %Car{controller: :player},
-         crash_check_side
-       ) do
-    case CrashDetection.crash?(race, updated_player_car, crash_check_side) do
-      true ->
-        race
-        |> Race.update_car(updated_player_car)
-        |> Race.record_crash()
-
-      false ->
-        Race.update_car(race, updated_player_car)
-    end
-  end
-
-  @spec adapt_autonomous_cars_y_position(Race.t()) :: Race.t()
-  defp adapt_autonomous_cars_y_position(race = %Race{}) do
-    race
-    |> Race.get_all_autonomous_cars()
-    |> adapt_autonomous_cars_y_position(race)
-  end
-
-  @spec adapt_autonomous_cars_y_position(list(Car.t()), Race.t()) :: Race.t()
-  defp adapt_autonomous_cars_y_position(
-         _autonomous_cars = [car],
-         race = %Race{}
-       ) do
-    adapted_car = Car.adapt_autonomous_car_y_position(car, race)
-    Race.update_car(race, adapted_car)
-  end
-
-  defp adapt_autonomous_cars_y_position(
-         _autonomous_cars = [car | remaining_cars],
-         race = %Race{}
-       ) do
-    adapted_car = Car.adapt_autonomous_car_y_position(car, race)
-    updated_race = Race.update_car(race, adapted_car)
-    adapt_autonomous_cars_y_position(remaining_cars, updated_race)
   end
 end
