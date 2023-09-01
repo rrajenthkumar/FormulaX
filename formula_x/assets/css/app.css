@@ -363,8 +363,8 @@
   animation-name: green_button_transformation;
 }
 
-.race_live .console .speed_controls .top .jumping_button {
-  animation: jumping_button_transformation 0.5s ease-in-out 0s infinite
+.race_live .console .speed_controls .top .flickering_button {
+  animation: flickering_button_transformation 0.5s ease-in-out 0s infinite
     alternate;
 }
 
@@ -418,7 +418,7 @@
     transform: translateX(0px);
   }
 }
-@keyframes jumping_button_transformation {
+@keyframes flickering_button_transformation {
   from {
     transform: translateY(-2px);
     background-color: rgb(95, 160, 140);
