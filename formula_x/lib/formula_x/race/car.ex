@@ -181,6 +181,36 @@ defmodule FormulaX.Race.Car do
     end)
   end
 
+  @spec get_side_end_coordinates(Car.t(), :front | :rear | :left | :right) ::
+          {Car.coordinates(), Car.coordinates()}
+  def get_side_end_coordinates(
+        %Car{x_position: car_edge_x, y_position: car_edge_y},
+        _side = :front
+      ) do
+    {{car_edge_x, car_edge_y + @car_length}, {car_edge_x + @car_width, car_edge_y + @car_length}}
+  end
+
+  def get_side_end_coordinates(
+        %Car{x_position: car_edge_x, y_position: car_edge_y},
+        _side = :rear
+      ) do
+    {{car_edge_x, car_edge_y}, {car_edge_x + @car_width, car_edge_y}}
+  end
+
+  def get_side_end_coordinates(
+        %Car{x_position: car_edge_x, y_position: car_edge_y},
+        _side = :left
+      ) do
+    {{car_edge_x, car_edge_y}, {car_edge_x, car_edge_y + @car_length}}
+  end
+
+  def get_side_end_coordinates(
+        %Car{x_position: car_edge_x, y_position: car_edge_y},
+        _side = :right
+      ) do
+    {{car_edge_x + @car_width, car_edge_y}, {car_edge_x + @car_width, car_edge_y + @car_length}}
+  end
+
   @doc """
   Function to position computer controlled cars correctly on the screen.
   """
