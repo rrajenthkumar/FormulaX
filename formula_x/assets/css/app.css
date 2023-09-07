@@ -5,6 +5,11 @@
 
 /* This file is for your main application CSS */
 /* Keep console screen, lane, car dimensions same as in FormulaX.Parameters module */
+.webpage_footer {
+  @apply h-6 flex flex-col items-center text-gray-600 text-xs;
+  background-color: #fffff0d4;
+}
+
 .race_live {
   @apply flex justify-center items-center h-[calc(100vh-1.5rem)] pt-6;
   background-color: #fffff0d4;
@@ -468,7 +473,11 @@
   }
 }
 
-@media (max-width: 820px) {
+@media (max-width: 1024px) {
+  .webpage_footer {
+    @apply text-white bg-gray-600;
+  }
+
   .race_live {
     @apply bg-gray-600;
   }
