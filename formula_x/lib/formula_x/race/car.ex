@@ -143,68 +143,30 @@ defmodule FormulaX.Race.Car do
     |> Map.fetch!(:lane_number)
   end
 
-  @spec get_side_coordinates(Car.t(), :front | :rear | :left | :right) ::
-          list(Car.coordinates())
-  def get_side_coordinates(
-        %Car{x_position: car_edge_x, y_position: car_edge_y},
-        _side = :front
-      ) do
-    Enum.map(car_edge_x..(car_edge_x + @car_width)//@position_range_step, fn x ->
-      {x, car_edge_y + @car_length}
-    end)
-  end
-
-  def get_side_coordinates(
-        %Car{x_position: car_edge_x, y_position: car_edge_y},
-        _side = :rear
-      ) do
-    Enum.map(car_edge_x..(car_edge_x + @car_width)//@position_range_step, fn x ->
-      {x, car_edge_y}
-    end)
-  end
-
-  def get_side_coordinates(
-        %Car{x_position: car_edge_x, y_position: car_edge_y},
-        _side = :left
-      ) do
-    Enum.map(car_edge_y..(car_edge_y + @car_length)//@position_range_step, fn y ->
-      {car_edge_x, y}
-    end)
-  end
-
-  def get_side_coordinates(
-        %Car{x_position: car_edge_x, y_position: car_edge_y},
-        _side = :right
-      ) do
-    Enum.map(car_edge_y..(car_edge_y + @car_length)//@position_range_step, fn y ->
-      {car_edge_x + @car_width, y}
-    end)
-  end
-
-  @spec get_side_end_coordinates(Car.t(), :front | :rear | :left | :right) ::
+  @spec get_side_edge_coordinates(Car.t(), :front | :rear | :left | :right) ::
           {Car.coordinates(), Car.coordinates()}
-  def get_side_end_coordinates(
+  def get_side_edge_coordinates(
         %Car{x_position: car_edge_x, y_position: car_edge_y},
         _side = :front
       ) do
     {{car_edge_x, car_edge_y + @car_length}, {car_edge_x + @car_width, car_edge_y + @car_length}}
   end
 
-  def get_side_end_coordinates(
+  def get_side_edge_coordinates(
         %Car{x_position: car_edge_x, y_position: car_edge_y},
         _side = :rear
       ) do
     {{car_edge_x, car_edge_y}, {car_edge_x + @car_width, car_edge_y}}
   end
 
-  def get_side_end_coordinates(
+  def get_side_edge_coordinates(
         %Car{x_position: car_edge_x, y_position: car_edge_y},
         _side = :left
       ) do
     {{car_edge_x, car_edge_y}, {car_edge_x, car_edge_y + @car_length}}
   end
 
-  def get_side_end_coordinates(
+  def get_side_edge_coordinates(
         %Car{x_position: car_edge_x, y_position: car_edge_y},
         _side = :right
       ) do

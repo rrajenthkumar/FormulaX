@@ -131,13 +131,10 @@ defmodule FormulaX.CarControl.CrashDetection do
          _crash_check_side = :front
        ) do
     # We get the same lane cars within a distance of one car length in front of querying car if any.
-    y_position_lower_limit_for_vicinity_check = querying_car_y_position + @car_length
 
-    y_position_upper_limit_for_vicinity_check = querying_car_y_position + 2 * @car_length
-
-    Enum.reject(same_lane_cars, fn same_lane_car ->
-      same_lane_car.y_position >= y_position_lower_limit_for_vicinity_check and
-        same_lane_car.y_position <= y_position_upper_limit_for_vicinity_check
+    Enum.filter(same_lane_cars, fn same_lane_car ->
+      same_lane_car.y_position >= querying_car_y_position and
+        same_lane_car.y_position <= querying_car_y_position + 2 * @car_length
     end)
   end
 
@@ -164,34 +161,16 @@ defmodule FormulaX.CarControl.CrashDetection do
   end
 
   @spec crash_between_cars?(Car.t(), Car.t(), :left | :right | :front) :: boolean()
-  # defp crash_between_cars?(querying_car = %Car{}, left_car = %Car{}, :left) do
-  #   querying_car_all_except_right_border_coordinates =
-  #     Car.get_side_coordinates(querying_car, :front) ++
-  #       Car.get_side_coordinates(querying_car, :rear) ++
-  #       Car.get_side_coordinates(querying_car, :left)
-
-  #   left_car_all_except_left_border_coordinates =
-  #     Car.get_side_coordinates(left_car, :front) ++
-  #       Car.get_side_coordinates(left_car, :rear) ++
-  #       Car.get_side_coordinates(left_car, :right)
-
-  #   # To check for an intersection between possibly crashing sides
-  #   querying_car_all_except_right_border_coordinates
-  #   |> Enum.any?(fn querying_car_coordinate ->
-  #     Enum.member?(left_car_all_except_left_border_coordinates, querying_car_coordinate)
-  #   end)
-  # end
-
   defp crash_between_cars?(querying_car = %Car{}, left_car = %Car{}, :left) do
-    _querying_car_left_side_end_coordinates =
+    _querying_car_left_side_edge_coordinates =
       {{querying_car_left_side_rear_end_x, querying_car_left_side_rear_end_y},
        {_querying_car_left_side_front_end_x, querying_car_left_side_front_end_y}} =
-      Car.get_side_end_coordinates(querying_car, :left)
+      Car.get_side_edge_coordinates(querying_car, :left)
 
-    _left_car_right_side_end_coordinates =
+    _left_car_right_side_edge_coordinates =
       {{left_car_right_side_rear_end_x, left_car_right_side_rear_end_y},
        {_left_car_right_side_front_end_x, left_car_right_side_front_end_y}} =
-      Car.get_side_end_coordinates(left_car, :right)
+      Car.get_side_edge_coordinates(left_car, :right)
 
     querying_car_left_side_rear_end_x <= left_car_right_side_rear_end_x and
       ((querying_car_left_side_front_end_y >= left_car_right_side_rear_end_y and
@@ -200,34 +179,16 @@ defmodule FormulaX.CarControl.CrashDetection do
             querying_car_left_side_rear_end_y <= left_car_right_side_front_end_y))
   end
 
-  # defp crash_between_cars?(querying_car = %Car{}, right_car = %Car{}, :right) do
-  #   querying_car_all_except_left_border_coordinates =
-  #     Car.get_side_coordinates(querying_car, :front) ++
-  #       Car.get_side_coordinates(querying_car, :rear) ++
-  #       Car.get_side_coordinates(querying_car, :right)
-
-  #   right_car_all_except_right_border_coordinates =
-  #     Car.get_side_coordinates(right_car, :front) ++
-  #       Car.get_side_coordinates(right_car, :rear) ++
-  #       Car.get_side_coordinates(right_car, :left)
-
-  #   # To check for an intersection between possibly crashing sides
-  #   querying_car_all_except_left_border_coordinates
-  #   |> Enum.any?(fn querying_car_coordinate ->
-  #     Enum.member?(right_car_all_except_right_border_coordinates, querying_car_coordinate)
-  #   end)
-  # end
-
   defp crash_between_cars?(querying_car = %Car{}, right_car = %Car{}, :right) do
-    _querying_car_right_side_end_coordinates =
+    _querying_car_right_side_edge_coordinates =
       {{querying_car_right_side_rear_end_x, querying_car_right_side_rear_end_y},
        {_querying_car_right_side_front_end_x, querying_car_right_side_front_end_y}} =
-      Car.get_side_end_coordinates(querying_car, :right)
+      Car.get_side_edge_coordinates(querying_car, :right)
 
-    _right_car_left_side_end_coordinates =
+    _right_car_left_side_edge_coordinates =
       {{right_car_left_side_rear_end_x, right_car_left_side_rear_end_y},
        {_right_car_left_side_front_end_x, right_car_left_side_front_end_y}} =
-      Car.get_side_end_coordinates(right_car, :left)
+      Car.get_side_edge_coordinates(right_car, :left)
 
     querying_car_right_side_rear_end_x >= right_car_left_side_rear_end_x and
       ((querying_car_right_side_front_end_y >= right_car_left_side_rear_end_y and
@@ -236,54 +197,23 @@ defmodule FormulaX.CarControl.CrashDetection do
             querying_car_right_side_rear_end_y <= right_car_left_side_front_end_y))
   end
 
-  defp crash_between_cars?(querying_car = %Car{}, car_in_the_front = %Car{}, :front) do
-    querying_car_all_except_rear_border_coordinates =
-      Car.get_side_coordinates(querying_car, :front) ++
-        Car.get_side_coordinates(querying_car, :left) ++
-        Car.get_side_coordinates(querying_car, :right)
+  defp crash_between_cars?(querying_car = %Car{}, front_car = %Car{}, :front) do
+    _querying_car_front_side_edge_coordinates =
+      {{querying_car_front_side_left_end_x, querying_car_front_side_left_end_y},
+       {querying_car_front_side_right_end_x, _querying_car_front_side_right_end_y}} =
+      Car.get_side_edge_coordinates(querying_car, :front)
 
-    front_car_all_except_front_border_coordinates =
-      Car.get_side_coordinates(car_in_the_front, :rear) ++
-        Car.get_side_coordinates(car_in_the_front, :left) ++
-        Car.get_side_coordinates(car_in_the_front, :right)
+    _front_car_rear_side_edge_coordinates =
+      {{front_car_rear_side_left_end_x, front_car_rear_side_left_end_y},
+       {front_car_rear_side_right_end_x, _front_car_rear_side_right_end_y}} =
+      Car.get_side_edge_coordinates(front_car, :rear)
 
-    # To check for an intersection between possibly crashing sides
-    querying_car_all_except_rear_border_coordinates
-    |> Enum.any?(fn querying_car_coordinate ->
-      Enum.member?(front_car_all_except_front_border_coordinates, querying_car_coordinate)
-    end)
+    querying_car_front_side_left_end_y >= front_car_rear_side_left_end_y and
+      ((querying_car_front_side_left_end_x >= front_car_rear_side_left_end_x and
+          querying_car_front_side_left_end_x <= front_car_rear_side_right_end_x) or
+         (querying_car_front_side_right_end_x >= front_car_rear_side_left_end_x and
+            querying_car_front_side_right_end_x <= front_car_rear_side_right_end_x))
   end
-
-  # defp crash_between_cars?(querying_car = %Car{}, front_car = %Car{}, :front) do
-  #   querying_car_front_side_end_coordinates =
-  #     {{querying_car_front_side_left_end_x, querying_car_front_side_left_end_y},
-  #      {querying_car_front_side_right_end_x, _querying_car_front_side_right_end_y}} =
-  #     Car.get_side_end_coordinates(querying_car, :front)
-
-  #   front_car_rear_side_end_coordinates =
-  #     {{front_car_rear_side_left_end_x, front_car_rear_side_left_end_y},
-  #      {front_car_rear_side_right_end_x, _front_car_rear_side_right_end_y}} =
-  #     Car.get_side_end_coordinates(front_car, :rear)
-
-  #   IO.inspect(querying_car.image, label: "**********querying_car*********")
-
-  #   IO.inspect(querying_car_front_side_end_coordinates,
-  #     label: "**********querying_car_front_side_end_coordinates*********"
-  #   )
-
-  #   IO.inspect(front_car.image, label: "**********front_car*********")
-
-  #   IO.inspect(front_car_rear_side_end_coordinates,
-  #     label: "**********front_car_rear_side_end_coordinates*********"
-  #   )
-
-  #   querying_car_front_side_left_end_y >= front_car_rear_side_left_end_y and
-  #     ((querying_car_front_side_left_end_x >= front_car_rear_side_left_end_x and
-  #         querying_car_front_side_left_end_x <= front_car_rear_side_right_end_x) or
-  #        (querying_car_front_side_right_end_x >= front_car_rear_side_left_end_x and
-  #           querying_car_front_side_right_end_x <= front_car_rear_side_right_end_x))
-  #     |> IO.inspect(label: "**********crash with front car*********")
-  # end
 
   @spec get_lane_limits(integer()) :: map()
   defp get_lane_limits(lane) do
