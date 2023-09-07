@@ -12,7 +12,6 @@ defmodule FormulaX.Race.Car do
   @car_width Parameters.car_dimensions().width
   @car_length Parameters.car_dimensions().length
   @number_of_cars Parameters.number_of_cars()
-  @position_range_step Parameters.position_range_step()
   @car_steering_step Parameters.car_steering_step()
 
   @type filename :: String.t()
