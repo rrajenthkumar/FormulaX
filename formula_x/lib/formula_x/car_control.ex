@@ -70,7 +70,7 @@ defmodule FormulaX.CarControl do
 
   # Not used yet
   @spec change_car_speed(Race.t(), Car.t(), :speedup | :slowdown) :: Race.t()
-  def change_car_speed(race = %Race{}, %Car{id: car_id}, action) do
+  def change_autonomous_car_speed(race = %Race{}, %Car{id: car_id}, action) do
     updated_car =
       race
       |> Race.get_car(car_id)

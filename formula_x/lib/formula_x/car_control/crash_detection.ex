@@ -1,7 +1,8 @@
 defmodule FormulaX.CarControl.CrashDetection do
   @moduledoc """
   **Crash detection context**
-  This module is used by the Car Control module to detect crashes between cars, with background items and with obstacles
+  This module is used by the Car Control module to detect crashes between cars, with background items
+  Please note that all every race and car mentioned in this module are already updated with the forward or sideward movement for which the possibility of crash is checked.
   """
   alias FormulaX.Race
   alias FormulaX.Race.Car
@@ -11,19 +12,19 @@ defmodule FormulaX.CarControl.CrashDetection do
 
   @spec crash?(Race.t(), Car.t(), :front | :left | :right) :: boolean()
   def crash?(
-        uptodate_race = %Race{},
-        querying_car_after_forward_movement = %Car{},
+        race = %Race{},
+        querying_car = %Car{},
         _crash_check_side = :front
       ) do
-    crash_check(uptodate_race, querying_car_after_forward_movement)
+    crash_check(race, querying_car)
   end
 
   def crash?(
-        uptodate_race = %Race{},
-        querying_car_after_sideward_movement = %Car{},
+        race = %Race{},
+        querying_car = %Car{},
         _crash_check_side
       ) do
-    querying_car_lane = Car.get_lane(querying_car_after_sideward_movement)
+    querying_car_lane = Car.get_lane(querying_car)
 
     case querying_car_lane do
       # Crash with a background item outside tracks
@@ -31,7 +32,7 @@ defmodule FormulaX.CarControl.CrashDetection do
         true
 
       _querying_car_lane ->
-        crash_check(uptodate_race, querying_car_after_sideward_movement)
+        crash_check(race, querying_car)
     end
   end
 

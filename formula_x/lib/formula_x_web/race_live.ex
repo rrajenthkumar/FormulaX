@@ -629,11 +629,11 @@ defmodule FormulaXWeb.RaceLive do
     cond do
       Race.player_car_past_finish?(race) ->
         RaceEngine.stop()
-        Process.send_after(self(), :result, 2000)
+        Process.send_after(self(), :result, 1500)
 
       status == :crash ->
         RaceEngine.stop()
-        Process.send_after(self(), :crash, 2000)
+        Process.send_after(self(), :crash, 1500)
 
       true ->
         nil
