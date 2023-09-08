@@ -190,7 +190,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
     <div class="cars">
       <%= for car = %Car{image: image, controller: controller} <- @cars do %>
       <%= case controller do%>
-        <% :computer -> %>
+        <% :autonomous -> %>
           <img class="car" src={"/images/cars/#{image}"} style={car_position_style(car)}/>
         <% :player -> %>
           <img class="car" src={"/images/cars/#{image}"} style={car_position_style(car)}/>

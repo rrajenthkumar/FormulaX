@@ -15,7 +15,7 @@ defmodule FormulaX.Race.Car do
   @car_steering_step Parameters.car_steering_step()
 
   @type filename :: String.t()
-  @type controller :: :player | :computer
+  @type controller :: :player | :autonomous
   @type speed :: :rest | :low | :moderate | :high
   @type coordinates :: {Parameters.pixel(), Parameters.pixel()}
 
@@ -58,15 +58,6 @@ defmodule FormulaX.Race.Car do
     autonomous_cars ++ [player_car]
   end
 
-  @spec steer(Car.t(), :left | :right) :: Car.t()
-  def steer(car = %Car{x_position: x_position}, :left) do
-    %Car{car | x_position: x_position - @car_steering_step}
-  end
-
-  def steer(car = %Car{x_position: x_position}, :right) do
-    %Car{car | x_position: x_position + @car_steering_step}
-  end
-
   @spec drive(Car.t()) :: Car.t()
   def drive(
         car = %Car{
@@ -78,6 +69,39 @@ defmodule FormulaX.Race.Car do
       car
       | distance_travelled: distance_travelled + Parameters.car_drive_step(speed)
     }
+  end
+
+  @doc """
+  Function to position autonomous cars correctly w.r.t player car position on screen.
+  """
+  @spec adapt_autonomous_car_position(Car.t(), Race.t()) :: Car.t()
+  def adapt_autonomous_car_position(
+        car = %Car{
+          id: car_id,
+          distance_travelled: distance_travelled_by_autonomous_car,
+          controller: :autonomous
+        },
+        race = %Race{}
+      ) do
+    %Car{distance_travelled: distance_travelled_by_player_car} = Race.get_player_car(race)
+
+    {_, starting_y_position} = get_starting_x_and_y_positions(car_id)
+
+    updated_y_position =
+      starting_y_position +
+        distance_travelled_by_autonomous_car -
+        distance_travelled_by_player_car
+
+    %Car{car | y_position: updated_y_position}
+  end
+
+  @spec steer(Car.t(), :left | :right) :: Car.t()
+  def steer(car = %Car{x_position: x_position}, :left) do
+    %Car{car | x_position: x_position - @car_steering_step}
+  end
+
+  def steer(car = %Car{x_position: x_position}, :right) do
+    %Car{car | x_position: x_position + @car_steering_step}
   end
 
   @spec change_speed(Car.t(), :speedup | :slowdown) :: Car.t()
@@ -118,84 +142,6 @@ defmodule FormulaX.Race.Car do
     %Car{car | speed: :rest}
   end
 
-  # TO DO: Improve
-  @spec get_lane(Car.t()) :: integer()
-  def get_lane(%Car{x_position: car_x_position}) do
-    %{x_end: driving_area_x_end} = Parameters.driving_area_limits()
-
-    lanes = Parameters.lanes()
-
-    default_lane_info =
-      if(car_x_position > driving_area_x_end) do
-        Enum.find(lanes, fn %{lane_number: lane_number} -> lane_number == 3 end)
-      else
-        Enum.find(lanes, fn %{lane_number: lane_number} -> lane_number == 1 end)
-      end
-
-    lanes
-    |> Enum.find(
-      default_lane_info,
-      fn %{x_start: lane_x_start, x_end: lane_x_end} ->
-        car_x_position in lane_x_start..lane_x_end
-      end
-    )
-    |> Map.fetch!(:lane_number)
-  end
-
-  @spec get_side_edge_coordinates(Car.t(), :front | :rear | :left | :right) ::
-          {Car.coordinates(), Car.coordinates()}
-  def get_side_edge_coordinates(
-        %Car{x_position: car_edge_x, y_position: car_edge_y},
-        _side = :front
-      ) do
-    {{car_edge_x, car_edge_y + @car_length}, {car_edge_x + @car_width, car_edge_y + @car_length}}
-  end
-
-  def get_side_edge_coordinates(
-        %Car{x_position: car_edge_x, y_position: car_edge_y},
-        _side = :rear
-      ) do
-    {{car_edge_x, car_edge_y}, {car_edge_x + @car_width, car_edge_y}}
-  end
-
-  def get_side_edge_coordinates(
-        %Car{x_position: car_edge_x, y_position: car_edge_y},
-        _side = :left
-      ) do
-    {{car_edge_x, car_edge_y}, {car_edge_x, car_edge_y + @car_length}}
-  end
-
-  def get_side_edge_coordinates(
-        %Car{x_position: car_edge_x, y_position: car_edge_y},
-        _side = :right
-      ) do
-    {{car_edge_x + @car_width, car_edge_y}, {car_edge_x + @car_width, car_edge_y + @car_length}}
-  end
-
-  @doc """
-  Function to position computer controlled cars correctly on the screen.
-  """
-  @spec adapt_autonomous_car_y_position(Car.t(), Race.t()) :: Car.t()
-  def adapt_autonomous_car_y_position(
-        car = %Car{
-          id: car_id,
-          distance_travelled: distance_travelled_by_autonomous_car,
-          controller: :computer
-        },
-        race = %Race{}
-      ) do
-    %Car{distance_travelled: distance_travelled_by_player_car} = Race.get_player_car(race)
-
-    {_, starting_y_position} = get_starting_x_and_y_positions(car_id)
-
-    updated_y_position =
-      starting_y_position +
-        distance_travelled_by_autonomous_car -
-        distance_travelled_by_player_car
-
-    %Car{car | y_position: updated_y_position}
-  end
-
   @spec add_completion_time_if_finished(Car.t(), Race.t()) :: Car.t()
   def add_completion_time_if_finished(car = %Car{completion_time: nil}, race = %Race{}) do
     case finished?(car, race) do
@@ -216,18 +162,30 @@ defmodule FormulaX.Race.Car do
     distance_travelled_by_car >= race_distance
   end
 
+  @spec get_lane(Car.t()) :: integer() | :out_of_tracks
+  def get_lane(%Car{x_position: car_x_position}) do
+    Parameters.lanes()
+    |> Enum.find(fn %{x_start: lane_x_start, x_end: lane_x_end} ->
+      car_x_position in lane_x_start..lane_x_end
+    end)
+    |> case do
+      nil -> :out_of_tracks
+      lane_map -> Map.fetch!(lane_map, :lane_number)
+    end
+  end
+
   @spec initialize_autonomous_cars(list(integer()), list(filename())) :: list(Car.t())
   defp initialize_autonomous_cars([car_id], car_images) when is_list(car_images) do
     car_image = Enum.random(car_images)
 
-    [initialize_car(car_id, car_image, :computer)]
+    [initialize_car(car_id, car_image, :autonomous)]
   end
 
   defp initialize_autonomous_cars(_car_ids = [head | tail], car_images)
        when is_list(car_images) do
     car_image = Enum.random(car_images)
 
-    car = initialize_car(head, car_image, :computer)
+    car = initialize_car(head, car_image, :autonomous)
 
     remaining_car_images = car_images -- [car_image]
 
