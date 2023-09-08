@@ -84,7 +84,7 @@ defmodule FormulaX.CarControl do
   defp update_crash_check_result(
          race = %Race{},
          player_car = %Car{controller: :player},
-         crash_check_side = :front
+         crash_check_side
        ) do
     case CrashDetection.crash?(race, player_car, crash_check_side) do
       true ->
