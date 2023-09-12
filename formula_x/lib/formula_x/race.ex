@@ -128,4 +128,9 @@ defmodule FormulaX.Race do
   def get_lanes_and_cars_map(%Race{cars: cars}) do
     Enum.group_by(cars, &Car.get_lane/1, & &1)
   end
+
+  @spec get_lanes_and_obstacles_map(Race.t()) :: map()
+  def get_lanes_and_obstacles_map(%Race{obstacles: obstacles}) do
+    Enum.group_by(obstacles, &Obstacle.get_lane/1, & &1)
+  end
 end

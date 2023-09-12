@@ -148,4 +148,12 @@ defmodule FormulaX.Parameters do
       190
     ]
   end
+
+  @doc """
+  Obstacle dimensions map
+  """
+  @spec obstacle_dimensions() :: map()
+  def obstacle_dimensions() do
+    %{width: 96, length: 64}
+  end
 end

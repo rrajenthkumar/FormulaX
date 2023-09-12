@@ -4,9 +4,11 @@ defmodule FormulaX.CarControl.CrashDetection do
   This module is used by the Car Control module to detect crashes between cars, with background items
   Please note that all every race and car mentioned in this module are already updated with the forward or sideward movement for which the possibility of crash is checked.
   """
+
+  alias FormulaX.Parameters
   alias FormulaX.Race
   alias FormulaX.Race.Car
-  alias FormulaX.Parameters
+  alias FormulaX.Race.Obstacle
 
   @car_length Parameters.car_dimensions().length
 
@@ -22,8 +24,9 @@ defmodule FormulaX.CarControl.CrashDetection do
   def crash?(
         race = %Race{},
         querying_car = %Car{},
-        _crash_check_side
-      ) do
+        crash_check_side
+      )
+      when is_atom(crash_check_side) do
     querying_car_lane = Car.get_lane(querying_car)
 
     case querying_car_lane do
@@ -37,15 +40,19 @@ defmodule FormulaX.CarControl.CrashDetection do
   end
 
   @spec crash_check(Race.t(), Car.t()) :: boolean()
-  defp crash_check(race, querying_car) do
+  defp crash_check(race = %Race{}, querying_car = %Car{}) do
     race
     |> get_same_lane_cars(querying_car)
     |> overlapping_cars?(querying_car)
+    |> case do
+      false -> crash_with_obstacle?(race, querying_car)
+      result -> result
+    end
   end
 
   @spec get_same_lane_cars(Race.t(), Car.t()) :: list(Car.t())
   defp get_same_lane_cars(
-         race,
+         race = %Race{},
          querying_car = %Car{
            id: querying_car_id
          }
@@ -62,8 +69,9 @@ defmodule FormulaX.CarControl.CrashDetection do
   defp overlapping_cars?(
          same_lane_cars,
          _querying_car = %Car{y_position: querying_car_y_position}
-       ) do
-    Enum.find(same_lane_cars, fn same_lane_car ->
+       )
+       when is_list(same_lane_cars) do
+    Enum.any?(same_lane_cars, fn same_lane_car ->
       # Same lane car rear wheels between front and rear wheels of querying car or
       # same lane car front wheels between front and rear wheels of querying car
       (same_lane_car.y_position >= querying_car_y_position and
@@ -71,12 +79,39 @@ defmodule FormulaX.CarControl.CrashDetection do
         (same_lane_car.y_position + @car_length >= querying_car_y_position and
            same_lane_car.y_position <= querying_car_y_position)
     end)
-    |> case do
-      nil ->
-        false
+  end
 
-      _overlapping_car ->
-        true
-    end
+  @spec crash_with_obstacle?(Race.t(), Car.t()) :: boolean()
+  defp crash_with_obstacle?(
+         race = %Race{},
+         querying_car = %Car{
+           y_position: querying_car_y_position
+         }
+       ) do
+    race
+    |> get_same_lane_obstacles(querying_car)
+    |> Enum.any?(fn obstacle = %Obstacle{} ->
+      obstacle_y_position = Obstacle.get_obstacle_y_position(obstacle, race)
+
+      # Car front wheels beyond obstacle starting y position and rear wheels behind obstacle starting y position or
+      # Car rear wheels between obstacle starting and ending y positions
+      (querying_car_y_position + @car_length >= obstacle_y_position and
+         querying_car_y_position <= obstacle_y_position) or
+        (querying_car_y_position >= obstacle_y_position and
+           querying_car_y_position <=
+             obstacle_y_position + Parameters.obstacle_dimensions().length())
+    end)
+  end
+
+  @spec get_same_lane_obstacles(Race.t(), Car.t()) :: list(Obstacle.t())
+  defp get_same_lane_obstacles(
+         race = %Race{},
+         querying_car = %Car{}
+       ) do
+    querying_car_lane = Car.get_lane(querying_car)
+
+    race
+    |> Race.get_lanes_and_obstacles_map()
+    |> Map.get(querying_car_lane, [])
   end
 end

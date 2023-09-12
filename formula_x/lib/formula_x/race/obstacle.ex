@@ -7,6 +7,8 @@ defmodule FormulaX.Race.Obstacle do
 
   alias __MODULE__
   alias FormulaX.Parameters
+  alias FormulaX.Race
+  alias FormulaX.Race.Car
 
   @typedoc "Obstacle struct"
   typedstruct do
@@ -66,5 +68,20 @@ defmodule FormulaX.Race.Obstacle do
   defp max_obstacle_y_position_step() do
     Parameters.obstacle_y_position_steps()
     |> Enum.max()
+  end
+
+  @spec get_lane(Obstacle.t()) :: integer()
+  def get_lane(%Obstacle{x_position: obstacle_x_position}) do
+    Parameters.lanes()
+    |> Enum.find(fn %{x_start: lane_x_start, x_end: lane_x_end} ->
+      obstacle_x_position in lane_x_start..lane_x_end
+    end)
+    |> Map.fetch!(:lane_number)
+  end
+
+  @spec get_obstacle_y_position(Obstacle.t(), Race.t()) :: Parameters.pixel()
+  def get_obstacle_y_position(%Obstacle{distance: obstacle_distance}, race = %Race{}) do
+    %Car{distance_travelled: distance_travelled_by_player_car} = Race.get_player_car(race)
+    obstacle_distance - distance_travelled_by_player_car
   end
 end
