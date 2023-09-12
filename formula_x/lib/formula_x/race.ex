@@ -8,6 +8,7 @@ defmodule FormulaX.Race do
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
   alias FormulaX.Race.Obstacle
+  alias FormulaX.Race.SpeedBoost
   alias FormulaX.Parameters
 
   @race_distance Parameters.race_distance()
@@ -21,6 +22,7 @@ defmodule FormulaX.Race do
     field(:cars, cars(), enforce: true)
     field(:background, Background.t(), enforce: true)
     field(:obstacles, list(Obstacle.t()), enforce: true)
+    field(:speed_boosts, list(SpeedBoost.t()), enforce: true)
     field(:start_time, Time.t(), default: nil)
     field(:distance, Parameters.pixel(), enforce: true)
     field(:status, status(), default: :countdown)
@@ -36,8 +38,15 @@ defmodule FormulaX.Race do
     cars = Car.initialize_cars(player_car_index)
     background = Background.initialize(@race_distance)
     obstacles = Obstacle.initialize_obstacles(@race_distance)
+    speed_boosts = SpeedBoost.initialize_speed_boosts(@race_distance)
 
-    new(%{cars: cars, background: background, obstacles: obstacles, distance: @race_distance})
+    new(%{
+      cars: cars,
+      background: background,
+      obstacles: obstacles,
+      speed_boosts: speed_boosts,
+      distance: @race_distance
+    })
   end
 
   @spec start(Race.t()) :: Race.t()

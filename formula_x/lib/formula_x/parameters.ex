@@ -66,10 +66,10 @@ defmodule FormulaX.Parameters do
   def car_initial_positions() do
     [
       {20, 5},
-      {20, 120},
       {115, 5},
-      {115, 120},
       {210, 5},
+      {20, 120},
+      {115, 120},
       {210, 120},
       {20, 235},
       {115, 235},
@@ -120,6 +120,28 @@ defmodule FormulaX.Parameters do
 
   @spec obstacle_x_positions() :: list(pixel())
   def obstacle_x_positions() do
+    [
+      0,
+      95,
+      190
+    ]
+  end
+
+  @doc """
+  Speed boosts are not placed until this distance after the start of race
+  """
+  @spec speed_boost_free_distance() :: pixel()
+  def speed_boost_free_distance() do
+    1000
+  end
+
+  @spec speed_boost_y_position_step() :: pixel()
+  def speed_boost_y_position_step() do
+    5000
+  end
+
+  @spec speed_boost_x_positions() :: list(pixel())
+  def speed_boost_x_positions() do
     [
       0,
       95,

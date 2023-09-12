@@ -6,6 +6,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
   alias FormulaX.Race
   alias FormulaX.Race.Car
   alias FormulaX.Race.Obstacle
+  alias FormulaX.Race.SpeedBoost
   alias FormulaX.Utils
 
   @car_width Parameters.car_dimensions().width
@@ -159,6 +160,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
       <.lanes/>
       <.cars status={@race.status} cars={@race.cars}/>
       <.obstacles race={@race}/>
+      <.speed_boosts race={@race}/>
       <.finish_line race={@race}/>
     </div>
     <.background images={@race.background.right_side_images} y_position={@race.background.y_position}/>
@@ -213,7 +215,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
     ~H"""
     <div class="obstacles">
       <%= for obstacle <- @race.obstacles do %>
-        <div class="obstacle" style={obstacle_position_style(obstacle, @race)}>
+        <div class="obstacle" style={stationary_item_position_style(obstacle, @race)}>
           <.tires />
         </div>
       <% end %>
@@ -226,6 +228,18 @@ defmodule FormulaXWeb.RaceLive.Screen do
     <%= for _counter <- 1..6 do %>
       <img src={"/images/misc/tire.png"}/>
     <% end %>
+    """
+  end
+
+  defp speed_boosts(assigns) do
+    ~H"""
+    <div class="speed_boosts">
+      <%= for speed_boost <- @race.speed_boosts do %>
+        <div class="speed_boost" style={stationary_item_position_style(speed_boost, @race)}>
+          <img src={"/images/misc/speed_boost.png"} >
+        </div>
+      <% end %>
+    </div>
     """
   end
 
@@ -282,14 +296,14 @@ defmodule FormulaXWeb.RaceLive.Screen do
     "bottom: #{race_distance - distance_travelled_by_player_car}px;"
   end
 
-  @spec obstacle_position_style(Obstacle.t(), Race.t()) :: String.t()
-  defp obstacle_position_style(
-         %Obstacle{x_position: obstacle_x_position, distance: obstacle_distance},
+  @spec stationary_item_position_style(Obstacle.t() | SpeedBoost.t(), Race.t()) :: String.t()
+  defp stationary_item_position_style(
+         %{x_position: stationary_item_x_position, distance: stationary_item_distance},
          race = %Race{}
        ) do
     %Car{distance_travelled: distance_travelled_by_player_car} = Race.get_player_car(race)
-    obstacle_y_position = obstacle_distance - distance_travelled_by_player_car
-    "left: #{obstacle_x_position}px; bottom: #{obstacle_y_position}px;"
+    stationary_item_y_position = stationary_item_distance - distance_travelled_by_player_car
+    "left: #{stationary_item_x_position}px; bottom: #{stationary_item_y_position}px;"
   end
 
   @spec get_car_image(integer()) :: Car.filename()

@@ -231,6 +231,19 @@
   @apply w-7;
 }
 
+.race_live .console .race_screen .race .speed_boosts .speed_boost,
+.race_live .console .crash_screen .race .speed_boosts .speed_boost,
+.race_live .console .result_screen .race .speed_boosts .speed_boost {
+  @apply absolute w-24 flex justify-center;
+  transition: left 1s ease-out, bottom 1s ease-out;
+}
+
+.race_live .console .race_screen .race .speed_boosts img,
+.race_live .console .crash_screen .race .speed_boosts img,
+.race_live .console .result_screen .race .speed_boosts img {
+  @apply w-12;
+}
+
 .race_live .console .crash_screen .race .cars .bang {
   @apply absolute w-28 z-20;
   transition: left 1s ease-out, bottom 1s ease-out;
