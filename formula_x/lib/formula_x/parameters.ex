@@ -70,10 +70,11 @@ defmodule FormulaX.Parameters do
       {210, 5},
       {20, 120},
       {115, 120},
-      {210, 120},
-      {20, 235},
-      {115, 235},
-      {210, 235}
+      {210, 120}
+      # ,
+      # {20, 235},
+      # {115, 235},
+      # {210, 235}
     ]
   end
 
@@ -98,6 +99,10 @@ defmodule FormulaX.Parameters do
 
   def car_drive_step(_speed = :high) do
     100
+  end
+
+  def car_drive_step(_speed = :speed_boost) do
+    125
   end
 
   @spec car_steering_step() :: pixel()
@@ -155,5 +160,10 @@ defmodule FormulaX.Parameters do
   @spec obstacle_dimensions() :: map()
   def obstacle_dimensions() do
     %{width: 96, length: 64}
+  end
+
+  @spec speed_boost_dimensions() :: map()
+  def speed_boost_dimensions() do
+    %{width: 96, length: 48}
   end
 end

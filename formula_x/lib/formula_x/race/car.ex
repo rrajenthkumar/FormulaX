@@ -14,7 +14,7 @@ defmodule FormulaX.Race.Car do
 
   @type filename :: String.t()
   @type controller :: :player | :autonomous
-  @type speed :: :rest | :low | :moderate | :high
+  @type speed :: :rest | :low | :moderate | :high | :speed_boost
   @type coordinates :: {Parameters.pixel(), Parameters.pixel()}
 
   @typedoc "Car struct"
@@ -133,6 +133,14 @@ defmodule FormulaX.Race.Car do
 
   def change_speed(car = %Car{speed: :high}, _action = :slowdown) do
     %Car{car | speed: :moderate}
+  end
+
+  def enable_speed_boost(car = %Car{}) do
+    %Car{car | speed: :speed_boost}
+  end
+
+  def disable_speed_boost(car = %Car{}, pre_boost_speed) when is_atom(pre_boost_speed) do
+    %Car{car | speed: pre_boost_speed}
   end
 
   @spec stop(Car.t()) :: Car.t()

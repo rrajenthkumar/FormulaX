@@ -7,6 +7,8 @@ defmodule FormulaX.Race.SpeedBoost do
 
   alias __MODULE__
   alias FormulaX.Parameters
+  alias FormulaX.Race
+  alias FormulaX.Race.Car
 
   @typedoc "SpeedBoost struct"
   typedstruct do
@@ -57,5 +59,20 @@ defmodule FormulaX.Race.SpeedBoost do
       x_position: speed_boost_x_position,
       distance: distance_covered_with_speed_boosts + Parameters.speed_boost_y_position_step()
     })
+  end
+
+  @spec get_lane(SpeedBoost.t()) :: integer()
+  def get_lane(%SpeedBoost{x_position: speed_boost_x_position}) do
+    Parameters.lanes()
+    |> Enum.find(fn %{x_start: lane_x_start, x_end: lane_x_end} ->
+      speed_boost_x_position in lane_x_start..lane_x_end
+    end)
+    |> Map.fetch!(:lane_number)
+  end
+
+  @spec get_y_position(SpeedBoost.t(), Race.t()) :: Parameters.pixel()
+  def get_y_position(%SpeedBoost{distance: speed_boost_distance}, race = %Race{}) do
+    %Car{distance_travelled: distance_travelled_by_player_car} = Race.get_player_car(race)
+    speed_boost_distance - distance_travelled_by_player_car
   end
 end

@@ -133,4 +133,9 @@ defmodule FormulaX.Race do
   def get_lanes_and_obstacles_map(%Race{obstacles: obstacles}) do
     Enum.group_by(obstacles, &Obstacle.get_lane/1, & &1)
   end
+
+  @spec get_lanes_and_speed_boost_map(Race.t()) :: map()
+  def get_lanes_and_speed_boost_map(%Race{speed_boosts: speed_boosts}) do
+    Enum.group_by(speed_boosts, &SpeedBoost.get_lane/1, & &1)
+  end
 end

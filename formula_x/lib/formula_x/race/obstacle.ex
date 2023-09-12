@@ -79,8 +79,8 @@ defmodule FormulaX.Race.Obstacle do
     |> Map.fetch!(:lane_number)
   end
 
-  @spec get_obstacle_y_position(Obstacle.t(), Race.t()) :: Parameters.pixel()
-  def get_obstacle_y_position(%Obstacle{distance: obstacle_distance}, race = %Race{}) do
+  @spec get_y_position(Obstacle.t(), Race.t()) :: Parameters.pixel()
+  def get_y_position(%Obstacle{distance: obstacle_distance}, race = %Race{}) do
     %Car{distance_travelled: distance_travelled_by_player_car} = Race.get_player_car(race)
     obstacle_distance - distance_travelled_by_player_car
   end

@@ -234,7 +234,7 @@
 .race_live .console .race_screen .race .speed_boosts .speed_boost,
 .race_live .console .crash_screen .race .speed_boosts .speed_boost,
 .race_live .console .result_screen .race .speed_boosts .speed_boost {
-  @apply absolute w-24 flex justify-center;
+  @apply absolute w-24 h-12 flex justify-center;
   transition: left 1s ease-out, bottom 1s ease-out;
 }
 

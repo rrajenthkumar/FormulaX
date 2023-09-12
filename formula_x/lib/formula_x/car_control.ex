@@ -4,11 +4,12 @@ defmodule FormulaX.CarControl do
   This module is the interface for all controls related to player and autonomous cars
   """
   alias FormulaX.CarControl.CrashDetection
+  alias FormulaX.Parameters
   alias FormulaX.Race
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
+  alias FormulaX.Race.SpeedBoost
   alias FormulaX.RaceEngine
-  alias FormulaX.Parameters
 
   @car_length Parameters.car_dimensions().length
 
@@ -30,9 +31,10 @@ defmodule FormulaX.CarControl do
 
     race
     |> Race.update_car(updated_player_car)
+    |> Race.update_background(updated_background)
     |> adapt_autonomous_cars_positions()
     |> update_crash_check_result(updated_player_car, _crash_check_side = :front)
-    |> Race.update_background(updated_background)
+    |> enable_speed_boost_if_fetched()
     |> Race.end_if_completed()
   end
 
@@ -53,6 +55,7 @@ defmodule FormulaX.CarControl do
     race
     |> Race.update_car(updated_player_car)
     |> update_crash_check_result(updated_player_car, _crash_check_side = direction)
+    |> enable_speed_boost_if_fetched()
     |> RaceEngine.update()
   end
 
@@ -238,5 +241,55 @@ defmodule FormulaX.CarControl do
     adapted_car = Car.adapt_autonomous_car_position(car, race)
     updated_race = Race.update_car(race, adapted_car)
     adapt_autonomous_cars_positions(remaining_cars, updated_race)
+  end
+
+  @spec enable_speed_boost_if_fetched(Race.t()) :: Race.t()
+  def enable_speed_boost_if_fetched(race = %Race{}) do
+    case speed_boost_fetched?(race) do
+      true ->
+        updated_car =
+          race
+          |> Race.get_player_car()
+          |> Car.enable_speed_boost()
+
+        Race.update_car(race, updated_car)
+
+      false ->
+        race
+    end
+  end
+
+  @spec speed_boost_fetched?(Race.t()) :: boolean()
+  defp speed_boost_fetched?(race = %Race{}) do
+    player_car =
+      %Car{
+        y_position: player_car_y_position
+      } = Race.get_player_car(race)
+
+    race
+    |> get_same_lane_speed_boosts(player_car)
+    |> Enum.any?(fn speed_boost ->
+      speed_boost_y_position = SpeedBoost.get_y_position(speed_boost, race)
+
+      # Car front wheels beyond speed boost starting y position and rear wheels behind speed boost starting y position or
+      # Car rear wheels between speed boost starting and ending y positions
+      (player_car_y_position + @car_length >= speed_boost_y_position and
+         player_car_y_position <= speed_boost_y_position) or
+        (player_car_y_position >= speed_boost_y_position and
+           player_car_y_position <=
+             speed_boost_y_position + Parameters.speed_boost_dimensions().length())
+    end)
+  end
+
+  @spec get_same_lane_speed_boosts(Race.t(), Car.t()) :: list(SpeedBoost.t())
+  defp get_same_lane_speed_boosts(
+         race = %Race{},
+         player_car = %Car{}
+       ) do
+    player_car_lane = Car.get_lane(player_car)
+
+    race
+    |> Race.get_lanes_and_speed_boost_map()
+    |> Map.get(player_car_lane, [])
   end
 end
