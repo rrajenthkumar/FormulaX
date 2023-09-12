@@ -9,8 +9,6 @@ defmodule FormulaX.Race.Car do
   alias FormulaX.Parameters
   alias FormulaX.Utils
 
-  @car_width Parameters.car_dimensions().width
-  @car_length Parameters.car_dimensions().length
   @number_of_cars Parameters.number_of_cars()
   @car_steering_step Parameters.car_steering_step()
 

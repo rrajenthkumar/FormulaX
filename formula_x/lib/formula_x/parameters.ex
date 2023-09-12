@@ -104,4 +104,26 @@ defmodule FormulaX.Parameters do
   def car_steering_step() do
     95
   end
+
+  @doc """
+  Obstacles are not placed until this distance after the start of race
+  """
+  @spec obstacle_free_distance() :: pixel()
+  def obstacle_free_distance() do
+    1000
+  end
+
+  @spec obstacle_y_position_steps() :: list(pixel())
+  def obstacle_y_position_steps() do
+    [500, 1000, 1500]
+  end
+
+  @spec obstacle_x_positions() :: list(pixel())
+  def obstacle_x_positions() do
+    [
+      0,
+      95,
+      190
+    ]
+  end
 end

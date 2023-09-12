@@ -5,6 +5,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
   alias FormulaX.Parameters
   alias FormulaX.Race
   alias FormulaX.Race.Car
+  alias FormulaX.Race.Obstacle
   alias FormulaX.Utils
 
   @car_width Parameters.car_dimensions().width
@@ -157,6 +158,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
     <div class="race">
       <.lanes/>
       <.cars status={@race.status} cars={@race.cars}/>
+      <.obstacles race={@race}/>
       <.finish_line race={@race}/>
     </div>
     <.background images={@race.background.right_side_images} y_position={@race.background.y_position}/>
@@ -207,154 +209,44 @@ defmodule FormulaXWeb.RaceLive.Screen do
     """
   end
 
+  defp obstacles(assigns) do
+    ~H"""
+    <div class="obstacles">
+      <%= for obstacle <- @race.obstacles do %>
+        <div class="obstacle" style={obstacle_position_style(obstacle, @race)}>
+          <.tires />
+        </div>
+      <% end %>
+    </div>
+    """
+  end
+
+  defp tires(assigns) do
+    ~H"""
+    <%= for _counter <- 1..6 do %>
+      <img src={"/images/misc/tire.png"}/>
+    <% end %>
+    """
+  end
+
   defp finish_line(assigns) do
     ~H"""
     <div class="finish_line" style={finish_line_position_style(@race)}>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-        <div class="white">
-        </div>
-        <div class="black">
-        </div>
-      </div>
+      <%= for _counter1 <- 1..3 do %>
+        <%= for _counter2 <- 1..6 do %>
+          <div class="black">
+          </div>
+          <div class="white">
+          </div>
+        <% end %>
+        <%= for _counter3 <- 1..6 do %>
+          <div class="white">
+          </div>
+          <div class="black">
+          </div>
+        <% end %>
+      <% end %>
+    </div>
     """
   end
 
@@ -380,7 +272,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
     "left: #{player_car_x_position - @car_width / 2}px; bottom: #{player_car_y_position}px;"
   end
 
-  @spec finish_line_position_style(Car.t()) :: String.t()
+  @spec finish_line_position_style(Race.t()) :: String.t()
   defp finish_line_position_style(
          race = %Race{
            distance: race_distance
@@ -388,6 +280,16 @@ defmodule FormulaXWeb.RaceLive.Screen do
        ) do
     %Car{distance_travelled: distance_travelled_by_player_car} = Race.get_player_car(race)
     "bottom: #{race_distance - distance_travelled_by_player_car}px;"
+  end
+
+  @spec obstacle_position_style(Obstacle.t(), Race.t()) :: String.t()
+  defp obstacle_position_style(
+         %Obstacle{x_position: obstacle_x_position, distance: obstacle_distance},
+         race = %Race{}
+       ) do
+    %Car{distance_travelled: distance_travelled_by_player_car} = Race.get_player_car(race)
+    obstacle_y_position = obstacle_distance - distance_travelled_by_player_car
+    "left: #{obstacle_x_position}px; bottom: #{obstacle_y_position}px;"
   end
 
   @spec get_car_image(integer()) :: Car.filename()
