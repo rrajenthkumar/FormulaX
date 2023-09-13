@@ -19,7 +19,8 @@ defmodule FormulaX.Race do
 
   @typedoc "Race struct"
   typedstruct do
-    field(:cars, cars(), enforce: true)
+    field(:player_car, Car.t(), enforce: true)
+    field(:autonomous_cars, cars(), enforce: true)
     field(:background, Background.t(), enforce: true)
     field(:obstacles, list(Obstacle.t()), enforce: true)
     field(:speed_boosts, list(SpeedBoost.t()), enforce: true)
@@ -34,14 +35,16 @@ defmodule FormulaX.Race do
   end
 
   @spec initialize(integer()) :: Race.t()
-  def initialize(player_car_index) do
-    cars = Car.initialize_cars(player_car_index)
+  def initialize(player_car_index) when is_integer(player_car_index) do
+    player_car = Car.initialize_player_car(player_car_index)
+    autonomous_cars = Car.initialize_autonomous_cars(player_car)
     background = Background.initialize(@race_distance)
     obstacles = Obstacle.initialize_obstacles(@race_distance)
     speed_boosts = SpeedBoost.initialize_speed_boosts(@race_distance)
 
     new(%{
-      cars: cars,
+      player_car: player_car,
+      autonomous_cars: autonomous_cars,
       background: background,
       obstacles: obstacles,
       speed_boosts: speed_boosts,
@@ -59,18 +62,31 @@ defmodule FormulaX.Race do
     %Race{race | background: updated_background}
   end
 
-  @spec update_car(Race.t(), Car.t()) :: Race.t()
-  def update_car(race = %Race{cars: cars}, updated_car = %Car{id: updated_car_id}) do
-    updated_cars =
-      Enum.map(cars, fn car ->
-        if car.id == updated_car_id do
-          updated_car
+  @spec update_player_car(Race.t(), Car.t()) :: Race.t()
+  def update_player_car(race = %Race{}, updated_player_car = %Car{controller: :player}) do
+    %Race{race | player_car: updated_player_car}
+  end
+
+  @spec update_autonomous_car(Race.t(), Car.t()) :: Race.t()
+  def update_autonomous_car(
+        race = %Race{autonomous_cars: autonomous_cars},
+        updated_autonomous_car = %Car{id: updated_autonomous_car_id, controller: :autonomous}
+      ) do
+    updated_autonomous_cars =
+      Enum.map(autonomous_cars, fn autonomous_car ->
+        if autonomous_car.id == updated_autonomous_car_id do
+          updated_autonomous_car
         else
-          car
+          autonomous_car
         end
       end)
 
-    %Race{race | cars: updated_cars}
+    %Race{race | autonomous_cars: updated_autonomous_cars}
+  end
+
+  @spec adapt_autonomous_cars_positions(Race.t()) :: Race.t()
+  def adapt_autonomous_cars_positions(race = %Race{autonomous_cars: autonomous_cars}) do
+    adapt_autonomous_cars_positions(autonomous_cars, race)
   end
 
   @spec record_crash(Race.t()) :: Race.t()
@@ -78,55 +94,61 @@ defmodule FormulaX.Race do
     %Race{race | status: :crash}
   end
 
-  @spec end_if_completed(Race.t()) :: boolean()
-  def end_if_completed(race = %Race{}) do
-    %Car{completion_time: player_car_completion_time} = get_player_car(race)
+  @doc """
+   This function is used in RaceLive module to check and stop the RaceEngine.
+  """
+  @spec player_car_past_finish?(Race.t()) :: boolean
+  def player_car_past_finish?(%Race{
+        distance: race_distance,
+        player_car: %Car{
+          distance_travelled: distance_travelled_by_player_car,
+          controller: :player
+        }
+      }) do
+    # To check if the player car has travelled a distance of half the console screen height beyond the finish line (for cosmetic purpose)
+    distance_travelled_by_player_car > race_distance + @console_screen_height / 2
+  end
 
+  @spec end_if_completed(Race.t()) :: Race.t()
+  def end_if_completed(
+        race = %Race{
+          player_car: %Car{completion_time: player_car_completion_time, controller: :player}
+        }
+      ) do
     cond do
       is_nil(player_car_completion_time) -> race
       true -> %Race{race | status: :completed}
     end
   end
 
-  @spec get_car_by_id(Race.t(), integer()) :: {:ok, Car.t()} | {:error, String.t()}
-  def get_car_by_id(%Race{cars: cars}, car_id) when is_integer(car_id) do
-    result = Enum.find(cars, fn car -> car.id == car_id end)
-
-    case result do
-      nil -> {:error, "car not found"}
-      result -> {:ok, result}
-    end
-  end
-
-  @spec get_car(Race.t(), integer()) :: Car.t()
-  def get_car(%Race{cars: cars}, car_id) do
-    Enum.find(cars, fn car -> car.id == car_id end)
-  end
-
-  @spec get_player_car(Race.t()) :: Car.t()
-  def get_player_car(%Race{cars: cars}) do
-    Enum.find(cars, fn car -> car.controller == :player end)
-  end
-
-  @spec get_all_autonomous_cars(Race.t()) :: list(Car.t())
-  def get_all_autonomous_cars(%Race{cars: cars}) do
-    Enum.reject(cars, fn %Car{controller: controller} -> controller == :player end)
-  end
-
-  @doc """
-   This function is used in RaceLive module to check and stop the RaceEngine.
-  """
-  @spec player_car_past_finish?(Race.t()) :: boolean
-  def player_car_past_finish?(race = %Race{distance: race_distance}) do
-    %Car{distance_travelled: distance_travelled_by_player_car} = get_player_car(race)
-
-    # To check if the player car has travelled a distance of half the console screen height beyond the finish line (for cosmetic purpose)
-    distance_travelled_by_player_car > race_distance + @console_screen_height / 2
+  @spec get_autonomous_car_by_id(Race.t(), integer()) :: Car.t()
+  def get_autonomous_car_by_id(
+        %Race{autonomous_cars: autonomous_cars},
+        searched_autonomous_car_id
+      )
+      when is_integer(searched_autonomous_car_id) do
+    Enum.find(autonomous_cars, fn autonomous_car ->
+      autonomous_car.id == searched_autonomous_car_id
+    end)
   end
 
   @spec get_lanes_and_cars_map(Race.t()) :: map()
-  def get_lanes_and_cars_map(%Race{cars: cars}) do
-    Enum.group_by(cars, &Car.get_lane/1, & &1)
+  def get_lanes_and_cars_map(%Race{
+        player_car: player_car = %Car{controller: :player},
+        autonomous_cars: autonomous_cars
+      }) do
+    lanes_and_autonomous_cars_map = Enum.group_by(autonomous_cars, &Car.get_lane/1, & &1)
+
+    player_car_lane = Car.get_lane(player_car)
+
+    autonomous_cars_in_player_car_lane =
+      Map.get(lanes_and_autonomous_cars_map, player_car_lane, [])
+
+    Map.put(
+      lanes_and_autonomous_cars_map,
+      player_car_lane,
+      autonomous_cars_in_player_car_lane ++ [player_car]
+    )
   end
 
   @spec get_lanes_and_obstacles_map(Race.t()) :: map()
@@ -134,8 +156,28 @@ defmodule FormulaX.Race do
     Enum.group_by(obstacles, &Obstacle.get_lane/1, & &1)
   end
 
-  @spec get_lanes_and_speed_boost_map(Race.t()) :: map()
-  def get_lanes_and_speed_boost_map(%Race{speed_boosts: speed_boosts}) do
+  @spec get_lanes_and_speed_boosts_map(Race.t()) :: map()
+  def get_lanes_and_speed_boosts_map(%Race{speed_boosts: speed_boosts}) do
     Enum.group_by(speed_boosts, &SpeedBoost.get_lane/1, & &1)
+  end
+
+  @spec adapt_autonomous_cars_positions(list(Car.t()), Race.t()) :: Race.t()
+  defp adapt_autonomous_cars_positions(
+         _autonomous_cars = [autonomous_car = %Car{controller: :autonomous}],
+         race = %Race{}
+       ) do
+    adapted_autonomous_car = Car.adapt_autonomous_car_position(autonomous_car, race)
+    update_autonomous_car(race, adapted_autonomous_car)
+  end
+
+  defp adapt_autonomous_cars_positions(
+         _autonomous_cars = [
+           autonomous_car = %Car{controller: :autonomous} | remaining_autonomous_cars
+         ],
+         race = %Race{}
+       ) do
+    adapted_autonomous_car = Car.adapt_autonomous_car_position(autonomous_car, race)
+    updated_race = update_autonomous_car(race, adapted_autonomous_car)
+    adapt_autonomous_cars_positions(remaining_autonomous_cars, updated_race)
   end
 end

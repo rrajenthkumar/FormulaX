@@ -1,7 +1,7 @@
 defmodule FormulaX.Race.SpeedBoost do
   @moduledoc """
   **SpeedBoost**
-  Few speed boosts are placed randomly on tracks to help player car drive super fast for few seconds.
+  Few special items known as 'speed boosts' are placed randomly on tracks to help player car drive super fast for few seconds.
   """
   use TypedStruct
 
@@ -9,6 +9,11 @@ defmodule FormulaX.Race.SpeedBoost do
   alias FormulaX.Parameters
   alias FormulaX.Race
   alias FormulaX.Race.Car
+
+  @speed_boost_free_distance Parameters.speed_boost_free_distance()
+  @speed_boost_y_position_step Parameters.speed_boost_y_position_step()
+  @speed_boost_length Parameters.stationary_items_length()
+  @car_length Parameters.car_length()
 
   @typedoc "SpeedBoost struct"
   typedstruct do
@@ -24,7 +29,7 @@ defmodule FormulaX.Race.SpeedBoost do
   @spec initialize_speed_boosts(Parameters.rem()) :: list(SpeedBoost.t())
   def initialize_speed_boosts(race_distance) when is_float(race_distance) do
     %{distance: new_speed_boost_distance} =
-      new_speed_boost = initialize_speed_boost(Parameters.speed_boost_free_distance())
+      new_speed_boost = initialize_speed_boost(@speed_boost_free_distance)
 
     [new_speed_boost] ++
       initialize_speed_boosts(race_distance, new_speed_boost_distance)
@@ -36,7 +41,7 @@ defmodule FormulaX.Race.SpeedBoost do
        when is_float(race_distance) and is_float(distance_covered_with_speed_boosts) do
     cond do
       race_distance - distance_covered_with_speed_boosts <
-          Parameters.speed_boost_y_position_step() ->
+          @speed_boost_y_position_step ->
         []
 
       true ->
@@ -57,7 +62,7 @@ defmodule FormulaX.Race.SpeedBoost do
 
     new(%{
       x_position: speed_boost_x_position,
-      distance: distance_covered_with_speed_boosts + Parameters.speed_boost_y_position_step()
+      distance: distance_covered_with_speed_boosts + @speed_boost_y_position_step
     })
   end
 
@@ -71,8 +76,61 @@ defmodule FormulaX.Race.SpeedBoost do
   end
 
   @spec get_y_position(SpeedBoost.t(), Race.t()) :: Parameters.rem()
-  def get_y_position(%SpeedBoost{distance: speed_boost_distance}, race = %Race{}) do
-    %Car{distance_travelled: distance_travelled_by_player_car} = Race.get_player_car(race)
+  def get_y_position(
+        %SpeedBoost{distance: speed_boost_distance},
+        %Race{
+          player_car: %Car{
+            distance_travelled: distance_travelled_by_player_car,
+            controller: :player
+          }
+        }
+      ) do
     speed_boost_distance - distance_travelled_by_player_car
+  end
+
+  @spec enable_if_fetched(Race.t()) :: Race.t()
+  def enable_if_fetched(race = %Race{player_car: player_car = %Car{controller: :player}}) do
+    case speed_boost_fetched?(race) do
+      true ->
+        updated_player_car = Car.enable_speed_boost(player_car)
+
+        Race.update_player_car(race, updated_player_car)
+
+      false ->
+        race
+    end
+  end
+
+  @spec speed_boost_fetched?(Race.t()) :: boolean()
+  defp speed_boost_fetched?(
+         race = %Race{
+           player_car: player_car = %Car{controller: :player, y_position: player_car_y_position}
+         }
+       ) do
+    race
+    |> get_same_lane_speed_boosts(player_car)
+    |> Enum.any?(fn speed_boost ->
+      speed_boost_y_position = get_y_position(speed_boost, race)
+
+      # Car front wheels beyond speed boost starting y position and rear wheels behind speed boost starting y position or
+      # Car rear wheels between speed boost starting and ending y positions
+      (player_car_y_position + @car_length >= speed_boost_y_position and
+         player_car_y_position <= speed_boost_y_position) or
+        (player_car_y_position >= speed_boost_y_position and
+           player_car_y_position <=
+             speed_boost_y_position + @speed_boost_length)
+    end)
+  end
+
+  @spec get_same_lane_speed_boosts(Race.t(), Car.t()) :: list(SpeedBoost.t())
+  defp get_same_lane_speed_boosts(
+         race = %Race{},
+         player_car = %Car{controller: :player}
+       ) do
+    player_car_lane = Car.get_lane(player_car)
+
+    race
+    |> Race.get_lanes_and_speed_boosts_map()
+    |> Map.get(player_car_lane, [])
   end
 end

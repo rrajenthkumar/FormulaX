@@ -9,11 +9,6 @@ defmodule FormulaX.Parameters do
   @typedoc "Dimension on screen in X or Y direction measured in rem"
   @type rem() :: float()
 
-  @spec console_screen_height() :: rem()
-  def console_screen_height() do
-    35.0
-  end
-
   @doc """
   Total race distance
   """
@@ -22,9 +17,20 @@ defmodule FormulaX.Parameters do
     650.0
   end
 
+  @doc """
+  Used to calculate the number of background images needed for the race based on the race distance
+  """
   @spec background_image_container_height() :: rem()
   def background_image_container_height() do
     12.5
+  end
+
+  @doc """
+  This is alos used to calculate the number of background images needed for the race
+  """
+  @spec console_screen_height() :: rem()
+  def console_screen_height() do
+    35.0
   end
 
   @doc """
@@ -60,13 +66,9 @@ defmodule FormulaX.Parameters do
     %{x_start: x_start, x_end: x_end}
   end
 
-  @doc """
-  Car dimensions map
-  """
-  @spec car_dimensions() :: map()
-  def car_dimensions() do
-    car_width = 3.5
-    %{width: car_width, length: car_width * 2}
+  @spec car_length() :: rem()
+  def car_length() do
+    7
   end
 
   @doc """
@@ -118,11 +120,11 @@ defmodule FormulaX.Parameters do
   end
 
   @doc """
-  Stationary items (speed boosts, obstacles etc) dimensions map
+  Stationary items are speed boosts, obstacles etc
   """
-  @spec stationary_items_dimensions() :: map()
-  def stationary_items_dimensions() do
-    %{width: 6.0, length: 4.0}
+  @spec stationary_items_length() :: rem()
+  def stationary_items_length() do
+    4.0
   end
 
   @spec stationary_items_x_positions() :: list(rem())

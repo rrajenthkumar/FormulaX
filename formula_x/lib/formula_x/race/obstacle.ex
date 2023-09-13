@@ -10,6 +10,8 @@ defmodule FormulaX.Race.Obstacle do
   alias FormulaX.Race
   alias FormulaX.Race.Car
 
+  @obstacle_free_distance Parameters.obstacle_free_distance()
+
   @typedoc "Obstacle struct"
   typedstruct do
     field(:x_position, Parameters.rem(), enforce: true)
@@ -24,7 +26,7 @@ defmodule FormulaX.Race.Obstacle do
   @spec initialize_obstacles(Parameters.rem()) :: list(Obstacle.t())
   def initialize_obstacles(race_distance) when is_float(race_distance) do
     %{distance: new_obstacle_distance} =
-      new_obstacle = initialize_obstacle(Parameters.obstacle_free_distance())
+      new_obstacle = initialize_obstacle(@obstacle_free_distance)
 
     [new_obstacle] ++
       initialize_obstacles(race_distance, new_obstacle_distance)
@@ -80,8 +82,15 @@ defmodule FormulaX.Race.Obstacle do
   end
 
   @spec get_y_position(Obstacle.t(), Race.t()) :: Parameters.rem()
-  def get_y_position(%Obstacle{distance: obstacle_distance}, race = %Race{}) do
-    %Car{distance_travelled: distance_travelled_by_player_car} = Race.get_player_car(race)
+  def get_y_position(
+        %Obstacle{distance: obstacle_distance},
+        %Race{
+          player_car: %Car{
+            distance_travelled: distance_travelled_by_player_car,
+            controller: :player
+          }
+        }
+      ) do
     obstacle_distance - distance_travelled_by_player_car
   end
 end

@@ -34,26 +34,30 @@ defmodule FormulaX.Race.Car do
     struct!(Car, attrs)
   end
 
-  @spec initialize_cars(integer()) :: list(Car.t())
-  def initialize_cars(player_car_index) when is_integer(player_car_index) do
-    possible_ids =
-      1..@number_of_cars
-      |> Enum.to_list()
+  @spec initialize_player_car(integer()) :: Car.t()
+  def initialize_player_car(player_car_index) when is_integer(player_car_index) do
+    player_car_id =
+      get_all_possible_ids()
+      |> Enum.random()
 
-    player_car_id = Enum.random(possible_ids)
+    player_car_image =
+      "cars"
+      |> Utils.get_images()
+      |> Enum.at(player_car_index)
 
-    available_car_images = Utils.get_images("cars")
+    initialize_car(player_car_id, player_car_image, :player)
+  end
 
-    player_car_image = Enum.at(available_car_images, player_car_index)
+  @spec initialize_autonomous_cars(Car.t()) :: list(Car.t())
+  def initialize_autonomous_cars(%Car{
+        id: player_car_id,
+        image: player_car_image,
+        controller: :player
+      }) do
+    available_ids = get_all_possible_ids() -- [player_car_id]
+    available_car_images = Utils.get_images("cars") -- [player_car_image]
 
-    player_car = initialize_car(player_car_id, player_car_image, :player)
-
-    remaining_ids = possible_ids -- [player_car_id]
-    remaining_car_images = available_car_images -- [player_car_image]
-
-    autonomous_cars = initialize_autonomous_cars(remaining_ids, remaining_car_images)
-
-    autonomous_cars ++ [player_car]
+    initialize_autonomous_cars(available_ids, available_car_images)
   end
 
   @spec drive(Car.t()) :: Car.t()
@@ -75,15 +79,13 @@ defmodule FormulaX.Race.Car do
   @spec adapt_autonomous_car_position(Car.t(), Race.t()) :: Car.t()
   def adapt_autonomous_car_position(
         car = %Car{
-          id: car_id,
+          id: autonomous_car_id,
           distance_travelled: distance_travelled_by_autonomous_car,
           controller: :autonomous
         },
-        race = %Race{}
+        %Race{player_car: %Car{distance_travelled: distance_travelled_by_player_car}}
       ) do
-    %Car{distance_travelled: distance_travelled_by_player_car} = Race.get_player_car(race)
-
-    {_, starting_y_position} = get_starting_x_and_y_positions(car_id)
+    {_, starting_y_position} = get_starting_x_and_y_positions(autonomous_car_id)
 
     updated_y_position =
       starting_y_position +
@@ -135,17 +137,13 @@ defmodule FormulaX.Race.Car do
     %Car{car | speed: :moderate}
   end
 
-  def enable_speed_boost(car = %Car{}) do
+  def enable_speed_boost(car = %Car{controller: :player}) do
     %Car{car | speed: :speed_boost}
   end
 
-  def disable_speed_boost(car = %Car{}, pre_boost_speed) when is_atom(pre_boost_speed) do
+  def disable_speed_boost(car = %Car{controller: :player}, pre_boost_speed)
+      when is_atom(pre_boost_speed) do
     %Car{car | speed: pre_boost_speed}
-  end
-
-  @spec stop(Car.t()) :: Car.t()
-  def stop(car = %Car{}) do
-    %Car{car | speed: :rest}
   end
 
   @spec add_completion_time_if_finished(Car.t(), Race.t()) :: Car.t()
@@ -181,14 +179,15 @@ defmodule FormulaX.Race.Car do
   end
 
   @spec initialize_autonomous_cars(list(integer()), list(filename())) :: list(Car.t())
-  defp initialize_autonomous_cars([car_id], car_images) when is_list(car_images) do
+  defp initialize_autonomous_cars([car_id], car_images)
+       when is_integer(car_id) and is_list(car_images) do
     car_image = Enum.random(car_images)
 
     [initialize_car(car_id, car_image, :autonomous)]
   end
 
   defp initialize_autonomous_cars(_car_ids = [head | tail], car_images)
-       when is_list(car_images) do
+       when is_integer(head) and is_list(car_images) do
     car_image = Enum.random(car_images)
 
     car = initialize_car(head, car_image, :autonomous)
@@ -214,8 +213,8 @@ defmodule FormulaX.Race.Car do
     })
   end
 
-  defp initialize_car(car_id, image, controller)
-       when is_integer(car_id) and is_binary(image) and is_atom(controller) do
+  defp initialize_car(car_id, image, controller = :autonomous)
+       when is_integer(car_id) and is_binary(image) do
     {x_position, y_position} = get_starting_x_and_y_positions(car_id)
     speed = Enum.random([:low, :moderate, :high])
 
@@ -233,5 +232,11 @@ defmodule FormulaX.Race.Car do
   defp get_starting_x_and_y_positions(car_id) when is_integer(car_id) do
     Parameters.car_initial_positions()
     |> Enum.at(car_id - 1)
+  end
+
+  @spec get_all_possible_ids() :: list(integer())
+  defp get_all_possible_ids() do
+    1..@number_of_cars
+    |> Enum.to_list()
   end
 end

@@ -26,9 +26,10 @@ defmodule FormulaX.Result do
   end
 
   @spec get_player_car_result(Race.t()) :: Result.t()
-  def get_player_car_result(race = %Race{status: :crash}) do
-    %Car{image: player_car_image} = Race.get_player_car(race)
-
+  def get_player_car_result(%Race{
+        player_car: %Car{image: player_car_image, controller: :player},
+        status: :crash
+      }) do
     %{
       car: player_car_image,
       status: :crash
@@ -36,12 +37,21 @@ defmodule FormulaX.Result do
     |> Result.new()
   end
 
-  def get_player_car_result(race = %Race{cars: cars, start_time: race_start_time, status: status}) do
-    %Car{completion_time: player_car_completion_time, image: player_car_image} =
-      Race.get_player_car(race)
+  def get_player_car_result(%Race{
+        player_car:
+          player_car = %Car{
+            completion_time: player_car_completion_time,
+            image: player_car_image,
+            controller: :player
+          },
+        autonomous_cars: autonomous_cars,
+        start_time: race_start_time,
+        status: status
+      }) do
+    all_cars = autonomous_cars ++ [player_car]
 
     player_car_index_after_finish =
-      cars
+      all_cars
       |> Enum.reject(fn car -> is_nil(car.completion_time) end)
       |> Enum.sort_by(& &1.completion_time, Time)
       |> Enum.find_index(fn car -> car.controller == :player end)
@@ -59,14 +69,15 @@ defmodule FormulaX.Result do
     |> Result.new()
   end
 
-  @spec update_last_5_results(list(Result.t()), list(Result.t())) :: list(Result.t())
-  def update_last_5_results(new_result, last_5_results) do
+  @spec update_last_5_results(Result.t(), list(Result.t())) :: list(Result.t())
+  def update_last_5_results(new_result = %Result{}, last_5_results)
+      when is_list(last_5_results) do
     results_count = length(last_5_results)
 
     cond do
       results_count == 5 ->
-        {_, results} = List.pop_at(last_5_results, 4)
-        [new_result] ++ results
+        {_, last_4_results} = List.pop_at(last_5_results, 4)
+        [new_result] ++ last_4_results
 
       results_count < 5 ->
         [new_result] ++ last_5_results
@@ -74,7 +85,7 @@ defmodule FormulaX.Result do
     |> update_review
   end
 
-  defp update_review(_last_5_results = [last_result]) do
+  defp update_review(_last_5_results = [last_result = %Result{}]) do
     review =
       cond do
         last_result.status == :crash -> :bad
@@ -85,7 +96,7 @@ defmodule FormulaX.Result do
     [%Result{last_result | review: review}]
   end
 
-  defp update_review(_last_5_results = [last_result | other_results]) do
+  defp update_review(_last_5_results = [last_result = %Result{} | other_results]) do
     [last_but_one_result | _other_results] = other_results
 
     review =

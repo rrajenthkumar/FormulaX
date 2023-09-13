@@ -9,7 +9,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
   alias FormulaX.Race.SpeedBoost
   alias FormulaX.Utils
 
-  @car_width Parameters.car_dimensions().width
+  @car_length Parameters.car_length()
 
   def render(assigns = %{screen_state: :switched_off}) do
     ~H"""
@@ -158,7 +158,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
     <.background images={@race.background.left_side_images} y_position={@race.background.y_position}/>
     <div class="race">
       <.lanes/>
-      <.cars status={@race.status} cars={@race.cars}/>
+      <.cars status={@race.status} player_car={@race.player_car} autonomous_cars={@race.autonomous_cars}/>
       <.obstacles race={@race}/>
       <.speed_boosts race={@race}/>
       <.finish_line race={@race}/>
@@ -192,18 +192,16 @@ defmodule FormulaXWeb.RaceLive.Screen do
   defp cars(assigns) do
     ~H"""
     <div class="cars">
-      <%= for car = %Car{image: image, controller: controller} <- @cars do %>
-      <%= case controller do%>
-        <% :autonomous -> %>
-          <img class="car" src={"/images/cars/#{image}"} style={car_position_style(car)}/>
-        <% :player -> %>
-          <img class="car" src={"/images/cars/#{image}"} style={car_position_style(car)}/>
-          <%=if @status == :crash do %>
-            <audio controls autoplay>
-              <source src="/sounds/car_crash.mp3" type="audio/mpeg">
-              Your browser does not support the audio element.
-            </audio>
-            <img class="bang" src={"/images/misc/bang.png"} style={crash_illustration_position_style(car)}>
+      <%= with all_cars <- [@player_car] ++ @autonomous_cars  do %>
+        <%= for car = %Car{image: image, controller: controller} <- all_cars do %>
+        <%= case controller do%>
+          <% :autonomous -> %>
+            <img class="car" src={"/images/cars/#{image}"} style={car_position_style(car)}/>
+          <% :player -> %>
+            <img class="car" src={"/images/cars/#{image}"} style={car_position_style(car)}/>
+            <%=if @status == :crash do %>
+              <img class="bang" src={"/images/misc/bang.png"} style={crash_illustration_position_style(car)}>
+            <% end %>
           <% end %>
         <% end %>
       <% end %>
@@ -280,27 +278,34 @@ defmodule FormulaXWeb.RaceLive.Screen do
   @spec crash_illustration_position_style(Car.t()) :: String.t()
   defp crash_illustration_position_style(%Car{
          x_position: player_car_x_position,
-         y_position: player_car_y_position
+         y_position: player_car_y_position,
+         controller: :player
        }) do
-    "left: #{player_car_x_position - @car_width / 2}rem; bottom: #{player_car_y_position}rem;"
+    "left: #{player_car_x_position - @car_length / 4}rem; bottom: #{player_car_y_position}rem;"
   end
 
   @spec finish_line_position_style(Race.t()) :: String.t()
-  defp finish_line_position_style(
-         race = %Race{
-           distance: race_distance
-         }
-       ) do
-    %Car{distance_travelled: distance_travelled_by_player_car} = Race.get_player_car(race)
+  defp finish_line_position_style(%Race{
+         player_car: %Car{
+           distance_travelled: distance_travelled_by_player_car,
+           controller: :player
+         },
+         distance: race_distance
+       }) do
     "bottom: #{race_distance - distance_travelled_by_player_car}rem;"
   end
 
   @spec stationary_item_position_style(Obstacle.t() | SpeedBoost.t(), Race.t()) :: String.t()
   defp stationary_item_position_style(
          %{x_position: stationary_item_x_position, distance: stationary_item_distance},
-         race = %Race{}
-       ) do
-    %Car{distance_travelled: distance_travelled_by_player_car} = Race.get_player_car(race)
+         %Race{
+           player_car: %Car{
+             distance_travelled: distance_travelled_by_player_car,
+             controller: :player
+           }
+         }
+       )
+       when is_float(stationary_item_x_position) and is_float(stationary_item_distance) do
     stationary_item_y_position = stationary_item_distance - distance_travelled_by_player_car
     "left: #{stationary_item_x_position}rem; bottom: #{stationary_item_y_position}rem;"
   end

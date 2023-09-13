@@ -1,8 +1,8 @@
 defmodule FormulaX.CarControl.CrashDetection do
   @moduledoc """
   **Crash detection context**
-  This module is used by the Car Control module to detect crashes between cars, with background items
-  Please note that all every race and car mentioned in this module are already updated with the forward or sideward movement for which the possibility of crash is checked.
+  This module is used by the Car Control module to detect crashes between cars and with background items
+  Please note that every race struct and car struct mentioned in this module is already updated with the forward or sideward movement for which the possibility of crash is checked.
   """
 
   alias FormulaX.Parameters
@@ -10,8 +10,8 @@ defmodule FormulaX.CarControl.CrashDetection do
   alias FormulaX.Race.Car
   alias FormulaX.Race.Obstacle
 
-  @car_length Parameters.car_dimensions().length
-  @obstacle_length Parameters.stationary_items_dimensions().length()
+  @car_length Parameters.car_length()
+  @obstacle_length Parameters.stationary_items_length()
 
   @spec crash?(Race.t(), Car.t(), :front | :left | :right) :: boolean()
   def crash?(
