@@ -37,7 +37,7 @@ defmodule FormulaX.CarControl do
     |> Race.update_player_car(updated_player_car)
     |> Race.update_background(updated_background)
     |> Race.adapt_autonomous_cars_positions()
-    |> update_crash_check_result(updated_player_car, _crash_check_side = :front)
+    |> CrashDetection.update_crash_check_result(updated_player_car, _crash_check_side = :front)
     |> SpeedBoost.enable_if_fetched()
     |> Race.end_if_completed()
   end
@@ -57,7 +57,7 @@ defmodule FormulaX.CarControl do
 
     race
     |> Race.update_player_car(updated_player_car)
-    |> update_crash_check_result(updated_player_car, _crash_check_side = direction)
+    |> CrashDetection.update_crash_check_result(updated_player_car, _crash_check_side = direction)
     |> SpeedBoost.enable_if_fetched()
     |> RaceEngine.update()
   end
@@ -73,23 +73,6 @@ defmodule FormulaX.CarControl do
     race
     |> Race.update_player_car(updated_player_car)
     |> RaceEngine.update()
-  end
-
-  @spec update_crash_check_result(Race.t(), Car.t(), :left | :right | :front) ::
-          Race.t()
-  defp update_crash_check_result(
-         race = %Race{},
-         player_car = %Car{controller: :player},
-         crash_check_side
-       )
-       when is_atom(crash_check_side) do
-    case CrashDetection.crash?(race, player_car, crash_check_side) do
-      true ->
-        Race.record_crash(race)
-
-      false ->
-        race
-    end
   end
 
   @spec drive_autonomous_cars(list(Car.t()), Race.t()) :: Race.t()
