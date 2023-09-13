@@ -11,6 +11,7 @@ defmodule FormulaX.CarControl.CrashDetection do
   alias FormulaX.Race.Obstacle
 
   @car_length Parameters.car_dimensions().length
+  @obstacle_length Parameters.obstacle_dimensions().length()
 
   @spec crash?(Race.t(), Car.t(), :front | :left | :right) :: boolean()
   def crash?(
@@ -99,7 +100,7 @@ defmodule FormulaX.CarControl.CrashDetection do
          querying_car_y_position <= obstacle_y_position) or
         (querying_car_y_position >= obstacle_y_position and
            querying_car_y_position <=
-             obstacle_y_position + Parameters.obstacle_dimensions().length())
+             obstacle_y_position + @obstacle_length)
     end)
   end
 

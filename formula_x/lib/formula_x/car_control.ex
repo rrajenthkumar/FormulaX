@@ -12,6 +12,7 @@ defmodule FormulaX.CarControl do
   alias FormulaX.RaceEngine
 
   @car_length Parameters.car_dimensions().length
+  @speed_boost_length Parameters.speed_boost_dimensions().length()
 
   @doc """
   When the player car is driven, the car remains at same position
@@ -277,7 +278,7 @@ defmodule FormulaX.CarControl do
          player_car_y_position <= speed_boost_y_position) or
         (player_car_y_position >= speed_boost_y_position and
            player_car_y_position <=
-             speed_boost_y_position + Parameters.speed_boost_dimensions().length())
+             speed_boost_y_position + @speed_boost_length)
     end)
   end
 
