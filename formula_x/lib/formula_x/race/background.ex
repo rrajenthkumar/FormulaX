@@ -19,7 +19,7 @@ defmodule FormulaX.Race.Background do
   typedstruct do
     field(:left_side_images, filenames(), enforce: true)
     field(:right_side_images, filenames(), enforce: true)
-    field(:y_position, Parameters.pixel(), enforce: true)
+    field(:y_position, Parameters.rem(), enforce: true)
   end
 
   @spec new(map()) :: Background.t()
@@ -27,8 +27,8 @@ defmodule FormulaX.Race.Background do
     struct!(Background, attrs)
   end
 
-  @spec initialize(Parameters.pixel()) :: Background.t()
-  def initialize(race_distance) when is_integer(race_distance) do
+  @spec initialize(Parameters.rem()) :: Background.t()
+  def initialize(race_distance) when is_float(race_distance) do
     available_background_images = Utils.get_images("backgrounds")
     left_side_images = get_side_images(available_background_images, race_distance)
     right_side_images = get_side_images(available_background_images, race_distance)
@@ -54,12 +54,15 @@ defmodule FormulaX.Race.Background do
     %Background{background | y_position: updated_y_position}
   end
 
-  @spec get_side_images(filenames(), Parameters.pixel()) :: filenames()
+  @spec get_side_images(filenames(), Parameters.rem()) :: filenames()
   defp get_side_images(available_background_images, race_distance)
-       when is_integer(race_distance) and is_list(available_background_images) do
+       when is_float(race_distance) and is_list(available_background_images) do
     # 2 * @console_screen_height is added to race length here to have few more background images to be shown after the finish line as explained earlier
+
     number_of_images_required =
-      div(race_distance + 2 * @console_screen_height, @background_image_container_height)
+      ((race_distance + 2 * @console_screen_height) /
+         @background_image_container_height)
+      |> round()
 
     Enum.map(1..number_of_images_required, fn _grid_number ->
       Enum.random(available_background_images)

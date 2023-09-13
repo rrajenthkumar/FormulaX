@@ -24,7 +24,7 @@ defmodule FormulaX.Race do
     field(:obstacles, list(Obstacle.t()), enforce: true)
     field(:speed_boosts, list(SpeedBoost.t()), enforce: true)
     field(:start_time, Time.t(), default: nil)
-    field(:distance, Parameters.pixel(), enforce: true)
+    field(:distance, Parameters.rem(), enforce: true)
     field(:status, status(), default: :countdown)
   end
 
@@ -121,7 +121,7 @@ defmodule FormulaX.Race do
     %Car{distance_travelled: distance_travelled_by_player_car} = get_player_car(race)
 
     # To check if the player car has travelled a distance of half the console screen height beyond the finish line (for cosmetic purpose)
-    distance_travelled_by_player_car > race_distance + div(@console_screen_height, 2)
+    distance_travelled_by_player_car > race_distance + @console_screen_height / 2
   end
 
   @spec get_lanes_and_cars_map(Race.t()) :: map()

@@ -269,21 +269,20 @@ defmodule FormulaXWeb.RaceLive.Screen do
          x_position: x_position,
          y_position: y_position
        }) do
-    "left: #{x_position}px; bottom: #{y_position}px;"
+    "left: #{x_position}rem; bottom: #{y_position}rem;"
   end
 
-  @spec background_position_style(Parameters.pixel()) :: String.t()
-  defp background_position_style(y_position) when is_integer(y_position) do
-    "top: #{y_position}px"
+  @spec background_position_style(Parameters.rem()) :: String.t()
+  defp background_position_style(y_position) when is_float(y_position) do
+    "top: #{y_position}rem"
   end
 
   @spec crash_illustration_position_style(Car.t()) :: String.t()
   defp crash_illustration_position_style(%Car{
          x_position: player_car_x_position,
          y_position: player_car_y_position
-       })
-       when is_integer(player_car_x_position) and is_integer(player_car_y_position) do
-    "left: #{player_car_x_position - @car_width / 2}px; bottom: #{player_car_y_position}px;"
+       }) do
+    "left: #{player_car_x_position - @car_width / 2}rem; bottom: #{player_car_y_position}rem;"
   end
 
   @spec finish_line_position_style(Race.t()) :: String.t()
@@ -293,7 +292,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
          }
        ) do
     %Car{distance_travelled: distance_travelled_by_player_car} = Race.get_player_car(race)
-    "bottom: #{race_distance - distance_travelled_by_player_car}px;"
+    "bottom: #{race_distance - distance_travelled_by_player_car}rem;"
   end
 
   @spec stationary_item_position_style(Obstacle.t() | SpeedBoost.t(), Race.t()) :: String.t()
@@ -303,7 +302,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
        ) do
     %Car{distance_travelled: distance_travelled_by_player_car} = Race.get_player_car(race)
     stationary_item_y_position = stationary_item_distance - distance_travelled_by_player_car
-    "left: #{stationary_item_x_position}px; bottom: #{stationary_item_y_position}px;"
+    "left: #{stationary_item_x_position}rem; bottom: #{stationary_item_y_position}rem;"
   end
 
   @spec get_car_image(integer()) :: Car.filename()

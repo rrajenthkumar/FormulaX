@@ -15,17 +15,17 @@ defmodule FormulaX.Race.Car do
   @type filename :: String.t()
   @type controller :: :player | :autonomous
   @type speed :: :rest | :low | :moderate | :high | :speed_boost
-  @type coordinates :: {Parameters.pixel(), Parameters.pixel()}
+  @type coordinates :: {Parameters.rem(), Parameters.rem()}
 
   @typedoc "Car struct"
   typedstruct do
     field(:id, integer(), enforce: true)
     field(:image, filename(), enforce: true)
     field(:controller, controller(), enforce: true)
-    field(:x_position, Parameters.pixel(), enforce: true)
-    field(:y_position, Parameters.pixel(), enforce: true)
+    field(:x_position, Parameters.rem(), enforce: true)
+    field(:y_position, Parameters.rem(), enforce: true)
     field(:speed, speed(), enforce: true)
-    field(:distance_travelled, Parameters.pixel(), default: 0)
+    field(:distance_travelled, Parameters.rem(), default: 0)
     field(:completion_time, Time.t(), default: nil)
   end
 
@@ -172,7 +172,7 @@ defmodule FormulaX.Race.Car do
   def get_lane(%Car{x_position: car_x_position}) do
     Parameters.lanes()
     |> Enum.find(fn %{x_start: lane_x_start, x_end: lane_x_end} ->
-      car_x_position in lane_x_start..lane_x_end
+      car_x_position >= lane_x_start and car_x_position <= lane_x_end
     end)
     |> case do
       nil -> :out_of_tracks

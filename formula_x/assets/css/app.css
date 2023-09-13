@@ -17,17 +17,17 @@
 
 .race_live .console {
   @apply w-[100rem] h-[45rem] bg-gray-600 rounded-full flex items-center justify-evenly;
-  box-shadow: 5px 5px 5px 5px rgb(65, 65, 65);
+  box-shadow: 0.35rem 0.35rem 0.35rem 0.35rem rgb(65, 65, 65);
 }
 
 .race_live .console .screen {
   @apply w-[35rem] h-[35rem] bg-white rounded-md overflow-hidden font-Orbitron;
-  box-shadow: 0 0 30px rgb(197, 197, 197);
+  box-shadow: 0 0 2rem rgb(197, 197, 197);
 }
 
 .race_live .console .switched_off_screen {
   background-color: #353839;
-  box-shadow: 0 0 30px #353839;
+  box-shadow: 0 0 2rem #353839;
 }
 
 .race_live .console .startup_screen {
@@ -43,8 +43,8 @@
 
 .race_live .console .startup_screen .body .content {
   @apply bg-white bg-opacity-80 w-full h-48 flex justify-center items-center tracking-wide;
-  box-shadow: 0 -30px 30px 10px rgba(255, 255, 255, 0.8),
-    0 30px 30px 10px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 -2rem 2rem 0.65rem rgba(255, 255, 255, 0.8),
+    0 2rem 2rem 0.65rem rgba(255, 255, 255, 0.8);
   color: #100c08;
 }
 
@@ -160,7 +160,7 @@
 .race_live .console .crash_screen,
 .race_live .console .result_screen {
   @apply grid;
-  /* 18rem width along X axis in total for 3 lanes, 6rem(96px) width per lane */
+  /* 18rem width along X axis in total for 3 lanes, 6rem width per lane */
   grid-template-columns: 1fr 18rem 1fr;
 }
 
@@ -179,7 +179,7 @@
 .race_live .console .race_screen .background .image_container,
 .race_live .console .crash_screen .background .image_container,
 .race_live .console .result_screen .background .image_container {
-  /* Every image container is 12.5rem(200px) long along Y axis */
+  /* Every image container is 12.5rem long along Y axis */
   @apply w-full h-[12.5rem] flex items-center justify-center;
 }
 
@@ -211,7 +211,7 @@
 .race_live .console .race_screen .race .cars .car,
 .race_live .console .crash_screen .race .cars .car,
 .race_live .console .result_screen .race .cars .car {
-  @apply w-[55px] absolute z-10;
+  @apply w-14 absolute z-10;
   aspect-ratio: 0.5;
   transition: left 1s ease-out, bottom 1s ease-out;
 }
@@ -234,7 +234,7 @@
 .race_live .console .race_screen .race .speed_boosts .speed_boost,
 .race_live .console .crash_screen .race .speed_boosts .speed_boost,
 .race_live .console .result_screen .race .speed_boosts .speed_boost {
-  @apply absolute w-24 h-12 flex justify-center;
+  @apply absolute w-24 h-16 flex justify-center;
   transition: left 1s ease-out, bottom 1s ease-out;
 }
 
@@ -508,23 +508,23 @@
 
 @keyframes game_over_animation {
   0% {
-    transform: translateX(50px);
+    transform: translateX(4rem);
   }
 
   25% {
-    transform: translateY(-225px);
+    transform: translateY(-14.75rem);
   }
 
   50% {
-    transform: translateX(-50px);
+    transform: translateX(-4rem);
   }
 
   75% {
-    transform: translateY(225px);
+    transform: translateY(14.75rem);
   }
 
   100% {
-    transform: translateX(50px);
+    transform: translateX(4rem);
   }
 }
 

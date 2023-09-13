@@ -12,7 +12,7 @@ defmodule FormulaX.CarControl do
   alias FormulaX.RaceEngine
 
   @car_length Parameters.car_dimensions().length
-  @speed_boost_length Parameters.speed_boost_dimensions().length()
+  @speed_boost_length Parameters.stationary_items_dimensions().length()
 
   @doc """
   When the player car is driven, the car remains at same position
@@ -203,16 +203,17 @@ defmodule FormulaX.CarControl do
          _querying_car = %Car{y_position: querying_car_y_position}
        ) do
     # We search for cars in the adjacent lane whose Y direction midpoint lies between half the car length behind the querying car to half the car length in front of the querying car.
-    y_position_lower_limit_for_vicinity_check = querying_car_y_position - div(@car_length, 2)
+
+    y_position_lower_limit_for_vicinity_check = querying_car_y_position - @car_length / 2
 
     y_position_upper_limit_for_vicinity_check =
       querying_car_y_position + @car_length +
-        div(@car_length, 2)
+        @car_length / 2
 
     Enum.filter(adjacent_lane_cars, fn %Car{y_position: adjacent_lane_car_y_position} ->
       adjacent_lane_car_midpoint_y_cordinate =
         adjacent_lane_car_y_position +
-          div(@car_length, 2)
+          @car_length / 2
 
       adjacent_lane_car_midpoint_y_cordinate >= y_position_lower_limit_for_vicinity_check and
         adjacent_lane_car_midpoint_y_cordinate <= y_position_upper_limit_for_vicinity_check
