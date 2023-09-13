@@ -65,7 +65,7 @@ defmodule FormulaX.Race.SpeedBoost do
   def get_lane(%SpeedBoost{x_position: speed_boost_x_position}) do
     Parameters.lanes()
     |> Enum.find(fn %{x_start: lane_x_start, x_end: lane_x_end} ->
-      speed_boost_x_position >= lane_x_start and speed_boost_x_position <= lane_x_end
+      speed_boost_x_position >= lane_x_start and speed_boost_x_position < lane_x_end
     end)
     |> Map.fetch!(:lane_number)
   end

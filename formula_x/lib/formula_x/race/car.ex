@@ -172,7 +172,7 @@ defmodule FormulaX.Race.Car do
   def get_lane(%Car{x_position: car_x_position}) do
     Parameters.lanes()
     |> Enum.find(fn %{x_start: lane_x_start, x_end: lane_x_end} ->
-      car_x_position >= lane_x_start and car_x_position <= lane_x_end
+      car_x_position >= lane_x_start and car_x_position < lane_x_end
     end)
     |> case do
       nil -> :out_of_tracks

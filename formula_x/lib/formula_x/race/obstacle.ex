@@ -74,7 +74,7 @@ defmodule FormulaX.Race.Obstacle do
   def get_lane(%Obstacle{x_position: obstacle_x_position}) do
     Parameters.lanes()
     |> Enum.find(fn %{x_start: lane_x_start, x_end: lane_x_end} ->
-      obstacle_x_position >= lane_x_start and obstacle_x_position <= lane_x_end
+      obstacle_x_position >= lane_x_start and obstacle_x_position < lane_x_end
     end)
     |> Map.fetch!(:lane_number)
   end
