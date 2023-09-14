@@ -259,7 +259,7 @@
 
 .race_live .console .crash_screen .crash_info .body p {
   @apply tracking-wide text-7xl font-black;
-  animation: game_over_animation 5s linear 0s infinite forwards;
+  animation: game_over_animation 10s linear 0s infinite forwards;
 }
 
 .race_live .console .crash_screen .crash_info .footer {
