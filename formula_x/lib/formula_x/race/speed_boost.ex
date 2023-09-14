@@ -93,7 +93,6 @@ defmodule FormulaX.Race.SpeedBoost do
     case speed_boost_fetched?(race) do
       true ->
         updated_player_car = Car.enable_speed_boost(player_car)
-
         Race.update_player_car(race, updated_player_car)
 
       false ->

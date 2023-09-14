@@ -112,13 +112,18 @@ defmodule FormulaX.Race do
   @spec end_if_completed(Race.t()) :: Race.t()
   def end_if_completed(
         race = %Race{
-          player_car: %Car{completion_time: player_car_completion_time, controller: :player}
+          player_car: %Car{completion_time: nil, controller: :player}
         }
       ) do
-    cond do
-      is_nil(player_car_completion_time) -> race
-      true -> %Race{race | status: :completed}
-    end
+    race
+  end
+
+  def end_if_completed(
+        race = %Race{
+          player_car: %Car{controller: :player}
+        }
+      ) do
+    %Race{race | status: :completed}
   end
 
   @spec get_autonomous_car_by_id(Race.t(), integer()) :: Car.t()
