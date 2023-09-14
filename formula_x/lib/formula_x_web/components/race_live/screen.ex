@@ -21,7 +21,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
   def render(assigns = %{screen_state: :startup}) do
     ~H"""
     <div class="screen startup_screen">
-      <audio src="sounds/Carmack_FadeEndm.mp3" autoplay="true"></audio>
+      <audio src="sounds/Carmack_FadeEndm.mp3" type="audio/mp3" autoplay="true" loop="true" preload="auto"></audio>
       <div class="body">
         <div class="content">
           <div class="text_container">
@@ -98,9 +98,12 @@ defmodule FormulaXWeb.RaceLive.Screen do
     <div class="screen race_screen">
       <.race_setup race={@race}/>
       <%= if @countdown_count do %>
+        <audio src="sounds/mixkit-simple-game-countdown-921.wav" type="audio/wav" autoplay="true" preload="auto"></audio>
         <div class="countdown">
           <%= @countdown_count %>
         </div>
+      <% else %>
+        <audio src="sounds/rally-car-idle-loop-14-32339.mp3" type="audio/mp3" autoplay="true" loop="true" preload="auto"></audio>
       <% end %>
     </div>
     """
@@ -109,6 +112,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
   def render(assigns = %{screen_state: :crash}) do
     ~H"""
     <div class="screen crash_screen">
+      <audio src="sounds/mixkit-arcade-fast-game-over-233.wav" type="audio/wav" autoplay="true" preload="auto"></audio>
       <.race_setup race={@race}/>
       <div class="crash_info">
         <div class="body">
