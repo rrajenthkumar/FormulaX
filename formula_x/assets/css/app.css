@@ -70,12 +70,15 @@
 }
 
 .race_live .console .startup_screen .footer {
-  flex-basis: 5%;
-  @apply text-center text-xs tracking-widest;
+  @apply text-center text-xs tracking-widest pb-3;
 }
 
 .race_live .console .startup_screen .footer .green {
   @apply text-green-700 font-semibold;
+}
+
+.race_live .console .startup_screen .footer .red {
+  @apply text-red-700 font-semibold;
 }
 
 .race_live .console .startup_screen .footer .arrow {
@@ -101,6 +104,10 @@
 
 .race_live .console .car_selection_screen .footer .green {
   @apply text-green-700 font-semibold;
+}
+
+.race_live .console .car_selection_screen .footer .red {
+  @apply text-red-700 font-semibold;
 }
 
 .race_live .console .car_selection_screen .footer .yellow {
@@ -133,7 +140,7 @@
 }
 
 .race_live .console .race_info_screen .footer {
-  @apply text-center text-xs tracking-widest;
+  @apply text-center text-xs tracking-widest pb-3;
 }
 
 .race_live .console .race_info_screen .footer .green {

@@ -21,6 +21,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
   def render(assigns = %{screen_state: :startup}) do
     ~H"""
     <div class="screen startup_screen">
+      <audio src="sounds/Carmack_FadeEndm.mp3" autoplay="true"></audio>
       <div class="body">
         <div class="content">
           <div class="text_container">
@@ -32,6 +33,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
       </div>
       <div class="footer">
         <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to proceed</p>
+        <p>Press <span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch the console off</p>
       </div>
     </div>
     """
@@ -48,6 +50,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
       <div class="footer">
         <p>Browse cars using <span class="yellow">Yellow</span> and <span class="blue">Blue</span> buttons or using <span class="arrow">&#8678</span> and <span class="arrow">&#8680</span> keys</p>
         <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to select your car and proceed</p>
+        <p>Press <span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch the console off</p>
       </div>
     </div>
     """
@@ -84,6 +87,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
       </div>
       <div class="footer">
         <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to proceed</p>
+        <p>Press <span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch the console off</p>
       </div>
     </div>
     """

@@ -97,6 +97,37 @@ defmodule FormulaXWeb.RaceLive do
   end
 
   def handle_event(
+        "red_button_clicked",
+        _params,
+        socket = %Socket{
+          assigns: %{screen_state: :startup}
+        }
+      ) do
+    updated_socket = initialize_switched_off_screen(socket)
+
+    {:noreply, updated_socket}
+  end
+
+  def handle_event(
+        "keydown",
+        %{"key" => "ArrowDown"},
+        socket = %Socket{
+          assigns: %{
+            screen_state: :startup
+          }
+        }
+      ) do
+    updated_socket =
+      socket
+      |> initialize_switched_off_screen()
+      |> assign(:clicked_button, :red)
+
+    Process.send_after(self(), :reset_clicked_button_assign, 250)
+
+    {:noreply, updated_socket}
+  end
+
+  def handle_event(
         "green_button_clicked",
         _params,
         socket = %Socket{
@@ -123,6 +154,37 @@ defmodule FormulaXWeb.RaceLive do
       socket
       |> initialize_race_info_screen()
       |> assign(:clicked_button, :green)
+
+    Process.send_after(self(), :reset_clicked_button_assign, 250)
+
+    {:noreply, updated_socket}
+  end
+
+  def handle_event(
+        "red_button_clicked",
+        _params,
+        socket = %Socket{
+          assigns: %{screen_state: :car_selection}
+        }
+      ) do
+    updated_socket = initialize_switched_off_screen(socket)
+
+    {:noreply, updated_socket}
+  end
+
+  def handle_event(
+        "keydown",
+        %{"key" => "ArrowDown"},
+        socket = %Socket{
+          assigns: %{
+            screen_state: :car_selection
+          }
+        }
+      ) do
+    updated_socket =
+      socket
+      |> initialize_switched_off_screen()
+      |> assign(:clicked_button, :red)
 
     Process.send_after(self(), :reset_clicked_button_assign, 250)
 
@@ -222,6 +284,37 @@ defmodule FormulaXWeb.RaceLive do
       socket
       |> initialize_race_count_down_screen()
       |> assign(:clicked_button, :green)
+
+    Process.send_after(self(), :reset_clicked_button_assign, 250)
+
+    {:noreply, updated_socket}
+  end
+
+  def handle_event(
+        "red_button_clicked",
+        _params,
+        socket = %Socket{
+          assigns: %{screen_state: :race_info}
+        }
+      ) do
+    updated_socket = initialize_switched_off_screen(socket)
+
+    {:noreply, updated_socket}
+  end
+
+  def handle_event(
+        "keydown",
+        %{"key" => "ArrowDown"},
+        socket = %Socket{
+          assigns: %{
+            screen_state: :race_info
+          }
+        }
+      ) do
+    updated_socket =
+      socket
+      |> initialize_switched_off_screen()
+      |> assign(:clicked_button, :red)
 
     Process.send_after(self(), :reset_clicked_button_assign, 250)
 
