@@ -223,9 +223,7 @@
   transition: left 1s ease-out, bottom 1s ease-out;
 }
 
-.race_live .console .race_screen .race .cars .player_car,
-.race_live .console .crash_screen .race .cars .player_car,
-.race_live .console .result_screen .race .cars .player_car {
+.race_live .console .race_screen .race .cars .player_car {
   animation: player_car_animation 1.5s ease-in-out 0s infinite forwards;
 }
 
