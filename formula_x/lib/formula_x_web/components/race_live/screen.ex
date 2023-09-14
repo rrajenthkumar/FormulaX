@@ -130,6 +130,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
   def render(assigns = %{screen_state: :result}) do
     ~H"""
     <div class="screen result_screen">
+      <audio src="sounds/mixkit-cheering-crowd-loud-whistle-610.wav" type="audio/wav" autoplay="true" preload="auto"></audio>
       <.race_setup race={@race}/>
       <div class="result">
         <div class="body">
