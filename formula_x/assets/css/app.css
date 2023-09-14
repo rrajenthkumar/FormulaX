@@ -223,6 +223,12 @@
   transition: left 1s ease-out, bottom 1s ease-out;
 }
 
+.race_live .console .race_screen .race .cars .player_car,
+.race_live .console .crash_screen .race .cars .player_car,
+.race_live .console .result_screen .race .cars .player_car {
+  animation: player_car_animation 1.5s ease-in-out 0s infinite forwards;
+}
+
 .race_live .console .race_screen .race .obstacles .obstacle,
 .race_live .console .crash_screen .race .obstacles .obstacle,
 .race_live .console .result_screen .race .obstacles .obstacle {
@@ -509,6 +515,21 @@
   to {
     transform: translateY(0px);
     background-color: rgba(95, 160, 140, 0.761);
+  }
+}
+
+@keyframes player_car_animation {
+  0% {
+    box-shadow: none;
+  }
+
+  50% {
+    @apply rounded-lg;
+    box-shadow: 0px 0px 0px 4px rgb(0, 255, 149);
+  }
+
+  100% {
+    box-shadow: none;
   }
 }
 

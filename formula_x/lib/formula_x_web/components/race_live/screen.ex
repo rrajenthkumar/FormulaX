@@ -201,7 +201,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
   defp cars(assigns) do
     ~H"""
     <div class="cars">
-      <img class="car" src={"/images/cars/#{@player_car.image}"} style={car_position_style(@player_car)}/>
+      <img class="car player_car" src={"/images/cars/#{@player_car.image}"} style={car_position_style(@player_car)}/>
       <%=if @status == :crash do %>
         <img class="bang" src={"/images/misc/bang.png"} style={crash_illustration_position_style(@player_car)}>
       <% end %>
