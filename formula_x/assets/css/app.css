@@ -172,7 +172,7 @@
 }
 
 .race_live .console .race_screen .countdown {
-  @apply absolute z-20 flex items-center justify-center w-[35rem] h-[35rem] text-black bg-white opacity-70;
+  @apply absolute z-30 flex items-center justify-center w-[35rem] h-[35rem] text-black bg-white opacity-70;
   font-size: 16rem;
 }
 
@@ -226,7 +226,7 @@
 .race_live .console .race_screen .race .obstacles .obstacle,
 .race_live .console .crash_screen .race .obstacles .obstacle,
 .race_live .console .result_screen .race .obstacles .obstacle {
-  @apply absolute w-24 h-16 grid justify-items-center items-center;
+  @apply absolute w-24 h-16 grid justify-items-center items-center z-20;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   transition: left 1s ease-out, bottom 1s ease-out;
@@ -303,7 +303,7 @@
 }
 
 .race_live .console .result_screen .result {
-  @apply absolute z-20 flex flex-col justify-center w-[35rem] h-[35rem] text-black bg-white opacity-80 text-sm;
+  @apply absolute z-30 flex flex-col justify-center w-[35rem] h-[35rem] text-black bg-white opacity-80 text-sm;
 }
 
 .race_live .console .result_screen .result .body {
