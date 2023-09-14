@@ -21,7 +21,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
   def render(assigns = %{screen_state: :startup}) do
     ~H"""
     <div class="screen startup_screen">
-      <audio src="sounds/Carmack_FadeEndm.mp3" type="audio/mp3" autoplay="true" loop="true" preload="auto"></audio>
+      <audio src="sounds/8-bit-powerup-6768.mp3" type="audio/mp3" autoplay="true" preload="auto"></audio>
       <div class="body">
         <div class="content">
           <div class="text_container">
