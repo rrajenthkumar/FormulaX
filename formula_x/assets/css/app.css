@@ -249,7 +249,7 @@
 }
 
 .race_live .console .crash_screen .crash_info {
-  @apply flex flex-col absolute z-30 w-[35rem] h-[35rem] text-black bg-white opacity-70;
+  @apply flex flex-col absolute z-30 w-[35rem] h-[35rem] text-black bg-white opacity-70 overflow-hidden;
 }
 
 .race_live .console .crash_screen .crash_info .body {
@@ -258,8 +258,8 @@
 }
 
 .race_live .console .crash_screen .crash_info .body p {
-  @apply tracking-wide text-6xl font-black;
-  animation: game_over_animation 10s linear 0s infinite forwards;
+  @apply tracking-wide text-7xl font-black;
+  animation: game_over_animation 5s linear 0s infinite forwards;
 }
 
 .race_live .console .crash_screen .crash_info .footer {
@@ -506,24 +506,12 @@
 }
 
 @keyframes game_over_animation {
-  0% {
-    transform: translateX(4rem);
+  from {
+    transform: translateX(-35rem);
   }
 
-  25% {
-    transform: translateY(-14.75rem);
-  }
-
-  50% {
-    transform: translateX(-4rem);
-  }
-
-  75% {
-    transform: translateY(14.75rem);
-  }
-
-  100% {
-    transform: translateX(4rem);
+  to {
+    transform: translateX(35rem);
   }
 }
 
