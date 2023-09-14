@@ -224,7 +224,7 @@
 }
 
 .race_live .console .race_screen .race .cars .player_car {
-  animation: player_car_animation 1.5s ease-in-out 0s infinite forwards;
+  animation: player_car_animation 1s ease-in-out 0s infinite forwards;
 }
 
 .race_live .console .race_screen .race .obstacles .obstacle,
