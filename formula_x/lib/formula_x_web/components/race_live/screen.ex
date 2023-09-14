@@ -88,28 +88,47 @@ defmodule FormulaXWeb.RaceLive.Screen do
       <div class="footer">
         <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to proceed</p>
         <p>Press <span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch the console off</p>
+        <p>Click on screen or press Spacebar to pause or unpause an ongoing or a paused race respectively</p>
       </div>
     </div>
     """
   end
 
-  def render(assigns = %{screen_state: :race}) do
+  def render(assigns = %{screen_state: :race, race: %Race{status: :countdown}}) do
     ~H"""
-    <div class="screen race_screen" phx-click="race_screen_clicked">
+    <div class="screen race_screen">
+      <audio src="sounds/mixkit-simple-game-countdown-921.wav" type="audio/wav" autoplay="true" preload="auto"></audio>
       <.race_setup race={@race}/>
-      <%= if @countdown_count do %>
-        <audio src="sounds/mixkit-simple-game-countdown-921.wav" type="audio/wav" autoplay="true" preload="auto"></audio>
-        <div class="countdown">
+      <div class="info">
+        <span class="countdown">
           <%= @countdown_count %>
-        </div>
-      <% else %>
-        <audio src="sounds/rally-car-idle-loop-14-32339.mp3" type="audio/mp3" autoplay="true" loop="true" preload="auto"></audio>
-      <% end %>
+        </span>
+      </div>
     </div>
     """
   end
 
-  def render(assigns = %{screen_state: :crash}) do
+  def render(assigns = %{screen_state: :race, race: %Race{status: :ongoing}}) do
+    ~H"""
+    <div class="screen race_screen race_screen_pause_feature" phx-click="race_screen_clicked">
+      <audio src="sounds/rally-car-idle-loop-14-32339.mp3" type="audio/mp3" autoplay="true" loop="true" preload="auto"></audio>
+      <.race_setup race={@race}/>
+    </div>
+    """
+  end
+
+  def render(assigns = %{screen_state: :race, race: %Race{status: :paused}}) do
+    ~H"""
+    <div class="screen race_screen race_screen_pause_feature" phx-click="race_screen_clicked">
+      <.race_setup race={@race}/>
+      <div class="info">
+        <span class="pause_info">PAUSED</span>
+      </div>
+    </div>
+    """
+  end
+
+  def render(assigns = %{screen_state: :race, race: %Race{status: :crash}}) do
     ~H"""
     <div class="screen crash_screen">
       <audio src="sounds/mixkit-arcade-fast-game-over-233.wav" type="audio/wav" autoplay="true" preload="auto"></audio>
@@ -127,7 +146,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
     """
   end
 
-  def render(assigns = %{screen_state: :result}) do
+  def render(assigns = %{screen_state: :race, race: %Race{status: :completed}}) do
     ~H"""
     <div class="screen result_screen">
       <audio src="sounds/mixkit-cheering-crowd-loud-whistle-610.wav" type="audio/wav" autoplay="true" preload="auto"></audio>

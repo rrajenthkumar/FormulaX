@@ -163,10 +163,6 @@
   @apply font-black;
 }
 
-.race_live .console .race_screen:hover {
-  @apply cursor-pointer;
-}
-
 .race_live .console .race_screen,
 .race_live .console .crash_screen,
 .race_live .console .result_screen {
@@ -175,9 +171,16 @@
   grid-template-columns: 1fr 18rem 1fr;
 }
 
-.race_live .console .race_screen .countdown {
+.race_live .console .race_screen .info {
   @apply absolute z-30 flex items-center justify-center w-[35rem] h-[35rem] text-black bg-white opacity-70;
+}
+
+.race_live .console .race_screen .info .countdown {
   font-size: 16rem;
+}
+
+.race_live .console .race_screen .info .pause_info {
+  @apply text-7xl font-black;
 }
 
 .race_live .console .race_screen .background,
@@ -308,6 +311,10 @@
 .race_live .console .crash_screen .race .finish_line .black,
 .race_live .console .result_screen .race .finish_line .black {
   background-color: black;
+}
+
+.race_live .console .race_screen_pause_feature:hover {
+  @apply cursor-pointer;
 }
 
 .race_live .console .result_screen .result {

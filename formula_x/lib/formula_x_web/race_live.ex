@@ -326,7 +326,7 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket = %Socket{
           assigns: %{
-            screen_state: :crash,
+            screen_state: :race,
             race: %Race{status: :crash}
           }
         }
@@ -341,7 +341,7 @@ defmodule FormulaXWeb.RaceLive do
         %{"key" => "ArrowUp"},
         socket = %Socket{
           assigns: %{
-            screen_state: :crash,
+            screen_state: :race,
             race: %Race{status: :crash}
           }
         }
@@ -361,7 +361,7 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket = %Socket{
           assigns: %{
-            screen_state: :result,
+            screen_state: :race,
             race: %Race{status: :completed}
           }
         }
@@ -376,7 +376,7 @@ defmodule FormulaXWeb.RaceLive do
         %{"key" => "ArrowUp"},
         socket = %Socket{
           assigns: %{
-            screen_state: :result,
+            screen_state: :race,
             race: %Race{status: :completed}
           }
         }
@@ -396,7 +396,7 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket = %Socket{
           assigns: %{
-            screen_state: :crash,
+            screen_state: :race,
             race: %Race{status: :crash}
           }
         }
@@ -411,7 +411,7 @@ defmodule FormulaXWeb.RaceLive do
         %{"key" => "ArrowDown"},
         socket = %Socket{
           assigns: %{
-            screen_state: :crash,
+            screen_state: :race,
             race: %Race{status: :crash}
           }
         }
@@ -431,7 +431,7 @@ defmodule FormulaXWeb.RaceLive do
         _params,
         socket = %Socket{
           assigns: %{
-            screen_state: :result,
+            screen_state: :race,
             race: %Race{status: :completed}
           }
         }
@@ -446,7 +446,7 @@ defmodule FormulaXWeb.RaceLive do
         %{"key" => "ArrowDown"},
         socket = %Socket{
           assigns: %{
-            screen_state: :result,
+            screen_state: :race,
             race: %Race{status: :completed}
           }
         }
@@ -907,52 +907,18 @@ defmodule FormulaXWeb.RaceLive do
         socket = %Socket{}
       )
       when is_atom(status) do
-    cond do
-      status == :crash ->
-        RaceEngine.stop()
-        Process.send_after(self(), :crash, 1500)
-
-      Race.player_car_past_finish?(race) ->
-        RaceEngine.stop()
-        Process.send_after(self(), :result, 1500)
-
-      true ->
-        nil
-    end
-
-    updated_socket = assign(socket, :race, race)
-
-    {:noreply, updated_socket}
-  end
-
-  def handle_info(
-        :crash,
-        socket = %Socket{
-          assigns: %{
-            screen_state: :race
-          }
-        }
-      ) do
     updated_socket =
-      socket
-      |> update_results()
-      |> assign(:screen_state, :crash)
+      cond do
+        status == :crash or Race.player_car_past_finish?(race) ->
+          RaceEngine.stop()
 
-    {:noreply, updated_socket}
-  end
+          socket
+          |> assign(:race, race)
+          |> update_results()
 
-  def handle_info(
-        :result,
-        socket = %Socket{
-          assigns: %{
-            screen_state: :race
-          }
-        }
-      ) do
-    updated_socket =
-      socket
-      |> update_results()
-      |> assign(:screen_state, :result)
+        true ->
+          assign(socket, :race, race)
+      end
 
     {:noreply, updated_socket}
   end
