@@ -192,18 +192,12 @@ defmodule FormulaXWeb.RaceLive.Screen do
   defp cars(assigns) do
     ~H"""
     <div class="cars">
-      <%= with all_cars <- [@player_car] ++ @autonomous_cars  do %>
-        <%= for car = %Car{image: image, controller: controller} <- all_cars do %>
-        <%= case controller do%>
-          <% :autonomous -> %>
-            <img class="car" src={"/images/cars/#{image}"} style={car_position_style(car)}/>
-          <% :player -> %>
-            <img class="car" src={"/images/cars/#{image}"} style={car_position_style(car)}/>
-            <%=if @status == :crash do %>
-              <img class="bang" src={"/images/misc/bang.png"} style={crash_illustration_position_style(car)}>
-            <% end %>
-          <% end %>
-        <% end %>
+      <img class="car" src={"/images/cars/#{@player_car.image}"} style={car_position_style(@player_car)}/>
+      <%=if @status == :crash do %>
+        <img class="bang" src={"/images/misc/bang.png"} style={crash_illustration_position_style(@player_car)}>
+      <% end %>
+      <%= for autonomous_car = %Car{image: autonomous_car_image} <- @autonomous_cars do %>
+        <img class="car" src={"/images/cars/#{autonomous_car_image}"} style={car_position_style(autonomous_car)}/>
       <% end %>
     </div>
     """
