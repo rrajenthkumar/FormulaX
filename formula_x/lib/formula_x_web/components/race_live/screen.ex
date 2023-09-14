@@ -95,7 +95,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
 
   def render(assigns = %{screen_state: :race}) do
     ~H"""
-    <div class="screen race_screen">
+    <div class="screen race_screen" phx-click="race_screen_clicked">
       <.race_setup race={@race}/>
       <%= if @countdown_count do %>
         <audio src="sounds/mixkit-simple-game-countdown-921.wav" type="audio/wav" autoplay="true" preload="auto"></audio>

@@ -15,7 +15,7 @@ defmodule FormulaX.Race do
   @console_screen_height Parameters.console_screen_height()
 
   @type cars :: list(Car.t())
-  @type status :: :countdown | :ongoing | :crash | :completed
+  @type status :: :countdown | :ongoing | :paused | :crash | :completed
 
   @typedoc "Race struct"
   typedstruct do
@@ -107,6 +107,32 @@ defmodule FormulaX.Race do
       }) do
     # To check if the player car has travelled a distance of half the console screen height beyond the finish line (for cosmetic purpose)
     distance_travelled_by_player_car > race_distance + @console_screen_height / 2
+  end
+
+  @spec pause(Race.t()) :: Race.t()
+  def pause(
+        race = %Race{
+          status: :ongoing
+        }
+      ) do
+    %Race{race | status: :paused}
+  end
+
+  def pause(race = %Race{}) do
+    race
+  end
+
+  @spec unpause(Race.t()) :: Race.t()
+  def unpause(
+        race = %Race{
+          status: :paused
+        }
+      ) do
+    %Race{race | status: :ongoing}
+  end
+
+  def unpause(race = %Race{}) do
+    race
   end
 
   @spec end_if_completed(Race.t()) :: Race.t()

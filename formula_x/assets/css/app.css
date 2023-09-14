@@ -163,6 +163,10 @@
   @apply font-black;
 }
 
+.race_live .console .race_screen:hover {
+  @apply cursor-pointer;
+}
+
 .race_live .console .race_screen,
 .race_live .console .crash_screen,
 .race_live .console .result_screen {

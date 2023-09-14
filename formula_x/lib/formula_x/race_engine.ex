@@ -23,7 +23,7 @@ defmodule FormulaX.RaceEngine do
     GenServer.cast(__MODULE__, {:update, updated_race})
   end
 
-  @spec update(Race.t()) :: :ok
+  @spec stop() :: :ok
   def stop() do
     GenServer.cast(__MODULE__, :stop)
   end

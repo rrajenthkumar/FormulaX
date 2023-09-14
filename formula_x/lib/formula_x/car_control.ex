@@ -21,6 +21,14 @@ defmodule FormulaX.CarControl do
   @spec drive_player_car(Race.t()) :: Race.t()
   def drive_player_car(
         race = %Race{
+          status: :paused
+        }
+      ) do
+    race
+  end
+
+  def drive_player_car(
+        race = %Race{
           background: background = %Background{},
           player_car: player_car = %Car{controller: :player}
         }
@@ -43,6 +51,10 @@ defmodule FormulaX.CarControl do
   end
 
   @spec drive_autonomous_cars(Race.t()) :: Race.t()
+  def drive_autonomous_cars(race = %Race{status: :paused}) do
+    race
+  end
+
   def drive_autonomous_cars(race = %Race{autonomous_cars: autonomous_cars}) do
     drive_autonomous_cars(autonomous_cars, race)
   end
