@@ -236,8 +236,12 @@
   aspect-ratio: 0.5;
 }
 
-.race_live .console .race_screen .race .cars .moving_car {
-  transition: left 1s ease-out, bottom 1s ease-out;
+.race_live .console .race_screen .race .cars .player_car {
+  transition: left 500ms linear;
+}
+
+.race_live .console .race_screen .race .cars .autonomous_car {
+  transition: left 500ms linear, bottom 500ms linear;
 }
 
 .race_live .console .race_screen .race .cars .car_highlight {

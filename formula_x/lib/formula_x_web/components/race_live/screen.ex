@@ -222,13 +222,11 @@ defmodule FormulaXWeb.RaceLive.Screen do
     ~H"""
     <div class="cars">
       <%=if @status == :crash do %>
-        <img class="bang" src={"/images/misc/bang.png"} style={crash_illustration_position_style(@player_car)}>
-        <img class="car" src={"/images/cars/#{@player_car.image}"} style={car_position_style(@player_car)}/>
-      <% else %>
-        <img class="car moving_car car_highlight" src={"/images/cars/#{@player_car.image}"} style={car_position_style(@player_car)}/>
+        <%=#<img class="bang" src={"/images/misc/bang.png"} style={crash_illustration_position_style(@player_car)}>%>
       <% end %>
+      <img class="car player_car car_highlight" src={"/images/cars/#{@player_car.image}"} style={car_position_style(@player_car)}/>
       <%= for autonomous_car = %Car{image: autonomous_car_image} <- @autonomous_cars do %>
-        <img class="car moving_car" src={"/images/cars/#{autonomous_car_image}"} style={car_position_style(autonomous_car)}/>
+        <img class="car autonomous_car" src={"/images/cars/#{autonomous_car_image}"} style={car_position_style(autonomous_car)}/>
       <% end %>
     </div>
     """
