@@ -111,8 +111,8 @@ defmodule FormulaX.Race.SpeedBoost do
     |> Enum.any?(fn speed_boost ->
       speed_boost_y_position = get_y_position(speed_boost, race)
 
-      # Car front wheels beyond speed boost starting y position and rear wheels behind speed boost starting y position or
-      # Car rear wheels between speed boost starting and ending y positions
+      # Player car front wheels between speed boost starting and ending y positions or
+      # Player car rear wheels between speed boost starting and ending y positions
       (player_car_y_position + @car_length >= speed_boost_y_position and
          player_car_y_position <= speed_boost_y_position) or
         (player_car_y_position >= speed_boost_y_position and
