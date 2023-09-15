@@ -569,19 +569,19 @@
 
 @keyframes text_part_1_transformation {
   from {
-    transform: translateY(-300px);
+    transform: translateY(-20rem);
   }
   to {
-    transform: translateY(0px);
+    transform: translateY(0rem);
   }
 }
 
 @keyframes text_part_2_transformation {
   from {
-    transform: translateY(300px);
+    transform: translateY(20rem);
   }
   to {
-    transform: translateY(0px);
+    transform: translateY(0rem);
   }
 }
 
