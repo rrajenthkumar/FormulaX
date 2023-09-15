@@ -106,7 +106,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
 
   def render(assigns = %{screen_state: :race, race: %Race{status: :ongoing}}) do
     ~H"""
-    <div class="screen race_screen race_screen_pause_feature" phx-click="race_screen_clicked">
+    <div class="screen race_screen race_pause_feature" phx-click="race_screen_clicked">
       <audio src="sounds/rally-car-idle-loop-14-32339.mp3" type="audio/mp3" autoplay="true" loop="true" preload="auto"></audio>
       <.race_setup race={@race}/>
     </div>
@@ -115,7 +115,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
 
   def render(assigns = %{screen_state: :race, race: %Race{status: :paused}}) do
     ~H"""
-    <div class="screen race_screen race_screen_pause_feature" phx-click="race_screen_clicked">
+    <div class="screen race_screen race_pause_feature" phx-click="race_screen_clicked">
       <.race_setup race={@race}/>
       <div class="pause_info">
         <div class="body">
@@ -131,7 +131,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
 
   def render(assigns = %{screen_state: :race, race: %Race{status: :crash}}) do
     ~H"""
-    <div class="screen crash_screen">
+    <div class="screen race_screen">
       <audio src="sounds/mixkit-arcade-fast-game-over-233.wav" type="audio/wav" autoplay="true" preload="auto"></audio>
       <.race_setup race={@race}/>
       <div class="crash_info">
@@ -149,7 +149,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
 
   def render(assigns = %{screen_state: :race, race: %Race{status: :completed}}) do
     ~H"""
-    <div class="screen result_screen">
+    <div class="screen race_screen">
       <audio src="sounds/mixkit-cheering-crowd-loud-whistle-610.wav" type="audio/wav" autoplay="true" preload="auto"></audio>
       <.race_setup race={@race}/>
       <div class="result">
@@ -221,12 +221,14 @@ defmodule FormulaXWeb.RaceLive.Screen do
   defp cars(assigns) do
     ~H"""
     <div class="cars">
-      <img class="car player_car" src={"/images/cars/#{@player_car.image}"} style={car_position_style(@player_car)}/>
       <%=if @status == :crash do %>
         <img class="bang" src={"/images/misc/bang.png"} style={crash_illustration_position_style(@player_car)}>
+        <img class="car" src={"/images/cars/#{@player_car.image}"} style={car_position_style(@player_car)}/>
+      <% else %>
+        <img class="car moving_car car_highlight" src={"/images/cars/#{@player_car.image}"} style={car_position_style(@player_car)}/>
       <% end %>
       <%= for autonomous_car = %Car{image: autonomous_car_image} <- @autonomous_cars do %>
-        <img class="car" src={"/images/cars/#{autonomous_car_image}"} style={car_position_style(autonomous_car)}/>
+        <img class="car moving_car" src={"/images/cars/#{autonomous_car_image}"} style={car_position_style(autonomous_car)}/>
       <% end %>
     </div>
     """
