@@ -136,7 +136,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
       <.race_setup race={@race}/>
       <div class="crash_info">
         <div class="body">
-          <p>GAME OVER</p>
+          <span class="text_part_1">Game</span>&nbsp;<span class="text_part_2">Over</span>
         </div>
         <div class="footer">
           <.new_race_info/>

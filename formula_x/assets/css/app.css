@@ -280,11 +280,22 @@
 
 .race_live .console .race_screen .crash_info .body {
   flex-basis: 95%;
-  @apply mx-auto flex items-center justify-center;
+  @apply mx-auto flex items-center justify-center tracking-wide text-6xl font-black;
 }
 
-.race_live .console .race_screen .crash_info .body p {
-  @apply tracking-wide text-5xl font-black;
+.race_live .console .race_screen .crash_info .body .text_part_1,
+.race_live .console .race_screen .crash_info .body .text_part_2 {
+  @apply uppercase mt-10;
+  animation-duration: 2s;
+  animation-timing-function: ease-in-out;
+}
+
+.race_live .console .race_screen .crash_info .body .text_part_1 {
+  animation-name: text_part_1_transformation;
+}
+
+.race_live .console .race_screen .crash_info .body .text_part_2 {
+  animation-name: text_part_2_transformation;
 }
 
 .race_live .console .race_screen .crash_info .footer {
@@ -553,6 +564,24 @@
 
   100% {
     @apply w-28;
+  }
+}
+
+@keyframes text_part_1_transformation {
+  from {
+    transform: translateY(-300px);
+  }
+  to {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes text_part_2_transformation {
+  from {
+    transform: translateY(300px);
+  }
+  to {
+    transform: translateY(0px);
   }
 }
 
