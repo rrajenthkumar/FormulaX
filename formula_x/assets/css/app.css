@@ -179,7 +179,7 @@
 }
 
 .race_live .console .race_screen .count_down_info {
-  @apply absolute z-30 flex items-center justify-center w-[35rem] h-[35rem] bg-white opacity-70;
+  @apply absolute z-40 flex items-center justify-center w-[35rem] h-[35rem] bg-white opacity-70;
 }
 
 .race_live .console .race_screen .count_down_info .countdown {
@@ -188,7 +188,7 @@
 }
 
 .race_live .console .race_screen .pause_info {
-  @apply absolute z-30 flex flex-col w-[35rem] h-[35rem] bg-white opacity-70;
+  @apply absolute z-40 flex flex-col w-[35rem] h-[35rem] bg-white opacity-70;
 }
 
 .race_live .console .race_screen .pause_info .body {
@@ -237,7 +237,7 @@
 }
 
 .race_live .console .race_screen .race .cars .player_car {
-  @apply rounded-2xl;
+  @apply rounded-2xl z-20;
   transition: left 500ms linear;
 }
 
@@ -250,7 +250,7 @@
 }
 
 .race_live .console .race_screen .race .cars .bang {
-  @apply absolute z-20;
+  @apply absolute z-30;
   animation: bang_animation 1s ease-in-out 0s infinite forwards;
 }
 
@@ -275,7 +275,7 @@
 }
 
 .race_live .console .race_screen .crash_info {
-  @apply flex flex-col absolute z-30 w-[35rem] h-[35rem] text-black bg-white opacity-70 overflow-hidden;
+  @apply flex flex-col absolute z-40 w-[35rem] h-[35rem] text-black bg-white opacity-70 overflow-hidden;
 }
 
 .race_live .console .race_screen .crash_info .body {
@@ -319,7 +319,7 @@
 }
 
 .race_live .console .race_screen .result {
-  @apply absolute z-30 flex flex-col justify-center w-[35rem] h-[35rem] text-black bg-white opacity-80 text-sm;
+  @apply absolute z-40 flex flex-col justify-center w-[35rem] h-[35rem] text-black bg-white opacity-80 text-sm;
 }
 
 .race_live .console .race_screen .result .body {
