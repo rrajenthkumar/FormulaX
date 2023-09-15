@@ -84,11 +84,6 @@ defmodule FormulaX.Race do
     %Race{race | autonomous_cars: updated_autonomous_cars}
   end
 
-  @spec adapt_autonomous_cars_positions(Race.t()) :: Race.t()
-  def adapt_autonomous_cars_positions(race = %Race{autonomous_cars: autonomous_cars}) do
-    adapt_autonomous_cars_positions(autonomous_cars, race)
-  end
-
   @spec record_crash(Race.t()) :: Race.t()
   def record_crash(race = %Race{}) do
     %Race{race | status: :crash}
@@ -190,25 +185,5 @@ defmodule FormulaX.Race do
   @spec get_lanes_and_speed_boosts_map(Race.t()) :: map()
   def get_lanes_and_speed_boosts_map(%Race{speed_boosts: speed_boosts}) do
     Enum.group_by(speed_boosts, &SpeedBoost.get_lane/1, & &1)
-  end
-
-  @spec adapt_autonomous_cars_positions(list(Car.t()), Race.t()) :: Race.t()
-  defp adapt_autonomous_cars_positions(
-         _autonomous_cars = [autonomous_car = %Car{controller: :autonomous}],
-         race = %Race{}
-       ) do
-    adapted_autonomous_car = Car.adapt_autonomous_car_position(autonomous_car, race)
-    update_autonomous_car(race, adapted_autonomous_car)
-  end
-
-  defp adapt_autonomous_cars_positions(
-         _autonomous_cars = [
-           autonomous_car = %Car{controller: :autonomous} | remaining_autonomous_cars
-         ],
-         race = %Race{}
-       ) do
-    adapted_autonomous_car = Car.adapt_autonomous_car_position(autonomous_car, race)
-    updated_race = update_autonomous_car(race, adapted_autonomous_car)
-    adapt_autonomous_cars_positions(remaining_autonomous_cars, updated_race)
   end
 end
