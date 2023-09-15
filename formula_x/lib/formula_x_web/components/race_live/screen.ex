@@ -77,6 +77,9 @@ defmodule FormulaXWeb.RaceLive.Screen do
           <li>
             <p>Click on console screen or press Spacebar to pause / unpause race</p>
           </li>
+          <li>
+            <p>Key board controls are recommended for Laptop and PC</p>
+          </li>
         </ul>
       </div>
       <div class="footer">
