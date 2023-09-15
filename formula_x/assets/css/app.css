@@ -237,6 +237,7 @@
 }
 
 .race_live .console .race_screen .race .cars .player_car {
+  @apply rounded-2xl;
   transition: left 500ms linear;
 }
 
@@ -533,8 +534,7 @@
   }
 
   50% {
-    @apply rounded-2xl;
-    box-shadow: 0rem 0rem 1.25rem rgb(0, 255, 34);
+    box-shadow: 0rem 0rem 1.25rem rgb(0, 255, 221);
   }
 
   100% {
