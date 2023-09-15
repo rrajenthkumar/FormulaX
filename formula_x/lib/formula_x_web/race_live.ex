@@ -990,7 +990,7 @@ defmodule FormulaXWeb.RaceLive do
       [] ->
         assign(socket, :screen_state, :race_info)
 
-      # To ensure that race info screen is showed only once after the consoleis switched ON
+      # To ensure that race info screen is showed only once after the console is switched ON
       _last_5_results_not_empty ->
         initialize_race_count_down_screen(socket)
     end
@@ -1008,7 +1008,7 @@ defmodule FormulaXWeb.RaceLive do
       |> assign(:race, race)
       |> assign(:screen_state, :race)
 
-    Process.send(self(), {:count_down, _count = 3}, [])
+    Process.send_after(self(), {:count_down, _count = 3}, 500)
 
     updated_socket
   end
