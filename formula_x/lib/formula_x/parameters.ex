@@ -68,7 +68,7 @@ defmodule FormulaX.Parameters do
 
   @spec car_length() :: rem()
   def car_length() do
-    7
+    7.0
   end
 
   @doc """
