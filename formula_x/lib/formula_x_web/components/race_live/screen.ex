@@ -21,7 +21,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
   def render(assigns = %{screen_state: :startup}) do
     ~H"""
     <div class="screen startup_screen">
-      <audio src="sounds/8-bit-powerup-6768.mp3" type="audio/mp3" autoplay="true" preload="auto"></audio>
+      <audio src="sounds/Carmack_FadeEndm.mp3" type="audio/mp3" autoplay="true" preload="auto"></audio>
       <div class="body">
         <div class="content">
           <div class="text_container">
@@ -32,8 +32,8 @@ defmodule FormulaXWeb.RaceLive.Screen do
         </div>
       </div>
       <div class="footer">
-        <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to proceed</p>
-        <p>Press <span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch the console off</p>
+        <.to_proceed_info/>
+        <.power_off_info/>
       </div>
     </div>
     """
@@ -48,9 +48,9 @@ defmodule FormulaXWeb.RaceLive.Screen do
         <% end %>
       </div>
       <div class="footer">
-        <p>Browse cars using <span class="yellow">Yellow</span> and <span class="blue">Blue</span> buttons or using <span class="arrow">&#8678</span> and <span class="arrow">&#8680</span> keys</p>
-        <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to select your car and proceed</p>
-        <p>Press <span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch the console off</p>
+        <p><span class="yellow">Yellow</span> / <span class="blue">Blue</span> buttons or <span class="arrow">&#8678</span> / <span class="arrow">&#8680</span> keys to browse cars</p>
+        <.to_proceed_info/>
+        <.power_off_info/>
       </div>
     </div>
     """
@@ -60,35 +60,28 @@ defmodule FormulaXWeb.RaceLive.Screen do
     ~H"""
     <div class="screen race_info_screen">
       <div class="body">
-        <h1 class="title">Instructions</h1>
+        <h1 class="title">Race controls:</h1>
         <ul class="instructions_list">
           <li>
-            <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to start car</p>
+            <p><span class="green">Green</span> button or <span class="arrow">&#8679</span> key to switch car speeds in increasing order</p>
           </li>
           <li>
-            <p>After car starts use the <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to switch speeds in the increasing order of rest, low, moderate and high</p>
+            <p><span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch car speeds in decreasing order</p>
           </li>
           <li>
-            <p>Use the <span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch speeds in the decreasing order of high, moderate, low, rest</p>
+            <p><span class="yellow">Yellow</span> button or <span class="arrow">&#8678</span> key to move left</p>
           </li>
           <li>
-            <p>Use the <span class="yellow">Yellow</span> button or <span class="arrow">&#8678</span> key to move left</p>
+            <p><span class="blue">Blue</span> button or <span class="arrow">&#8680</span> key to move right</p>
           </li>
           <li>
-            <p>Use the <span class="blue">Blue</span> button or <span class="arrow">&#8680</span> key to move right</p>
-          </li>
-          <li>
-            <p>Try to navigate the lanes and finish the race</p>
-          </li>
-          <li>
-            <p>Whoever finishes the race in the shortest time wins the race!!!</p>
+            <p>Click on console screen or press Spacebar to pause / unpause race</p>
           </li>
         </ul>
       </div>
       <div class="footer">
-        <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to proceed</p>
-        <p>Press <span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch the console off</p>
-        <p>Click on screen or press Spacebar to pause or unpause an ongoing or a paused race respectively</p>
+        <.to_proceed_info/>
+        <.power_off_info/>
       </div>
     </div>
     """
@@ -99,7 +92,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
     <div class="screen race_screen">
       <audio src="sounds/mixkit-simple-game-countdown-921.wav" type="audio/wav" autoplay="true" preload="auto"></audio>
       <.race_setup race={@race}/>
-      <div class="smoke_screen">
+      <div class="count_down_info">
         <span class="countdown">
           <%= @countdown_count %>
         </span>
@@ -121,8 +114,13 @@ defmodule FormulaXWeb.RaceLive.Screen do
     ~H"""
     <div class="screen race_screen race_screen_pause_feature" phx-click="race_screen_clicked">
       <.race_setup race={@race}/>
-      <div class="smoke_screen">
-        <img class="pause_icon" src={"/images/icons/pause.png"} alt="pause icon"/>
+      <div class="pause_info">
+        <div class="body">
+          <img class="pause_icon" src={"/images/icons/pause.png"} alt="pause icon"/>
+        </div>
+        <div class="footer">
+          <p>Click on console screen or press Spacebar to unpause</p>
+        </div>
       </div>
     </div>
     """
@@ -138,8 +136,8 @@ defmodule FormulaXWeb.RaceLive.Screen do
           <p>GAME OVER</p>
         </div>
         <div class="footer">
-          <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to start a new race</p>
-          <p>Press <span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch the console off</p>
+          <.new_race_info/>
+          <.power_off_info/>
         </div>
       </div>
     </div>
@@ -173,8 +171,8 @@ defmodule FormulaXWeb.RaceLive.Screen do
           </table>
         </div>
         <div class="footer">
-          <p>Press <span class="green">Green</span> button or <span class="arrow">&#8679</span> key to start a new race</p>
-          <p>Press <span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch the console off</p>
+          <.new_race_info/>
+          <.power_off_info/>
         </div>
       </div>
     </div>
@@ -281,6 +279,24 @@ defmodule FormulaXWeb.RaceLive.Screen do
         <% end %>
       <% end %>
     </div>
+    """
+  end
+
+  defp to_proceed_info(assigns) do
+    ~H"""
+    <p><span class="green">Green</span> button or <span class="arrow">&#8679</span> key to proceed</p>
+    """
+  end
+
+  defp new_race_info(assigns) do
+    ~H"""
+    <p><span class="green">Green</span> button or <span class="arrow">&#8679</span> key for a new race</p>
+    """
+  end
+
+  defp power_off_info(assigns) do
+    ~H"""
+    <p><span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch off</p>
     """
   end
 
