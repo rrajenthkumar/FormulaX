@@ -90,12 +90,12 @@ defmodule FormulaX.CarControl.CrashDetection do
        )
        when is_list(same_lane_cars) do
     Enum.any?(same_lane_cars, fn %Car{y_position: same_lane_car_y_position} ->
-      # Same lane car rear wheels between front and rear wheels of querying car or
-      # same lane car front wheels between front and rear wheels of querying car
-      (same_lane_car_y_position >= querying_car_y_position and
-         same_lane_car_y_position <= querying_car_y_position + @car_length) or
-        (same_lane_car_y_position + @car_length >= querying_car_y_position and
-           same_lane_car_y_position <= querying_car_y_position)
+      # Front wheels of querying car between rear and front wheels of same lane car or
+      # Rear wheels of querying car between rear and front wheels of same lane car
+      (querying_car_y_position + @car_length >= same_lane_car_y_position and
+         querying_car_y_position <= same_lane_car_y_position) or
+        (querying_car_y_position >= same_lane_car_y_position and
+           querying_car_y_position <= same_lane_car_y_position + @car_length)
     end)
   end
 
@@ -111,8 +111,8 @@ defmodule FormulaX.CarControl.CrashDetection do
     |> Enum.any?(fn obstacle ->
       obstacle_y_position = Obstacle.get_y_position(obstacle, race)
 
-      # Car front wheels beyond obstacle starting y position and rear wheels behind obstacle starting y position or
-      # Car rear wheels between obstacle starting and ending y positions
+      # Querying car front wheels between obstacle starting and ending y positions or
+      # Querying car rear wheels between obstacle starting and ending y positions
       (querying_car_y_position + @car_length >= obstacle_y_position and
          querying_car_y_position <= obstacle_y_position) or
         (querying_car_y_position >= obstacle_y_position and
