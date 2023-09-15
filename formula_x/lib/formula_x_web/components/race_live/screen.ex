@@ -99,7 +99,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
     <div class="screen race_screen">
       <audio src="sounds/mixkit-simple-game-countdown-921.wav" type="audio/wav" autoplay="true" preload="auto"></audio>
       <.race_setup race={@race}/>
-      <div class="info">
+      <div class="smoke_screen">
         <span class="countdown">
           <%= @countdown_count %>
         </span>
@@ -121,8 +121,8 @@ defmodule FormulaXWeb.RaceLive.Screen do
     ~H"""
     <div class="screen race_screen race_screen_pause_feature" phx-click="race_screen_clicked">
       <.race_setup race={@race}/>
-      <div class="info">
-        <span class="pause_info">PAUSED</span>
+      <div class="smoke_screen">
+        <img class="pause_icon" src={"/images/icons/pause.png"} alt="pause icon"/>
       </div>
     </div>
     """

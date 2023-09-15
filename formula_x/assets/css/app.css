@@ -171,16 +171,17 @@
   grid-template-columns: 1fr 18rem 1fr;
 }
 
-.race_live .console .race_screen .info {
-  @apply absolute z-30 flex items-center justify-center w-[35rem] h-[35rem] text-black bg-white opacity-70 tracking-wide;
+.race_live .console .race_screen .smoke_screen {
+  @apply absolute z-30 flex items-center justify-center w-[35rem] h-[35rem]  bg-white opacity-70;
 }
 
-.race_live .console .race_screen .info .countdown {
+.race_live .console .race_screen .smoke_screen .countdown {
+  @apply text-black tracking-wide;
   font-size: 16rem;
 }
 
-.race_live .console .race_screen .info .pause_info {
-  @apply text-7xl font-black;
+.race_live .console .race_screen .smoke_screen .pause_icon {
+  @apply w-40;
 }
 
 .race_live .console .race_screen .background,
@@ -533,8 +534,8 @@
   }
 
   50% {
-    @apply rounded-lg;
-    box-shadow: 0px 0px 0px 4px rgb(0, 255, 149);
+    @apply rounded-2xl;
+    box-shadow: 0rem 0rem 1.25rem rgb(0, 255, 34);
   }
 
   100% {
