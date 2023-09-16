@@ -81,7 +81,7 @@ defmodule FormulaX.Result do
       results_count < 5 ->
         [new_result] ++ last_5_results
     end
-    |> add_review
+    |> add_emoji
   end
 
   @spec add_emoji(list(Result.t())) :: list(Result.t())
@@ -100,11 +100,10 @@ defmodule FormulaX.Result do
   defp add_emoji(
          _last_5_results = [
            last_result = %Result{status: last_result_status, position: last_result_position}
-           | other_results
+           | other_4_results
          ]
        ) do
-    [last_but_one_result = %Result{position: last_but_one_result_position} | _remaining_results] =
-      other_results
+    [%Result{position: last_but_one_result_position} | _remaining_results] = other_4_results
 
     emoji =
       cond do
@@ -117,6 +116,6 @@ defmodule FormulaX.Result do
       end
 
     updated_last_result = %Result{last_result | emoji: emoji}
-    [updated_last_result] ++ other_results
+    [updated_last_result] ++ other_4_results
   end
 end
