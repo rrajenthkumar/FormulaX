@@ -1,26 +1,25 @@
 defmodule FormulaX.Race do
   @moduledoc """
-  **Race context**
+  Race context
   """
   use TypedStruct
 
   alias __MODULE__
+  alias FormulaX.Parameters
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
   alias FormulaX.Race.Obstacle
   alias FormulaX.Race.SpeedBoost
-  alias FormulaX.Parameters
 
   @race_distance Parameters.race_distance()
   @console_screen_height Parameters.console_screen_height()
 
-  @type cars :: list(Car.t())
   @type status :: :countdown | :ongoing | :paused | :crash | :completed
 
   @typedoc "Race struct"
   typedstruct do
     field(:player_car, Car.t(), enforce: true)
-    field(:autonomous_cars, cars(), enforce: true)
+    field(:autonomous_cars, list(Car.t()), enforce: true)
     field(:background, Background.t(), enforce: true)
     field(:obstacles, list(Obstacle.t()), enforce: true)
     field(:speed_boosts, list(SpeedBoost.t()), enforce: true)
@@ -58,18 +57,21 @@ defmodule FormulaX.Race do
   end
 
   @spec update_background(Race.t(), Background.t()) :: Race.t()
-  def update_background(race = %Race{}, updated_background = %Background{}) do
+  def update_background(race = %Race{status: :ongoing}, updated_background = %Background{}) do
     %Race{race | background: updated_background}
   end
 
   @spec update_player_car(Race.t(), Car.t()) :: Race.t()
-  def update_player_car(race = %Race{}, updated_player_car = %Car{controller: :player}) do
+  def update_player_car(
+        race = %Race{status: :ongoing},
+        updated_player_car = %Car{controller: :player}
+      ) do
     %Race{race | player_car: updated_player_car}
   end
 
   @spec update_autonomous_car(Race.t(), Car.t()) :: Race.t()
   def update_autonomous_car(
-        race = %Race{autonomous_cars: autonomous_cars},
+        race = %Race{autonomous_cars: autonomous_cars, status: :ongoing},
         updated_autonomous_car = %Car{id: updated_autonomous_car_id, controller: :autonomous}
       ) do
     updated_autonomous_cars =
@@ -85,12 +87,12 @@ defmodule FormulaX.Race do
   end
 
   @spec record_crash(Race.t()) :: Race.t()
-  def record_crash(race = %Race{}) do
+  def record_crash(race = %Race{status: :ongoing}) do
     %Race{race | status: :crash}
   end
 
   @doc """
-   This function is used in RaceLive module to check and stop the RaceEngine.
+   Check used to stop the RaceEngine.
   """
   @spec player_car_past_finish?(Race.t()) :: boolean
   def player_car_past_finish?(%Race{
@@ -98,9 +100,10 @@ defmodule FormulaX.Race do
         player_car: %Car{
           distance_travelled: distance_travelled_by_player_car,
           controller: :player
-        }
+        },
+        status: :ongoing
       }) do
-    # To check if the player car has travelled a distance of half the console screen height beyond the finish line (for cosmetic purpose)
+    # To check if the player car has travelled a distance of half the console screen height beyond the finish line. This particular distance is just to make the end look smooth.
     distance_travelled_by_player_car > race_distance + @console_screen_height / 2
   end
 
@@ -113,10 +116,6 @@ defmodule FormulaX.Race do
     %Race{race | status: :paused}
   end
 
-  def pause(race = %Race{}) do
-    race
-  end
-
   @spec unpause(Race.t()) :: Race.t()
   def unpause(
         race = %Race{
@@ -126,14 +125,11 @@ defmodule FormulaX.Race do
     %Race{race | status: :ongoing}
   end
 
-  def unpause(race = %Race{}) do
-    race
-  end
-
   @spec end_if_completed(Race.t()) :: Race.t()
   def end_if_completed(
         race = %Race{
-          player_car: %Car{completion_time: nil, controller: :player}
+          player_car: %Car{completion_time: nil, controller: :player},
+          status: :ongoing
         }
       ) do
     race
@@ -141,7 +137,8 @@ defmodule FormulaX.Race do
 
   def end_if_completed(
         race = %Race{
-          player_car: %Car{controller: :player}
+          player_car: %Car{controller: :player},
+          status: :ongoing
         }
       ) do
     %Race{race | status: :completed}

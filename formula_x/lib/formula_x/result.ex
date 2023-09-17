@@ -16,7 +16,7 @@ defmodule FormulaX.Result do
     field(:status, status(), enforce: true)
     field(:time, Time.t(), default: nil)
     field(:position, integer(), default: nil)
-    field(:emoji, String.t(), default: nil)
+    field(:symbol, String.t(), default: nil)
   end
 
   @spec new(map()) :: Result.t()
@@ -81,23 +81,23 @@ defmodule FormulaX.Result do
       results_count < 5 ->
         [new_result] ++ last_5_results
     end
-    |> add_emoji
+    |> add_symbol
   end
 
-  @spec add_emoji(list(Result.t())) :: list(Result.t())
+  @spec add_symbol(list(Result.t())) :: list(Result.t())
   # Case when the player has played only one race and so there is only one available result
-  defp add_emoji(_last_5_results = [result = %Result{status: status, position: position}]) do
-    emoji =
+  defp add_symbol(_last_5_results = [result = %Result{status: status, position: position}]) do
+    symbol =
       cond do
         status == :crash -> "&#128555"
         position == 1 -> "&#127942"
         true -> "&#128079"
       end
 
-    [%Result{result | emoji: emoji}]
+    [%Result{result | symbol: symbol}]
   end
 
-  defp add_emoji(
+  defp add_symbol(
          _last_5_results = [
            last_result = %Result{status: last_result_status, position: last_result_position}
            | other_4_results
@@ -105,7 +105,7 @@ defmodule FormulaX.Result do
        ) do
     [%Result{position: last_but_one_result_position} | _remaining_results] = other_4_results
 
-    emoji =
+    symbol =
       cond do
         last_result_status == :crash -> "&#128555"
         last_result_position == 1 -> "&#127942"
@@ -115,7 +115,7 @@ defmodule FormulaX.Result do
         last_but_one_result_position == nil -> "&#8679"
       end
 
-    updated_last_result = %Result{last_result | emoji: emoji}
+    updated_last_result = %Result{last_result | symbol: symbol}
     [updated_last_result] ++ other_4_results
   end
 end
