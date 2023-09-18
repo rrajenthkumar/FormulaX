@@ -46,7 +46,7 @@ defmodule FormulaX.CarControl do
     |> Race.update_background(updated_background)
     |> CrashDetection.update_crash_check_result(updated_player_car, _crash_check_side = :front)
     |> SpeedBoost.enable_if_fetched()
-    |> Race.end_if_completed()
+    |> Race.end_if_applicable()
   end
 
   @spec drive_autonomous_cars(Race.t()) :: Race.t()

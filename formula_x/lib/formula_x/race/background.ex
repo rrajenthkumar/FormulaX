@@ -29,7 +29,7 @@ defmodule FormulaX.Race.Background do
 
   @spec initialize(Parameters.rem()) :: Background.t()
   def initialize(race_distance) when is_float(race_distance) do
-    available_background_images = Utils.get_images("backgrounds")
+    available_background_images = Utils.get_filenames_of_images("backgrounds")
     left_side_images = get_side_images(available_background_images, race_distance)
     right_side_images = get_side_images(available_background_images, race_distance)
 

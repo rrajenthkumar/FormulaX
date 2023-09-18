@@ -42,7 +42,7 @@ defmodule FormulaX.Race.Car do
 
     player_car_image =
       "cars"
-      |> Utils.get_images()
+      |> Utils.get_filenames_of_images()
       |> Enum.at(player_car_index)
 
     initialize_car(player_car_id, player_car_image, :player)
@@ -55,7 +55,7 @@ defmodule FormulaX.Race.Car do
         controller: :player
       }) do
     available_ids = get_all_possible_ids() -- [player_car_id]
-    available_car_images = Utils.get_images("cars") -- [player_car_image]
+    available_car_images = Utils.get_filenames_of_images("cars") -- [player_car_image]
 
     initialize_autonomous_cars(available_ids, available_car_images)
   end

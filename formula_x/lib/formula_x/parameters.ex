@@ -26,7 +26,7 @@ defmodule FormulaX.Parameters do
   end
 
   @doc """
-  This is alos used to calculate the number of background images needed for the race
+  This is also used to calculate the number of background images needed for the race
   """
   @spec console_screen_height() :: rem()
   def console_screen_height() do
@@ -45,25 +45,6 @@ defmodule FormulaX.Parameters do
       %{lane_number: 2, x_start: 6.0, x_end: 12.0},
       %{lane_number: 3, x_start: 12.0, x_end: 18.0}
     ]
-  end
-
-  @doc """
-  Driving area limits map.
-  x_start and x_end are the limits of the complete driving area along the X axis.
-  """
-  @spec driving_area_limits() :: map()
-  def driving_area_limits() do
-    x_start =
-      lanes()
-      |> Enum.find(fn lane -> lane.lane_number == 1 end)
-      |> Map.fetch(:x_start)
-
-    x_end =
-      lanes()
-      |> Enum.find(fn lane -> lane.lane_number == 3 end)
-      |> Map.fetch(:x_end)
-
-    %{x_start: x_start, x_end: x_end}
   end
 
   @spec car_length() :: rem()
@@ -85,12 +66,6 @@ defmodule FormulaX.Parameters do
       {7.25, 9.0},
       {13.25, 9.0}
     ]
-  end
-
-  @spec number_of_cars() :: integer()
-  def number_of_cars() do
-    car_initial_positions()
-    |> Enum.count()
   end
 
   @spec car_drive_step(:rest | :low | :moderate | :high | :speed_boost) :: rem()
@@ -160,5 +135,30 @@ defmodule FormulaX.Parameters do
   @spec speed_boost_y_position_step() :: rem()
   def speed_boost_y_position_step() do
     300.0
+  end
+
+  @spec number_of_cars() :: integer()
+  def number_of_cars() do
+    car_initial_positions()
+    |> Enum.count()
+  end
+
+  @doc """
+  Driving area limits map.
+  x_start and x_end are the limits of the complete driving area along the X axis.
+  """
+  @spec driving_area_limits() :: map()
+  def driving_area_limits() do
+    x_start =
+      lanes()
+      |> Enum.find(fn lane -> lane.lane_number == 1 end)
+      |> Map.fetch(:x_start)
+
+    x_end =
+      lanes()
+      |> Enum.find(fn lane -> lane.lane_number == 3 end)
+      |> Map.fetch(:x_end)
+
+    %{x_start: x_start, x_end: x_end}
   end
 end

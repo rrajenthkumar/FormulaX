@@ -362,7 +362,7 @@ defmodule FormulaXWeb.RaceLive do
         socket = %Socket{
           assigns: %{
             screen_state: :race,
-            race: %Race{status: :completed}
+            race: %Race{status: :ended}
           }
         }
       ) do
@@ -377,7 +377,7 @@ defmodule FormulaXWeb.RaceLive do
         socket = %Socket{
           assigns: %{
             screen_state: :race,
-            race: %Race{status: :completed}
+            race: %Race{status: :ended}
           }
         }
       ) do
@@ -432,7 +432,7 @@ defmodule FormulaXWeb.RaceLive do
         socket = %Socket{
           assigns: %{
             screen_state: :race,
-            race: %Race{status: :completed}
+            race: %Race{status: :ended}
           }
         }
       ) do
@@ -447,7 +447,7 @@ defmodule FormulaXWeb.RaceLive do
         socket = %Socket{
           assigns: %{
             screen_state: :race,
-            race: %Race{status: :completed}
+            race: %Race{status: :ended}
           }
         }
       ) do
@@ -892,11 +892,12 @@ defmodule FormulaXWeb.RaceLive do
 
         assign(socket, :countdown_count, count)
       else
-        updated_race = Race.start(race)
+        race_liveview_pid = self()
+        updated_race = Race.start(race, race_liveview_pid)
 
-        RaceEngine.start(updated_race, self())
-
-        assign(socket, :countdown_count, nil)
+        socket
+        |> assign(:race, updated_race)
+        |> assign(:countdown_count, nil)
       end
 
     {:noreply, updated_socket}
@@ -977,7 +978,7 @@ defmodule FormulaXWeb.RaceLive do
   defp maximum_car_selection_index() do
     number_of_cars =
       "cars"
-      |> Utils.get_images()
+      |> Utils.get_filenames_of_images()
       |> Enum.count()
 
     number_of_cars - 1
