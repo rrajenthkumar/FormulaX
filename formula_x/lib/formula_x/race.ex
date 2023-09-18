@@ -144,7 +144,7 @@ defmodule FormulaX.Race do
     %Race{race | status: :completed}
   end
 
-  @spec get_autonomous_car_by_id(Race.t(), integer()) :: Car.t()
+  @spec get_autonomous_car_by_id(Race.t(), integer()) :: Car.t() | nil
   def get_autonomous_car_by_id(
         %Race{autonomous_cars: autonomous_cars},
         searched_autonomous_car_id
