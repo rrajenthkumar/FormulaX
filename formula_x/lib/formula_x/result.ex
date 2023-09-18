@@ -8,7 +8,7 @@ defmodule FormulaX.Result do
   alias FormulaX.Race
   alias FormulaX.Race.Car
 
-  @type status :: :crash | :completed
+  @type status :: :crashed | :completed
 
   @typedoc "Result struct"
   typedstruct do
@@ -27,11 +27,11 @@ defmodule FormulaX.Result do
   @spec get_player_car_result(Race.t()) :: Result.t()
   def get_player_car_result(%Race{
         player_car: %Car{image: image, controller: :player},
-        status: status = :crash
+        status: :crash
       }) do
     %{
       car: image,
-      status: status
+      status: :crashed
     }
     |> Result.new()
   end
@@ -45,7 +45,7 @@ defmodule FormulaX.Result do
           },
         autonomous_cars: autonomous_cars,
         start_time: race_start_time,
-        status: status = :completed
+        status: :ended
       }) do
     all_cars = autonomous_cars ++ [player_car]
 
@@ -61,7 +61,7 @@ defmodule FormulaX.Result do
 
     %{
       car: image,
-      status: status,
+      status: :completed,
       time: race_time_duration,
       position: finishing_position
     }
@@ -89,7 +89,7 @@ defmodule FormulaX.Result do
   defp add_symbol(_last_5_results = [result = %Result{status: status, position: position}]) do
     symbol =
       cond do
-        status == :crash -> "&#128555"
+        status == :crashed -> "&#128555"
         position == 1 -> "&#127942"
         true -> "&#128079"
       end
@@ -107,7 +107,7 @@ defmodule FormulaX.Result do
 
     symbol =
       cond do
-        last_result_status == :crash -> "&#128555"
+        last_result_status == :crashed -> "&#128555"
         last_result_position == 1 -> "&#127942"
         last_result_position < last_but_one_result_position -> "&#8679"
         last_result_position > last_but_one_result_position -> "&#8681"

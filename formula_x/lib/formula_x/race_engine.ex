@@ -1,20 +1,19 @@
 defmodule FormulaX.RaceEngine do
   @moduledoc """
-  GenServer module that drives all cars
+  Module that drives all cars forward using GenServer
   """
   use GenServer
 
-  alias FormulaX.Race
   alias FormulaX.CarControl
+  alias FormulaX.Race
 
-  # Cars  will be driven forward every 200 milliseconds
   @timeout 200
 
   # API
-
   @spec start(Race.t(), pid()) :: {:ok, pid()} | {:error, {:already_started, pid()}}
-  def start(race_after_start = %Race{}, race_live_pid) when is_pid(race_live_pid) do
-    initial_state = {race_after_start, race_live_pid}
+  def start(started_race = %Race{status: :ongoing}, race_liveview_pid)
+      when is_pid(race_liveview_pid) do
+    initial_state = {started_race, race_liveview_pid}
     GenServer.start_link(__MODULE__, initial_state, name: __MODULE__)
   end
 
@@ -29,42 +28,45 @@ defmodule FormulaX.RaceEngine do
   end
 
   # Callbacks
-
   @impl true
-  def init(initial_state = {%Race{}, _race_live_pid}) do
+  def init(initial_state = {%Race{status: :ongoing}, race_liveview_pid})
+      when is_pid(race_liveview_pid) do
     {:ok, initial_state, @timeout}
   end
 
   @impl true
   @doc """
-  This callback moves all drives cars forward periodically
+  This callback is called every timeout period (200 milliseconds) to drive all cars forward and update the Race LiveView.
   """
-  def handle_info(:timeout, _state = {race = %Race{}, race_live_pid}) do
+  def handle_info(:timeout, _state = {race = %Race{}, race_liveview_pid})
+      when is_pid(race_liveview_pid) do
     updated_race =
       race
-      |> CarControl.drive_player_car()
+      # Autonomous cars are driven forward first so that while driving the player car forward we can do crash check precisely using the latest Autonomous car positions
       |> CarControl.drive_autonomous_cars()
+      |> CarControl.drive_player_car()
 
-    Process.send(race_live_pid, {:update_visuals, updated_race}, [])
-    updated_state = {updated_race, race_live_pid}
+    Process.send(race_liveview_pid, {:update_visuals, updated_race}, [])
+    updated_state = {updated_race, race_liveview_pid}
     {:noreply, updated_state, @timeout}
   end
 
   @impl true
   @doc """
-  :update - to update the Genserver state and LiveView based on player interactions
+  :update - to update the Genserver state and Race LiveView based on player interactions
   :stop - to stop the Genserver
   """
   def handle_cast(
         {:update, updated_race = %Race{}},
-        _state = {_race, race_live_pid}
-      ) do
-    Process.send(race_live_pid, {:update_visuals, updated_race}, [])
-    updated_state = {updated_race, race_live_pid}
+        _state = {_current_race = %Race{}, race_liveview_pid}
+      )
+      when is_pid(race_liveview_pid) do
+    Process.send(race_liveview_pid, {:update_visuals, updated_race}, [])
+    updated_state = {updated_race, race_liveview_pid}
     {:noreply, updated_state, @timeout}
   end
 
-  def handle_cast(:stop, state) do
+  def handle_cast(:stop, state = {%Race{}, race_liveview_pid}) when is_pid(race_liveview_pid) do
     {:stop, :normal, state}
   end
 end

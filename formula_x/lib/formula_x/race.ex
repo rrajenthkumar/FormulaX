@@ -9,12 +9,13 @@ defmodule FormulaX.Race do
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
   alias FormulaX.Race.Obstacle
+  alias FormulaX.RaceEngine
   alias FormulaX.Race.SpeedBoost
 
   @race_distance Parameters.race_distance()
   @console_screen_height Parameters.console_screen_height()
 
-  @type status :: :countdown | :ongoing | :paused | :crash | :completed
+  @type status :: :countdown | :ongoing | :paused | :crash | :ended
 
   @typedoc "Race struct"
   typedstruct do
@@ -51,9 +52,13 @@ defmodule FormulaX.Race do
     })
   end
 
-  @spec start(Race.t()) :: Race.t()
-  def start(race = %Race{status: :countdown}) do
-    %Race{race | status: :ongoing, start_time: Time.utc_now()}
+  @spec start(Race.t(), pid()) :: Race.t()
+  def start(race = %Race{status: :countdown}, race_liveview_pid) do
+    started_race = %Race{race | status: :ongoing, start_time: Time.utc_now()}
+
+    RaceEngine.start(started_race, race_liveview_pid)
+
+    started_race
   end
 
   @spec update_background(Race.t(), Background.t()) :: Race.t()
@@ -125,8 +130,17 @@ defmodule FormulaX.Race do
     %Race{race | status: :ongoing}
   end
 
-  @spec end_if_completed(Race.t()) :: Race.t()
-  def end_if_completed(
+  @spec end_if_applicable(Race.t()) :: Race.t()
+  def end_if_applicable(
+        race = %Race{
+          player_car: %Car{controller: :player},
+          status: :crash
+        }
+      ) do
+    race
+  end
+
+  def end_if_applicable(
         race = %Race{
           player_car: %Car{completion_time: nil, controller: :player},
           status: :ongoing
@@ -135,13 +149,13 @@ defmodule FormulaX.Race do
     race
   end
 
-  def end_if_completed(
+  def end_if_applicable(
         race = %Race{
           player_car: %Car{controller: :player},
           status: :ongoing
         }
       ) do
-    %Race{race | status: :completed}
+    %Race{race | status: :ended}
   end
 
   @spec get_autonomous_car_by_id(Race.t(), integer()) :: Car.t() | nil
