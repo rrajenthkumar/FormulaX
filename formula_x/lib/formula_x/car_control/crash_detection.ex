@@ -11,7 +11,7 @@ defmodule FormulaX.CarControl.CrashDetection do
   alias FormulaX.Race.Obstacle
 
   @car_length Parameters.car_length()
-  @obstacle_length Parameters.stationary_items_length()
+  @obstacle_length Parameters.special_elements_length()
 
   @spec update_crash_check_result(Race.t(), Car.t(), :left | :right | :front) ::
           Race.t()

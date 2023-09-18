@@ -91,71 +91,63 @@ defmodule FormulaX.Race do
     %Race{race | autonomous_cars: updated_autonomous_cars}
   end
 
-  @spec record_crash(Race.t()) :: Race.t()
-  def record_crash(race = %Race{status: :ongoing}) do
-    %Race{race | status: :crash}
-  end
-
-  @doc """
-   Check used to stop the RaceEngine.
-  """
-  @spec player_car_past_finish?(Race.t()) :: boolean
-  def player_car_past_finish?(%Race{
-        distance: race_distance,
-        player_car: %Car{
-          distance_travelled: distance_travelled_by_player_car,
-          controller: :player
-        },
-        status: :ongoing
-      }) do
-    # To check if the player car has travelled a distance of half the console screen height beyond the finish line. This particular distance is just to make the end look smooth.
-    distance_travelled_by_player_car > race_distance + @console_screen_height / 2
-  end
-
-  @spec pause(Race.t()) :: Race.t()
+  @spec pause(Race.t()) :: :ok
   def pause(
         race = %Race{
           status: :ongoing
         }
       ) do
     %Race{race | status: :paused}
+    |> RaceEngine.update()
   end
 
-  @spec unpause(Race.t()) :: Race.t()
+  @spec unpause(Race.t()) :: :ok
   def unpause(
         race = %Race{
           status: :paused
         }
       ) do
     %Race{race | status: :ongoing}
+    |> RaceEngine.update()
+  end
+
+  @spec record_crash(Race.t()) :: Race.t()
+  def record_crash(
+        race = %Race{
+          status: :ongoing
+        }
+      ) do
+    RaceEngine.stop()
+    %Race{race | status: :crash}
   end
 
   @spec end_if_applicable(Race.t()) :: Race.t()
-  def end_if_applicable(
-        race = %Race{
-          player_car: %Car{controller: :player},
-          status: :crash
-        }
-      ) do
+  def end_if_applicable(race = %Race{status: :crash}) do
     race
   end
 
-  def end_if_applicable(
-        race = %Race{
-          player_car: %Car{completion_time: nil, controller: :player},
-          status: :ongoing
-        }
-      ) do
-    race
+  @spec end_if_applicable(Race.t()) :: Race.t()
+  def end_if_applicable(race = %Race{status: :ongoing}) do
+    case player_car_past_finish?(race) do
+      true ->
+        RaceEngine.stop()
+        %Race{race | status: :ended}
+
+      false ->
+        race
+    end
   end
 
-  def end_if_applicable(
-        race = %Race{
-          player_car: %Car{controller: :player},
-          status: :ongoing
-        }
-      ) do
-    %Race{race | status: :ended}
+  @spec player_car_past_finish?(Race.t()) :: boolean
+  defp player_car_past_finish?(%Race{
+         distance: race_distance,
+         player_car: %Car{
+           distance_travelled: distance_travelled_by_player_car,
+           controller: :player
+         }
+       }) do
+    # To check if the player car has travelled a distance of half the console screen height beyond the finish line. This particular distance is just to make the end look smooth.
+    distance_travelled_by_player_car > race_distance + @console_screen_height / 2
   end
 
   @spec get_autonomous_car_by_id(Race.t(), integer()) :: Car.t() | nil

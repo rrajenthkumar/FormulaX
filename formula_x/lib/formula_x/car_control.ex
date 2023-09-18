@@ -44,8 +44,8 @@ defmodule FormulaX.CarControl do
     race
     |> Race.update_player_car(updated_player_car)
     |> Race.update_background(updated_background)
-    |> CrashDetection.update_crash_check_result(updated_player_car, _crash_check_side = :front)
     |> SpeedBoost.enable_if_fetched()
+    |> CrashDetection.update_crash_check_result(updated_player_car, _crash_check_side = :front)
     |> Race.end_if_applicable()
   end
 
@@ -68,8 +68,8 @@ defmodule FormulaX.CarControl do
 
     race
     |> Race.update_player_car(updated_player_car)
-    |> CrashDetection.update_crash_check_result(updated_player_car, _crash_check_side = direction)
     |> SpeedBoost.enable_if_fetched()
+    |> CrashDetection.update_crash_check_result(updated_player_car, _crash_check_side = direction)
     |> RaceEngine.update()
   end
 

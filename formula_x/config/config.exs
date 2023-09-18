@@ -7,6 +7,46 @@
 # General application configuration
 import Config
 
+# All the parameters used in calculations done for Race visualisation
+config :formula_x,
+  parameters: %{
+    # Total race distance
+    race_distance: 650.0,
+    # Based on CSS styling of 'screen' class
+    console_screen_height: 35.0,
+    # List of lane info maps
+    # x_start and x_end are the limits of a lane along the X axis
+    # Based on CSS styling of 'race_screen' class
+    lanes: [
+      %{lane_number: 1, x_start: 0.0, x_end: 6.0},
+      %{lane_number: 2, x_start: 6.0, x_end: 12.0},
+      %{lane_number: 3, x_start: 12.0, x_end: 18.0}
+    ],
+    # Based on CSS styling of 'car' class
+    car_length: 7.0,
+    # Initial positions of cars during the start of a race
+    car_initial_positions: [
+      {1.25, 1.0},
+      {7.25, 1.0},
+      {13.25, 1.0},
+      {1.25, 9.0},
+      {7.25, 9.0},
+      {13.25, 9.0}
+    ],
+    # Car drive steps map with Y direction step values for different speeds
+    car_drive_steps: %{rest: 0.0, low: 3.0, moderate: 5.0, high: 7.0, speed_boost: 9.0},
+    # Car steering X direction step value
+    car_steering_step: 6.0,
+    # Special elements are speed boosts, obstacles etc
+    special_elements_length: 4.0,
+    # Special elements are not placed until this distance after the start of race
+    special_elements_free_distance: 60.0,
+    # Y direction step values used to position Obstacles
+    obstacle_y_position_steps: [30.0, 60.0, 90.0],
+    # Y direction step value used to position Speed boosts
+    speed_boost_y_position_step: 300.0
+  }
+
 # Configures the endpoint
 config :formula_x, FormulaXWeb.Endpoint,
   url: [host: "localhost"],

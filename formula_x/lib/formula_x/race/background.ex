@@ -10,7 +10,7 @@ defmodule FormulaX.Race.Background do
   alias FormulaX.Parameters
 
   @console_screen_height Parameters.console_screen_height()
-  @background_image_container_height Parameters.background_image_container_height()
+  @background_image_height Parameters.background_image_height()
 
   @type filename :: String.t()
   @type filenames :: list(filename())
@@ -61,7 +61,7 @@ defmodule FormulaX.Race.Background do
 
     number_of_images_required =
       ((race_distance + 2 * @console_screen_height) /
-         @background_image_container_height)
+         @background_image_height)
       |> round()
 
     Enum.map(1..number_of_images_required, fn _grid_number ->

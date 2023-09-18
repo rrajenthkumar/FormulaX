@@ -174,7 +174,7 @@ defmodule FormulaX.Race.Car do
     end)
     |> case do
       nil -> :out_of_tracks
-      lane_map -> Map.fetch!(lane_map, :lane_number)
+      lane_map -> Map.get(lane_map, :lane_number)
     end
   end
 

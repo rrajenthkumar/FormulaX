@@ -10,7 +10,7 @@ defmodule FormulaX.Race.Obstacle do
   alias FormulaX.Race
   alias FormulaX.Race.Car
 
-  @obstacle_free_distance Parameters.obstacle_free_distance()
+  @obstacles_free_distance Parameters.special_elements_free_distance()
 
   @typedoc "Obstacle struct"
   typedstruct do
@@ -26,7 +26,7 @@ defmodule FormulaX.Race.Obstacle do
   @spec initialize_obstacles(Parameters.rem()) :: list(Obstacle.t())
   def initialize_obstacles(race_distance) when is_float(race_distance) do
     %{distance: new_obstacle_distance} =
-      new_obstacle = initialize_obstacle(@obstacle_free_distance)
+      new_obstacle = initialize_obstacle(@obstacles_free_distance)
 
     [new_obstacle] ++
       initialize_obstacles(race_distance, new_obstacle_distance)
@@ -53,7 +53,7 @@ defmodule FormulaX.Race.Obstacle do
   defp initialize_obstacle(distance_covered_with_obstacles)
        when is_float(distance_covered_with_obstacles) do
     obstacle_x_position =
-      Parameters.stationary_items_x_positions()
+      Parameters.special_elements_x_positions()
       |> Enum.random()
 
     obstacle_y_position_step =
@@ -78,7 +78,7 @@ defmodule FormulaX.Race.Obstacle do
     |> Enum.find(fn %{x_start: lane_x_start, x_end: lane_x_end} ->
       obstacle_x_position >= lane_x_start and obstacle_x_position < lane_x_end
     end)
-    |> Map.fetch!(:lane_number)
+    |> Map.get(:lane_number)
   end
 
   @spec get_y_position(Obstacle.t(), Race.t()) :: Parameters.rem()

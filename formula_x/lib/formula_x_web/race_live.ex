@@ -6,7 +6,6 @@ defmodule FormulaXWeb.RaceLive do
 
   alias FormulaX.CarControl
   alias FormulaX.Race
-  alias FormulaX.RaceEngine
   alias FormulaXWeb.RaceLive.ConsoleControls
   alias FormulaXWeb.RaceLive.Screen
   alias FormulaX.Result
@@ -607,9 +606,7 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    race
-    |> Race.pause()
-    |> RaceEngine.update()
+    Race.pause(race)
 
     {:noreply, socket}
   end
@@ -624,9 +621,7 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    race
-    |> Race.pause()
-    |> RaceEngine.update()
+    Race.pause(race)
 
     {:noreply, socket}
   end
@@ -641,9 +636,7 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    race
-    |> Race.unpause()
-    |> RaceEngine.update()
+    Race.unpause(race)
 
     {:noreply, socket}
   end
@@ -658,9 +651,7 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    race
-    |> Race.unpause()
-    |> RaceEngine.update()
+    Race.unpause(race)
 
     {:noreply, socket}
   end
@@ -910,9 +901,7 @@ defmodule FormulaXWeb.RaceLive do
       when is_atom(status) do
     updated_socket =
       cond do
-        status == :crash or Race.player_car_past_finish?(race) ->
-          RaceEngine.stop()
-
+        status == :crash or status == :ended ->
           socket
           |> assign(:race, race)
           |> update_results()

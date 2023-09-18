@@ -10,9 +10,9 @@ defmodule FormulaX.Race.SpeedBoost do
   alias FormulaX.Race
   alias FormulaX.Race.Car
 
-  @speed_boost_free_distance Parameters.speed_boost_free_distance()
+  @speed_boosts_free_distance Parameters.special_elements_free_distance()
   @speed_boost_y_position_step Parameters.speed_boost_y_position_step()
-  @speed_boost_length Parameters.stationary_items_length()
+  @speed_boost_length Parameters.special_elements_length()
   @car_length Parameters.car_length()
 
   @typedoc "SpeedBoost struct"
@@ -29,7 +29,7 @@ defmodule FormulaX.Race.SpeedBoost do
   @spec initialize_speed_boosts(Parameters.rem()) :: list(SpeedBoost.t())
   def initialize_speed_boosts(race_distance) when is_float(race_distance) do
     %{distance: new_speed_boost_distance} =
-      new_speed_boost = initialize_speed_boost(@speed_boost_free_distance)
+      new_speed_boost = initialize_speed_boost(@speed_boosts_free_distance)
 
     [new_speed_boost] ++
       initialize_speed_boosts(race_distance, new_speed_boost_distance)
@@ -57,7 +57,7 @@ defmodule FormulaX.Race.SpeedBoost do
   defp initialize_speed_boost(distance_covered_with_speed_boosts)
        when is_float(distance_covered_with_speed_boosts) do
     speed_boost_x_position =
-      Parameters.stationary_items_x_positions()
+      Parameters.special_elements_x_positions()
       |> Enum.random()
 
     new(%{
@@ -72,7 +72,7 @@ defmodule FormulaX.Race.SpeedBoost do
     |> Enum.find(fn %{x_start: lane_x_start, x_end: lane_x_end} ->
       speed_boost_x_position >= lane_x_start and speed_boost_x_position < lane_x_end
     end)
-    |> Map.fetch!(:lane_number)
+    |> Map.get(:lane_number)
   end
 
   @spec get_y_position(SpeedBoost.t(), Race.t()) :: Parameters.rem()

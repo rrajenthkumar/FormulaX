@@ -200,9 +200,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
     ~H"""
     <div class="background" style={background_position_style(@y_position)}>
       <%= for image <- @images do %>
-        <div class="image_container">
-          <img src={"/images/backgrounds/#{image}"} />
-        </div>
+        <img src={"/images/backgrounds/#{image}"} />
       <% end %>
     </div>
     """

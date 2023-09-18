@@ -1,7 +1,6 @@
 defmodule FormulaX.Parameters do
   @moduledoc """
-  All the racing game related parameters are defined here.
-  TO DO: When it makes sense the important values defined in this module should be defined as environment variables
+  Module to manage all parameters used in calculations done for Race visualisation
   """
 
   alias FormulaX.Race.Car
@@ -9,132 +8,48 @@ defmodule FormulaX.Parameters do
   @typedoc "Dimension on screen in X or Y direction measured in rem"
   @type rem() :: float()
 
-  @doc """
-  Total race distance
-  """
+  @spec get_parameters() :: map()
+  def get_parameters() do
+    Application.get_env(:formula_x, :parameters)
+  end
+
   @spec race_distance() :: rem()
   def race_distance() do
-    650.0
+    get_parameters()
+    |> Map.get(:race_distance)
   end
 
-  @doc """
-  Used to calculate the number of background images needed for the race based on the race distance
-  """
-  @spec background_image_container_height() :: rem()
-  def background_image_container_height() do
-    12.5
-  end
-
-  @doc """
-  This is also used to calculate the number of background images needed for the race
-  """
-  @spec console_screen_height() :: rem()
-  def console_screen_height() do
-    35.0
-  end
-
-  @doc """
-  List of lane info maps.
-  x_start and x_end are the limits of a lane along the X axis.
-  Driving area is of 18rem width along X axis in total for 3 lanes with 6rem width per lane.
-  """
   @spec lanes() :: list(map())
   def lanes() do
-    [
-      %{lane_number: 1, x_start: 0.0, x_end: 6.0},
-      %{lane_number: 2, x_start: 6.0, x_end: 12.0},
-      %{lane_number: 3, x_start: 12.0, x_end: 18.0}
-    ]
+    get_parameters()
+    |> Map.get(:lanes)
+  end
+
+  @spec driving_area_limits() :: map()
+  def driving_area_limits() do
+    x_start =
+      lanes()
+      |> Enum.find(fn lane -> lane.lane_number == 1 end)
+      |> Map.get(:x_start)
+
+    x_end =
+      lanes()
+      |> Enum.find(fn lane -> lane.lane_number == 3 end)
+      |> Map.get(:x_end)
+
+    %{x_start: x_start, x_end: x_end}
   end
 
   @spec car_length() :: rem()
   def car_length() do
-    7.0
+    get_parameters()
+    |> Map.get(:car_length)
   end
 
-  @doc """
-  List of car initial position coordinates.
-  Origin point of cars is at the left bottom edge of first lane.
-  """
   @spec car_initial_positions() :: list(Car.coordinates())
   def car_initial_positions() do
-    [
-      {1.25, 1.0},
-      {7.25, 1.0},
-      {13.25, 1.0},
-      {1.25, 9.0},
-      {7.25, 9.0},
-      {13.25, 9.0}
-    ]
-  end
-
-  @spec car_drive_step(:rest | :low | :moderate | :high | :speed_boost) :: rem()
-  def car_drive_step(_speed = :rest) do
-    0.0
-  end
-
-  def car_drive_step(_speed = :low) do
-    3.0
-  end
-
-  def car_drive_step(_speed = :moderate) do
-    5.0
-  end
-
-  def car_drive_step(_speed = :high) do
-    7.0
-  end
-
-  def car_drive_step(_speed = :speed_boost) do
-    9.0
-  end
-
-  @spec car_steering_step() :: rem()
-  def car_steering_step() do
-    6.0
-  end
-
-  @doc """
-  Stationary items are speed boosts, obstacles etc
-  """
-  @spec stationary_items_length() :: rem()
-  def stationary_items_length() do
-    4.0
-  end
-
-  @spec stationary_items_x_positions() :: list(rem())
-  def stationary_items_x_positions() do
-    [
-      0.0,
-      6.0,
-      12.0
-    ]
-  end
-
-  @doc """
-  Obstacles are not placed until this distance after the start of race
-  """
-  @spec obstacle_free_distance() :: rem()
-  def obstacle_free_distance() do
-    60.0
-  end
-
-  @spec obstacle_y_position_steps() :: list(rem())
-  def obstacle_y_position_steps() do
-    [30.0, 60.0, 90.0]
-  end
-
-  @doc """
-  Speed boosts are not placed until this distance after the start of race
-  """
-  @spec speed_boost_free_distance() :: rem()
-  def speed_boost_free_distance() do
-    60.0
-  end
-
-  @spec speed_boost_y_position_step() :: rem()
-  def speed_boost_y_position_step() do
-    300.0
+    get_parameters()
+    |> Map.get(:car_initial_positions)
   end
 
   @spec number_of_cars() :: integer()
@@ -143,22 +58,69 @@ defmodule FormulaX.Parameters do
     |> Enum.count()
   end
 
-  @doc """
-  Driving area limits map.
-  x_start and x_end are the limits of the complete driving area along the X axis.
-  """
-  @spec driving_area_limits() :: map()
-  def driving_area_limits() do
-    x_start =
-      lanes()
-      |> Enum.find(fn lane -> lane.lane_number == 1 end)
-      |> Map.fetch(:x_start)
+  @spec car_drive_steps() :: map()
+  defp car_drive_steps() do
+    get_parameters()
+    |> Map.get(:car_drive_steps)
+  end
 
-    x_end =
-      lanes()
-      |> Enum.find(fn lane -> lane.lane_number == 3 end)
-      |> Map.fetch(:x_end)
+  @spec car_drive_step(:rest | :low | :moderate | :high | :speed_boost) :: rem()
+  def car_drive_step(speed) do
+    car_drive_steps()
+    |> Map.get(speed)
+  end
 
-    %{x_start: x_start, x_end: x_end}
+  @spec car_steering_step() :: rem()
+  def car_steering_step() do
+    get_parameters()
+    |> Map.get(:car_steering_step)
+  end
+
+  @spec special_elements_length() :: rem()
+  def special_elements_length() do
+    get_parameters()
+    |> Map.get(:special_elements_length)
+  end
+
+  @spec special_elements_free_distance() :: rem()
+  def special_elements_free_distance() do
+    get_parameters()
+    |> Map.get(:special_elements_free_distance)
+  end
+
+  @spec special_elements_x_positions() :: list(rem())
+  def special_elements_x_positions() do
+    lanes()
+    |> Enum.map(fn lane_info -> lane_info.x_start end)
+  end
+
+  @spec obstacle_y_position_steps() :: list(rem())
+  def obstacle_y_position_steps() do
+    get_parameters()
+    |> Map.get(:obstacle_y_position_steps)
+  end
+
+  @spec speed_boost_y_position_step() :: rem()
+  def speed_boost_y_position_step() do
+    get_parameters()
+    |> Map.get(:speed_boost_y_position_step)
+  end
+
+  @spec console_screen_height() :: rem()
+  def console_screen_height() do
+    get_parameters()
+    |> Map.get(:console_screen_height)
+  end
+
+  @spec background_image_height() :: rem()
+  def background_image_height() do
+    driving_area_width = driving_area_limits().x_end - driving_area_limits().x_start
+
+    # Console screen has an aspect ratio of 1
+    console_screen_width = console_screen_height()
+
+    # Background images are displayed both both left and right sides of driving area
+    # Background images too have an aspect ratio of 1 and so their height is same as their width
+    (console_screen_width - driving_area_width) / 2
   end
 end
