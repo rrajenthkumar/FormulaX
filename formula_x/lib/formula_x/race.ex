@@ -5,11 +5,12 @@ defmodule FormulaX.Race do
   use TypedStruct
 
   alias __MODULE__
+  alias FormulaX.CarControl.CrashDetection
   alias FormulaX.Parameters
+  alias FormulaX.RaceEngine
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
   alias FormulaX.Race.Obstacle
-  alias FormulaX.RaceEngine
   alias FormulaX.Race.SpeedBoost
 
   @race_distance Parameters.race_distance()
@@ -111,14 +112,19 @@ defmodule FormulaX.Race do
     |> RaceEngine.update()
   end
 
-  @spec record_crash(Race.t()) :: Race.t()
-  def record_crash(
-        race = %Race{
-          status: :ongoing
-        }
-      ) do
-    RaceEngine.stop()
-    %Race{race | status: :crash}
+  @spec record_crash_if_applicable(Race.t(), :left | :right | :front) :: Race.t()
+  def record_crash_if_applicable(
+        race = %Race{status: :ongoing, player_car: player_car},
+        crash_check_side
+      )
+      when crash_check_side in [:left, :right, :front] do
+    case CrashDetection.crash?(race, player_car, crash_check_side) do
+      true ->
+        %Race{race | status: :crash}
+
+      false ->
+        race
+    end
   end
 
   @spec end_if_applicable(Race.t()) :: Race.t()
@@ -126,11 +132,9 @@ defmodule FormulaX.Race do
     race
   end
 
-  @spec end_if_applicable(Race.t()) :: Race.t()
   def end_if_applicable(race = %Race{status: :ongoing}) do
     case player_car_past_finish?(race) do
       true ->
-        RaceEngine.stop()
         %Race{race | status: :ended}
 
       false ->

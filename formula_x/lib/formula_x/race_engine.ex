@@ -1,6 +1,6 @@
 defmodule FormulaX.RaceEngine do
   @moduledoc """
-  Module that drives all cars forward using GenServer
+  Module that drives all cars forward, taking player interations into account, using GenServer
   """
   use GenServer
 
@@ -22,11 +22,6 @@ defmodule FormulaX.RaceEngine do
     GenServer.cast(__MODULE__, {:update, updated_race})
   end
 
-  @spec stop() :: :ok
-  def stop() do
-    GenServer.cast(__MODULE__, :stop)
-  end
-
   # Callbacks
   @impl true
   def init(initial_state = {%Race{status: :ongoing}, race_liveview_pid})
@@ -36,13 +31,27 @@ defmodule FormulaX.RaceEngine do
 
   @impl true
   @doc """
-  This callback is called every timeout period (200 milliseconds) to drive all cars forward and update the Race LiveView.
+  This callback is called every timeout period of 200 milliseconds.
+
+  1. When the race status is :paused, the Genserver keeps looping without any action.
+  2. When the race status is :crash or :ended, the Genserver is stopped.
+  3. When the race status is :ongoing, it drives all cars forward and updates the Race LiveView.
   """
+  def handle_info(:timeout, state = {%Race{status: :paused}, race_liveview_pid})
+      when is_pid(race_liveview_pid) do
+    {:noreply, state, @timeout}
+  end
+
+  def handle_info(:timeout, state = {%Race{status: status}, race_liveview_pid})
+      when status in [:crash, :ended] and is_pid(race_liveview_pid) do
+    {:stop, :normal, state}
+  end
+
   def handle_info(:timeout, _state = {race = %Race{}, race_liveview_pid})
       when is_pid(race_liveview_pid) do
     updated_race =
       race
-      # Autonomous cars are driven forward first so that while driving the player car forward we can do crash check precisely using the latest Autonomous car positions
+      # Autonomous cars are driven forward first so that while driving the player car forward we do crash check precisely using the latest Autonomous car positions
       |> CarControl.drive_autonomous_cars()
       |> CarControl.drive_player_car()
 
@@ -53,8 +62,7 @@ defmodule FormulaX.RaceEngine do
 
   @impl true
   @doc """
-  :update - to update the Genserver state and Race LiveView based on player interactions
-  :stop - to stop the Genserver
+  Updates the Genserver state and Race LiveView based on player interactions  like steering,increasing speed, pausing, unpausing
   """
   def handle_cast(
         {:update, updated_race = %Race{}},
@@ -64,9 +72,5 @@ defmodule FormulaX.RaceEngine do
     Process.send(race_liveview_pid, {:update_visuals, updated_race}, [])
     updated_state = {updated_race, race_liveview_pid}
     {:noreply, updated_state, @timeout}
-  end
-
-  def handle_cast(:stop, state = {%Race{}, race_liveview_pid}) when is_pid(race_liveview_pid) do
-    {:stop, :normal, state}
   end
 end

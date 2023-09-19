@@ -13,23 +13,6 @@ defmodule FormulaX.CarControl.CrashDetection do
   @car_length Parameters.car_length()
   @obstacle_length Parameters.special_elements_length()
 
-  @spec update_crash_check_result(Race.t(), Car.t(), :left | :right | :front) ::
-          Race.t()
-  def update_crash_check_result(
-        race = %Race{},
-        player_car = %Car{controller: :player},
-        crash_check_side
-      )
-      when is_atom(crash_check_side) do
-    case crash?(race, player_car, crash_check_side) do
-      true ->
-        Race.record_crash(race)
-
-      false ->
-        race
-    end
-  end
-
   @spec crash?(Race.t(), Car.t(), :front | :left | :right) :: boolean()
   def crash?(
         race = %Race{},
@@ -44,7 +27,7 @@ defmodule FormulaX.CarControl.CrashDetection do
         querying_car = %Car{},
         crash_check_side
       )
-      when is_atom(crash_check_side) do
+      when crash_check_side in [:left, :right] do
     querying_car_lane = Car.get_lane(querying_car)
 
     case querying_car_lane do

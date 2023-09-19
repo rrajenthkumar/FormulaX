@@ -16,17 +16,8 @@ defmodule FormulaX.CarControl do
   @doc """
   When the player car is driven, the car remains at same position
   and only the Background is moved in opposite direction, to give an illusion of forward movement.
-  All autonomous cars' positions are adapted whenever the player car is driven forward.
   """
   @spec drive_player_car(Race.t()) :: Race.t()
-  def drive_player_car(
-        race = %Race{
-          status: :paused
-        }
-      ) do
-    race
-  end
-
   def drive_player_car(
         race = %Race{
           background: background = %Background{},
@@ -45,15 +36,11 @@ defmodule FormulaX.CarControl do
     |> Race.update_player_car(updated_player_car)
     |> Race.update_background(updated_background)
     |> SpeedBoost.enable_if_fetched()
-    |> CrashDetection.update_crash_check_result(updated_player_car, _crash_check_side = :front)
+    |> Race.record_crash_if_applicable(_crash_check_side = :front)
     |> Race.end_if_applicable()
   end
 
   @spec drive_autonomous_cars(Race.t()) :: Race.t()
-  def drive_autonomous_cars(race = %Race{status: :paused}) do
-    race
-  end
-
   def drive_autonomous_cars(race = %Race{autonomous_cars: autonomous_cars}) do
     drive_autonomous_cars(autonomous_cars, race)
   end
@@ -63,13 +50,13 @@ defmodule FormulaX.CarControl do
         race = %Race{player_car: player_car = %Car{controller: :player}},
         direction
       )
-      when is_atom(direction) do
+      when direction in [:left, :right] do
     updated_player_car = Car.steer(player_car, direction)
 
     race
     |> Race.update_player_car(updated_player_car)
     |> SpeedBoost.enable_if_fetched()
-    |> CrashDetection.update_crash_check_result(updated_player_car, _crash_check_side = direction)
+    |> Race.record_crash_if_applicable(_crash_check_side = direction)
     |> RaceEngine.update()
   end
 
@@ -78,7 +65,7 @@ defmodule FormulaX.CarControl do
         race = %Race{player_car: player_car = %Car{controller: :player}},
         action
       )
-      when is_atom(action) do
+      when action in [:speedup, :slowdown] do
     updated_player_car = Car.change_speed(player_car, action)
 
     race
