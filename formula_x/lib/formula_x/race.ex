@@ -1,6 +1,6 @@
 defmodule FormulaX.Race do
   @moduledoc """
-  Race context
+  The Race context
   """
   use TypedStruct
 
@@ -12,9 +12,12 @@ defmodule FormulaX.Race do
   alias FormulaX.Race.Car
   alias FormulaX.Race.Obstacle
   alias FormulaX.Race.SpeedBoost
+  alias FormulaX.Utils
 
   @race_distance Parameters.race_distance()
   @console_screen_height Parameters.console_screen_height()
+  @speed_boosts_free_distance Parameters.obstacles_and_speed_boosts_free_distance()
+  @speed_boost_y_position_step Parameters.speed_boost_y_position_step()
 
   @type status :: :countdown | :ongoing | :paused | :crash | :ended
 
@@ -30,18 +33,13 @@ defmodule FormulaX.Race do
     field(:status, status(), default: :countdown)
   end
 
-  @spec new(map()) :: Race.t()
-  def new(attrs) when is_map(attrs) do
-    struct!(Race, attrs)
-  end
-
   @spec initialize(integer()) :: Race.t()
   def initialize(player_car_index) when is_integer(player_car_index) do
     player_car = Car.initialize_player_car(player_car_index)
-    autonomous_cars = Car.initialize_autonomous_cars(player_car)
+    autonomous_cars = initialize_autonomous_cars(player_car)
     background = Background.initialize(@race_distance)
     obstacles = Obstacle.initialize_obstacles(@race_distance)
-    speed_boosts = SpeedBoost.initialize_speed_boosts(@race_distance)
+    speed_boosts = initialize_speed_boosts(@race_distance)
 
     new(%{
       player_car: player_car,
@@ -142,18 +140,6 @@ defmodule FormulaX.Race do
     end
   end
 
-  @spec player_car_past_finish?(Race.t()) :: boolean
-  defp player_car_past_finish?(%Race{
-         distance: race_distance,
-         player_car: %Car{
-           distance_travelled: distance_travelled_by_player_car,
-           controller: :player
-         }
-       }) do
-    # To check if the player car has travelled a distance of half the console screen height beyond the finish line. This particular distance is just to make the end look smooth.
-    distance_travelled_by_player_car > race_distance + @console_screen_height / 2
-  end
-
   @spec get_autonomous_car_by_id(Race.t(), integer()) :: Car.t() | nil
   def get_autonomous_car_by_id(
         %Race{autonomous_cars: autonomous_cars},
@@ -165,32 +151,78 @@ defmodule FormulaX.Race do
     end)
   end
 
-  @spec get_lanes_and_cars_map(Race.t()) :: map()
-  def get_lanes_and_cars_map(%Race{
-        player_car: player_car = %Car{controller: :player},
-        autonomous_cars: autonomous_cars
-      }) do
-    lanes_and_autonomous_cars_map = Enum.group_by(autonomous_cars, &Car.get_lane/1, & &1)
+  @spec initialize_autonomous_cars(Car.t()) :: list(Car.t())
+  defp initialize_autonomous_cars(%Car{
+         id: player_car_id,
+         image: player_car_image,
+         controller: :player
+       }) do
+    available_ids = Car.get_all_possible_ids() -- [player_car_id]
+    available_car_images = Utils.get_filenames_of_images("cars") -- [player_car_image]
 
-    player_car_lane = Car.get_lane(player_car)
-
-    autonomous_cars_in_player_car_lane =
-      Map.get(lanes_and_autonomous_cars_map, player_car_lane, [])
-
-    Map.put(
-      lanes_and_autonomous_cars_map,
-      player_car_lane,
-      autonomous_cars_in_player_car_lane ++ [player_car]
-    )
+    initialize_autonomous_cars(available_ids, available_car_images)
   end
 
-  @spec get_lanes_and_obstacles_map(Race.t()) :: map()
-  def get_lanes_and_obstacles_map(%Race{obstacles: obstacles}) do
-    Enum.group_by(obstacles, &Obstacle.get_lane/1, & &1)
+  @spec initialize_autonomous_cars(list(integer()), list(Car.filename())) :: list(Car.t())
+  defp initialize_autonomous_cars([car_id], car_images)
+       when is_integer(car_id) and is_list(car_images) do
+    car_image = Enum.random(car_images)
+
+    [Car.initialize_autonomous_car(car_id, car_image)]
   end
 
-  @spec get_lanes_and_speed_boosts_map(Race.t()) :: map()
-  def get_lanes_and_speed_boosts_map(%Race{speed_boosts: speed_boosts}) do
-    Enum.group_by(speed_boosts, &SpeedBoost.get_lane/1, & &1)
+  defp initialize_autonomous_cars(_car_ids = [head | tail], car_images)
+       when is_integer(head) and is_list(car_images) do
+    car_image = Enum.random(car_images)
+
+    car = Car.initialize_autonomous_car(head, car_image)
+
+    remaining_car_images = car_images -- [car_image]
+
+    [car] ++ initialize_autonomous_cars(tail, remaining_car_images)
+  end
+
+  @spec initialize_speed_boosts(Parameters.rem()) :: list(SpeedBoost.t())
+  defp initialize_speed_boosts(race_distance) when is_float(race_distance) do
+    %{distance: new_speed_boost_distance} =
+      new_speed_boost = SpeedBoost.initialize_speed_boost(@speed_boosts_free_distance)
+
+    [new_speed_boost] ++
+      initialize_speed_boosts(race_distance, new_speed_boost_distance)
+  end
+
+  @spec initialize_speed_boosts(Parameters.rem(), Parameters.rem()) ::
+          list(SpeedBoost.t()) | []
+  defp initialize_speed_boosts(race_distance, distance_covered_with_speed_boosts)
+       when is_float(race_distance) and is_float(distance_covered_with_speed_boosts) do
+    cond do
+      race_distance - distance_covered_with_speed_boosts <
+          @speed_boost_y_position_step ->
+        []
+
+      true ->
+        %{distance: new_speed_boost_distance} =
+          new_speed_boost = SpeedBoost.initialize_speed_boost(distance_covered_with_speed_boosts)
+
+        [new_speed_boost] ++
+          initialize_speed_boosts(race_distance, new_speed_boost_distance)
+    end
+  end
+
+  @spec new(map()) :: Race.t()
+  defp new(attrs) when is_map(attrs) do
+    struct!(Race, attrs)
+  end
+
+  @spec player_car_past_finish?(Race.t()) :: boolean
+  defp player_car_past_finish?(%Race{
+         distance: race_distance,
+         player_car: %Car{
+           distance_travelled: distance_travelled_by_player_car,
+           controller: :player
+         }
+       }) do
+    # To check if the player car has travelled a distance of half the console screen height beyond the finish line. This particular distance is just to make the end look smooth.
+    distance_travelled_by_player_car > race_distance + @console_screen_height / 2
   end
 end

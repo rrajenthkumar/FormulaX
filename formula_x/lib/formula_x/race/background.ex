@@ -1,7 +1,7 @@
 defmodule FormulaX.Race.Background do
   @moduledoc """
-  **Race background context**
-  Background struct is used to display background images on both the left and right sides of racing lanes.
+  The Background context
+  Background struct is used by Race struct to display and move background images on both the left and right sides of racing lanes based on player car movement.
   """
   use TypedStruct
 
@@ -20,11 +20,6 @@ defmodule FormulaX.Race.Background do
     field(:left_side_images, filenames(), enforce: true)
     field(:right_side_images, filenames(), enforce: true)
     field(:y_position, Parameters.rem(), enforce: true)
-  end
-
-  @spec new(map()) :: Background.t()
-  defp new(attrs) when is_map(attrs) do
-    struct!(Background, attrs)
   end
 
   @spec initialize(Parameters.rem()) :: Background.t()
@@ -67,5 +62,10 @@ defmodule FormulaX.Race.Background do
     Enum.map(1..number_of_images_required, fn _grid_number ->
       Enum.random(available_background_images)
     end)
+  end
+
+  @spec new(map()) :: Background.t()
+  defp new(attrs) when is_map(attrs) do
+    struct!(Background, attrs)
   end
 end

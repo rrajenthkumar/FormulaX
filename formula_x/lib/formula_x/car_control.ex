@@ -1,6 +1,5 @@
 defmodule FormulaX.CarControl do
   @moduledoc """
-  **Car Control context**
   This module is the interface for all controls related to player and autonomous cars
   """
   alias FormulaX.CarControl.CrashDetection
@@ -40,11 +39,6 @@ defmodule FormulaX.CarControl do
     |> Race.end_if_applicable()
   end
 
-  @spec drive_autonomous_cars(Race.t()) :: Race.t()
-  def drive_autonomous_cars(race = %Race{autonomous_cars: autonomous_cars}) do
-    drive_autonomous_cars(autonomous_cars, race)
-  end
-
   @spec steer_player_car(Race.t(), :left | :right) :: :ok
   def steer_player_car(
         race = %Race{player_car: player_car = %Car{controller: :player}},
@@ -71,6 +65,11 @@ defmodule FormulaX.CarControl do
     race
     |> Race.update_player_car(updated_player_car)
     |> RaceEngine.update()
+  end
+
+  @spec drive_autonomous_cars(Race.t()) :: Race.t()
+  def drive_autonomous_cars(race = %Race{autonomous_cars: autonomous_cars}) do
+    drive_autonomous_cars(autonomous_cars, race)
   end
 
   @spec drive_autonomous_cars(list(Car.t()), Race.t()) :: Race.t()
@@ -129,7 +128,7 @@ defmodule FormulaX.CarControl do
          race = %Race{},
          querying_autonomous_car = %Car{controller: :autonomous}
        ) do
-    lanes_cars_map = Race.get_lanes_and_cars_map(race)
+    lanes_cars_map = CrashDetection.get_lanes_and_cars_map(race)
 
     case Car.get_lane(querying_autonomous_car) do
       1 ->
@@ -184,22 +183,11 @@ defmodule FormulaX.CarControl do
          %Car{y_position: querying_autonomous_car_y_position, controller: :autonomous}
        )
        when is_list(adjacent_lane_cars) do
-    # We search for cars in the adjacent lane whose Y direction midpoint lies between half the car length behind the querying car to half the car length in front of the querying car.
+    # We take adjacent lane cars in the region from one car length behind the querying car to one car length in front of the querying car.
 
-    y_position_lower_limit_for_vicinity_check =
-      querying_autonomous_car_y_position - @car_length / 2
-
-    y_position_upper_limit_for_vicinity_check =
-      querying_autonomous_car_y_position + @car_length +
-        @car_length / 2
-
-    Enum.filter(adjacent_lane_cars, fn %Car{y_position: adjacent_lane_car_y_position} ->
-      adjacent_lane_car_midpoint_y_cordinate =
-        adjacent_lane_car_y_position +
-          @car_length / 2
-
-      adjacent_lane_car_midpoint_y_cordinate >= y_position_lower_limit_for_vicinity_check and
-        adjacent_lane_car_midpoint_y_cordinate <= y_position_upper_limit_for_vicinity_check
+    Enum.reject(adjacent_lane_cars, fn car ->
+      car.y_position < querying_autonomous_car_y_position - @car_length or
+        car.y_position > querying_autonomous_car_y_position + @car_length
     end)
   end
 end

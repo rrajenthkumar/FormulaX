@@ -51,6 +51,25 @@ defmodule FormulaX.CarControl.CrashDetection do
     end
   end
 
+  @spec get_lanes_and_cars_map(Race.t()) :: map()
+  def get_lanes_and_cars_map(%Race{
+        player_car: player_car = %Car{controller: :player},
+        autonomous_cars: autonomous_cars
+      }) do
+    lanes_and_autonomous_cars_map = Enum.group_by(autonomous_cars, &Car.get_lane/1, & &1)
+
+    player_car_lane = Car.get_lane(player_car)
+
+    autonomous_cars_in_player_car_lane =
+      Map.get(lanes_and_autonomous_cars_map, player_car_lane, [])
+
+    Map.put(
+      lanes_and_autonomous_cars_map,
+      player_car_lane,
+      autonomous_cars_in_player_car_lane ++ [player_car]
+    )
+  end
+
   ### Crash check with another car
 
   @spec crash_with_car?(Race.t(), Car.t(), :front | :left | :right) :: boolean()
@@ -104,7 +123,7 @@ defmodule FormulaX.CarControl.CrashDetection do
     querying_car_lane = Car.get_lane(querying_car)
 
     race
-    |> Race.get_lanes_and_cars_map()
+    |> get_lanes_and_cars_map()
     |> Map.get(querying_car_lane, [])
     |> Enum.reject(fn car -> car.id == querying_car_id end)
   end
@@ -198,8 +217,13 @@ defmodule FormulaX.CarControl.CrashDetection do
     querying_car_lane = Car.get_lane(querying_car)
 
     race
-    |> Race.get_lanes_and_obstacles_map()
+    |> get_lanes_and_obstacles_map()
     |> Map.get(querying_car_lane, [])
+  end
+
+  @spec get_lanes_and_obstacles_map(Race.t()) :: map()
+  defp get_lanes_and_obstacles_map(%Race{obstacles: obstacles}) do
+    Enum.group_by(obstacles, &Obstacle.get_lane/1, & &1)
   end
 
   @spec at_same_position_with_obstacle?(Car.t(), Parameters.rem()) :: boolean()
