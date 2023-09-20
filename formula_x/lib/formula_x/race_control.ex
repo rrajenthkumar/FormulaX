@@ -1,8 +1,8 @@
-defmodule FormulaX.CarControl do
+defmodule FormulaX.RaceControl do
   @moduledoc """
-  Interface for all controls related to player and autonomous cars.
+  Interface for all controls related to the Race.
   """
-  alias FormulaX.CarControl.CrashDetection
+  alias FormulaX.RaceControl.CrashDetection
   alias FormulaX.Parameters
   alias FormulaX.Race
   alias FormulaX.Race.Background
@@ -11,6 +11,14 @@ defmodule FormulaX.CarControl do
   alias FormulaX.RaceEngine
 
   @car_length Parameters.car_length()
+
+  @spec start_race(Race.t(), pid()) :: :ok
+  def start_race(race = %Race{status: :countdown}, race_liveview_pid)
+      when is_pid(race_liveview_pid) do
+    race
+    |> Race.start()
+    |> RaceEngine.start(race_liveview_pid)
+  end
 
   @doc """
   When the player car is driven, the car remains at same position
@@ -70,6 +78,20 @@ defmodule FormulaX.CarControl do
   @spec drive_autonomous_cars(Race.t()) :: Race.t()
   def drive_autonomous_cars(race = %Race{autonomous_cars: autonomous_cars}) do
     drive_autonomous_cars(autonomous_cars, race)
+  end
+
+  @spec pause_race(Race.t()) :: :ok
+  def pause_race(race = %Race{status: :ongoing}) do
+    race
+    |> Race.pause()
+    |> RaceEngine.update()
+  end
+
+  @spec unpause_race(Race.t()) :: :ok
+  def unpause_race(race = %Race{status: :paused}) do
+    race
+    |> Race.unpause()
+    |> RaceEngine.update()
   end
 
   @spec drive_autonomous_cars(list(Car.t()), Race.t()) :: Race.t()

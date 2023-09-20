@@ -5,9 +5,8 @@ defmodule FormulaX.Race do
   use TypedStruct
 
   alias __MODULE__
-  alias FormulaX.CarControl.CrashDetection
+  alias FormulaX.RaceControl.CrashDetection
   alias FormulaX.Parameters
-  alias FormulaX.RaceEngine
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
   alias FormulaX.Race.Obstacle
@@ -52,13 +51,9 @@ defmodule FormulaX.Race do
     })
   end
 
-  @spec start(Race.t(), pid()) :: Race.t()
-  def start(race = %Race{status: :countdown}, race_liveview_pid) do
-    started_race = %Race{race | status: :ongoing, start_time: Time.utc_now()}
-
-    RaceEngine.start(started_race, race_liveview_pid)
-
-    started_race
+  @spec start(Race.t()) :: Race.t()
+  def start(race = %Race{status: :countdown}) do
+    %Race{race | status: :ongoing, start_time: Time.utc_now()}
   end
 
   @spec update_background(Race.t(), Background.t()) :: Race.t()
@@ -91,24 +86,22 @@ defmodule FormulaX.Race do
     %Race{race | autonomous_cars: updated_autonomous_cars}
   end
 
-  @spec pause(Race.t()) :: :ok
+  @spec pause(Race.t()) :: Race.t()
   def pause(
         race = %Race{
           status: :ongoing
         }
       ) do
     %Race{race | status: :paused}
-    |> RaceEngine.update()
   end
 
-  @spec unpause(Race.t()) :: :ok
+  @spec unpause(Race.t()) :: Race.t()
   def unpause(
         race = %Race{
           status: :paused
         }
       ) do
     %Race{race | status: :ongoing}
-    |> RaceEngine.update()
   end
 
   @spec record_crash_if_applicable(Race.t(), :left | :right | :front) :: Race.t()

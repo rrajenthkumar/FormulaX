@@ -1,4 +1,4 @@
-defmodule FormulaX.CarControl.CrashDetection do
+defmodule FormulaX.RaceControl.CrashDetection do
   @moduledoc """
   Used to detect crash with a car or an obstacle.
   """

@@ -4,7 +4,7 @@ defmodule FormulaX.RaceEngine do
   """
   use GenServer
 
-  alias FormulaX.CarControl
+  alias FormulaX.RaceControl
   alias FormulaX.Race
 
   @timeout 200
@@ -52,8 +52,8 @@ defmodule FormulaX.RaceEngine do
     updated_race =
       race
       # Autonomous cars are driven forward first so that while driving the player car forward we do crash check precisely using the latest Autonomous car positions
-      |> CarControl.drive_autonomous_cars()
-      |> CarControl.drive_player_car()
+      |> RaceControl.drive_autonomous_cars()
+      |> RaceControl.drive_player_car()
 
     Process.send(race_liveview_pid, {:update_visuals, updated_race}, [])
     updated_state = {updated_race, race_liveview_pid}
