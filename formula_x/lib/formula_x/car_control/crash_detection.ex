@@ -24,7 +24,7 @@ defmodule FormulaX.CarControl.CrashDetection do
       ) do
     crash_with_car?(race, querying_car, :front)
     |> case do
-      false -> crash_with_obstacle?(race, querying_car)
+      false -> crash_with_obstacle?(race, querying_car, :front)
       result -> result
     end
   end
@@ -45,7 +45,7 @@ defmodule FormulaX.CarControl.CrashDetection do
       _querying_car_lane ->
         crash_with_car?(race, querying_car, crash_check_side)
         |> case do
-          false -> crash_with_obstacle?(race, querying_car)
+          false -> crash_with_obstacle?(race, querying_car, crash_check_side)
           result -> result
         end
     end
@@ -138,33 +138,55 @@ defmodule FormulaX.CarControl.CrashDetection do
 
   ### Crash check with an obstacle
 
-  @spec crash_with_obstacle?(Race.t(), Car.t()) :: boolean()
+  @spec crash_with_obstacle?(Race.t(), Car.t(), :front | :left | :right) :: boolean()
   defp crash_with_obstacle?(
          race = %Race{},
-         querying_car = %Car{}
-       ) do
+         querying_car = %Car{},
+         crash_check_side
+       )
+       when crash_check_side in [:front, :left, :right] do
     race
-    |> get_crashable_obstacles(querying_car)
+    |> get_crashable_obstacles(querying_car, crash_check_side)
     |> Enum.any?(fn obstacle ->
       obstacle_y_position = Obstacle.get_y_position(obstacle, race)
 
       at_same_position_with_obstacle?(querying_car, obstacle_y_position) or
         touching_obstacle?(querying_car, obstacle_y_position) or
-        overlap_with_obstacle?(querying_car, obstacle_y_position)
+        overlapping_with_obstacle?(querying_car, obstacle_y_position)
     end)
   end
 
-  @spec get_crashable_obstacles(Race.t(), Car.t()) :: list(Obstacle.t())
+  @spec get_crashable_obstacles(Race.t(), Car.t(), :front | :left | :right) :: list(Obstacle.t())
   defp get_crashable_obstacles(
          race = %Race{},
-         querying_car = %Car{y_position: querying_car_y_position}
+         querying_car = %Car{y_position: querying_car_y_position},
+         _crash_check_side = :front
        ) do
     race
+    # Since the movement that could possibly cause the crash has already happened all the crashable obstacles will be in the same lane as the querying car
     |> get_same_lane_obstacles(querying_car)
     # We remove the obstacles behind the querying car
     |> Enum.reject(fn obstacle ->
       obstacle_y_position = Obstacle.get_y_position(obstacle, race)
       obstacle_y_position < querying_car_y_position
+    end)
+  end
+
+  defp get_crashable_obstacles(
+         race = %Race{},
+         querying_car = %Car{y_position: querying_car_y_position},
+         crash_check_side
+       )
+       when crash_check_side in [:left, :right] do
+    race
+    # Since the movement that could possibly cause the crash has already happened all the crashable obstacles will be in the same lane as the querying car
+    |> get_same_lane_obstacles(querying_car)
+    # We remove the obstacles ouside the region from one obstacle length behind querying car to one obstacle length in front of the querying car
+    |> Enum.reject(fn obstacle ->
+      obstacle_y_position = Obstacle.get_y_position(obstacle, race)
+
+      obstacle_y_position < querying_car_y_position - @obstacle_length or
+        obstacle_y_position > querying_car_y_position + @obstacle_length
     end)
   end
 
@@ -196,8 +218,8 @@ defmodule FormulaX.CarControl.CrashDetection do
       car_y_position + @car_length == obstacle_y_position
   end
 
-  @spec overlap_with_obstacle?(Car.t(), Parameters.rem()) :: boolean()
-  defp overlap_with_obstacle?(%Car{y_position: car_y_position}, obstacle_y_position)
+  @spec overlapping_with_obstacle?(Car.t(), Parameters.rem()) :: boolean()
+  defp overlapping_with_obstacle?(%Car{y_position: car_y_position}, obstacle_y_position)
        when is_float(obstacle_y_position) do
     # Car front wheels between obstacle start and end or
     # Car rear wheels between obstacle start and end

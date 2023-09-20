@@ -45,9 +45,9 @@ defmodule FormulaX.Race.Background do
     })
   end
 
-  @spec move(Background.t(), :rest | :low | :moderate | :high) :: Background.t()
+  @spec move(Background.t(), :rest | :low | :moderate | :high | :speed_boost) :: Background.t()
   def move(background = %Background{y_position: y_position}, player_car_speed)
-      when player_car_speed in [:rest, :low, :moderate, :high] do
+      when player_car_speed in [:rest, :low, :moderate, :high, :speed_boost] do
     car_drive_step = Parameters.car_drive_step(player_car_speed)
     updated_y_position = y_position + car_drive_step
 
