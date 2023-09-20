@@ -244,7 +244,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
 
   defp tires(assigns) do
     ~H"""
-    <%= for _counter <- 1..6 do %>
+    <%= for _counter <- 1..12 do %>
       <img src={"/images/misc/tire.png"}/>
     <% end %>
     """

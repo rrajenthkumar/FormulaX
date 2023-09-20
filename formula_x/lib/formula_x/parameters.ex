@@ -76,20 +76,14 @@ defmodule FormulaX.Parameters do
     |> Map.get(:car_steering_step)
   end
 
-  @spec special_elements_length() :: rem()
-  def special_elements_length() do
+  @spec obstacles_and_speed_boosts_free_distance() :: rem()
+  def obstacles_and_speed_boosts_free_distance() do
     get_parameters()
-    |> Map.get(:special_elements_length)
+    |> Map.get(:obstacles_and_speed_boosts_free_distance)
   end
 
-  @spec special_elements_free_distance() :: rem()
-  def special_elements_free_distance() do
-    get_parameters()
-    |> Map.get(:special_elements_free_distance)
-  end
-
-  @spec special_elements_x_positions() :: list(rem())
-  def special_elements_x_positions() do
+  @spec obstacles_and_speed_boosts_x_positions() :: list(rem())
+  def obstacles_and_speed_boosts_x_positions() do
     lanes()
     |> Enum.map(fn lane_info -> lane_info.x_start end)
   end

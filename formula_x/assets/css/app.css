@@ -252,15 +252,12 @@
   animation: bang_animation 1s ease-in-out 0s infinite forwards;
 }
 
+/* Height of obstacle defined here is the length of an obstacle element used in calculations and it should be of same value as the car length in Parameters map in config file */
 .race_live .console .race_screen .race .obstacles .obstacle {
-  @apply absolute w-24 h-16 grid justify-items-center items-center;
+  @apply absolute w-24 h-[7rem] grid;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
   transition: left 1s ease-out, bottom 1s ease-out;
-}
-
-.race_live .console .race_screen .race .obstacles .obstacle img {
-  @apply w-7;
 }
 
 .race_live .console .race_screen .race .speed_boosts .speed_boost {

@@ -1,6 +1,5 @@
 defmodule FormulaX.Race.Obstacle do
   @moduledoc """
-  **Obstacle context**
   Obstacles (heaps of tires) to be avoided are placed randomly on lanes.
   """
   use TypedStruct
@@ -10,7 +9,7 @@ defmodule FormulaX.Race.Obstacle do
   alias FormulaX.Race
   alias FormulaX.Race.Car
 
-  @obstacles_free_distance Parameters.special_elements_free_distance()
+  @obstacles_free_distance Parameters.obstacles_and_speed_boosts_free_distance()
 
   @typedoc "Obstacle struct"
   typedstruct do
@@ -53,7 +52,7 @@ defmodule FormulaX.Race.Obstacle do
   defp initialize_obstacle(distance_covered_with_obstacles)
        when is_float(distance_covered_with_obstacles) do
     obstacle_x_position =
-      Parameters.special_elements_x_positions()
+      Parameters.obstacles_and_speed_boosts_x_positions()
       |> Enum.random()
 
     obstacle_y_position_step =

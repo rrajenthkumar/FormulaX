@@ -10,9 +10,10 @@ defmodule FormulaX.Race.SpeedBoost do
   alias FormulaX.Race
   alias FormulaX.Race.Car
 
-  @speed_boosts_free_distance Parameters.special_elements_free_distance()
+  @speed_boosts_free_distance Parameters.obstacles_and_speed_boosts_free_distance()
   @speed_boost_y_position_step Parameters.speed_boost_y_position_step()
-  @speed_boost_length Parameters.special_elements_length()
+  # Speed boost elements have been set to the same length as cars
+  @speed_boost_length Parameters.car_length()
   @car_length Parameters.car_length()
 
   @typedoc "SpeedBoost struct"
@@ -57,7 +58,7 @@ defmodule FormulaX.Race.SpeedBoost do
   defp initialize_speed_boost(distance_covered_with_speed_boosts)
        when is_float(distance_covered_with_speed_boosts) do
     speed_boost_x_position =
-      Parameters.special_elements_x_positions()
+      Parameters.obstacles_and_speed_boosts_x_positions()
       |> Enum.random()
 
     new(%{
