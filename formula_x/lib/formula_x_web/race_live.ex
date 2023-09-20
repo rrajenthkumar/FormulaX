@@ -1,6 +1,6 @@
 defmodule FormulaXWeb.RaceLive do
   @moduledoc """
-  Liveview to view and control the racing game
+  Liveview to visualize and control the racing game.
   """
   use FormulaXWeb, :live_view
 

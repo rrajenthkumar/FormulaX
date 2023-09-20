@@ -1,6 +1,6 @@
 defmodule FormulaX.Result do
   @moduledoc """
-  Module used to generate results at the end of a race
+  Used to generate results at the end of a race.
   """
   use TypedStruct
 
@@ -19,11 +19,6 @@ defmodule FormulaX.Result do
     field(:symbol, String.t(), default: nil)
   end
 
-  @spec new(map()) :: Result.t()
-  def new(attrs) when is_map(attrs) do
-    struct!(Result, attrs)
-  end
-
   @spec get_player_car_result(Race.t()) :: Result.t()
   def get_player_car_result(%Race{
         player_car: %Car{image: image, controller: :player},
@@ -33,7 +28,7 @@ defmodule FormulaX.Result do
       car: image,
       status: :crashed
     }
-    |> Result.new()
+    |> new()
   end
 
   def get_player_car_result(%Race{
@@ -65,7 +60,7 @@ defmodule FormulaX.Result do
       time: race_time_duration,
       position: finishing_position
     }
-    |> Result.new()
+    |> new()
   end
 
   @spec update_last_5_results(Result.t(), list(Result.t())) :: list(Result.t())
@@ -82,6 +77,11 @@ defmodule FormulaX.Result do
         [new_result] ++ last_5_results
     end
     |> add_symbol
+  end
+
+  @spec new(map()) :: Result.t()
+  defp new(attrs) when is_map(attrs) do
+    struct!(Result, attrs)
   end
 
   @spec add_symbol(list(Result.t())) :: list(Result.t())

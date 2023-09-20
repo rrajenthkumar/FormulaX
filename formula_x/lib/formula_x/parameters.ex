@@ -1,17 +1,12 @@
 defmodule FormulaX.Parameters do
   @moduledoc """
-  Module to manage all parameters used in calculations done for Race visualisation
+  Used to extract all parameters used in calculations from config file.
   """
 
   alias FormulaX.Race.Car
 
   @typedoc "Dimension on screen in X or Y direction measured in rem"
   @type rem() :: float()
-
-  @spec get_parameters() :: map()
-  def get_parameters() do
-    Application.get_env(:formula_x, :parameters)
-  end
 
   @spec race_distance() :: rem()
   def race_distance() do
@@ -58,12 +53,6 @@ defmodule FormulaX.Parameters do
     |> Enum.count()
   end
 
-  @spec car_drive_steps() :: map()
-  defp car_drive_steps() do
-    get_parameters()
-    |> Map.get(:car_drive_steps)
-  end
-
   @spec car_drive_step(:rest | :low | :moderate | :high | :speed_boost) :: rem()
   def car_drive_step(speed) do
     car_drive_steps()
@@ -94,6 +83,12 @@ defmodule FormulaX.Parameters do
     |> Map.get(:obstacle_y_position_steps)
   end
 
+  @spec max_obstacle_y_position_step() :: rem()
+  def max_obstacle_y_position_step() do
+    obstacle_y_position_steps()
+    |> Enum.max()
+  end
+
   @spec speed_boost_y_position_step() :: rem()
   def speed_boost_y_position_step() do
     get_parameters()
@@ -116,5 +111,16 @@ defmodule FormulaX.Parameters do
     # Background images are displayed both both left and right sides of driving area
     # Background images too have an aspect ratio of 1 and so their height is same as their width
     (console_screen_width - driving_area_width) / 2
+  end
+
+  @spec get_parameters() :: map()
+  defp get_parameters() do
+    Application.get_env(:formula_x, :parameters)
+  end
+
+  @spec car_drive_steps() :: map()
+  defp car_drive_steps() do
+    get_parameters()
+    |> Map.get(:car_drive_steps)
   end
 end

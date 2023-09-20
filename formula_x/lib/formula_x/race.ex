@@ -16,8 +16,9 @@ defmodule FormulaX.Race do
 
   @race_distance Parameters.race_distance()
   @console_screen_height Parameters.console_screen_height()
-  @speed_boosts_free_distance Parameters.obstacles_and_speed_boosts_free_distance()
+  @obstacles_and_speed_boosts_free_distance Parameters.obstacles_and_speed_boosts_free_distance()
   @speed_boost_y_position_step Parameters.speed_boost_y_position_step()
+  @max_obstacle_y_position_step Parameters.max_obstacle_y_position_step()
 
   @type status :: :countdown | :ongoing | :paused | :crash | :ended
 
@@ -38,7 +39,7 @@ defmodule FormulaX.Race do
     player_car = Car.initialize_player_car(player_car_index)
     autonomous_cars = initialize_autonomous_cars(player_car)
     background = Background.initialize(@race_distance)
-    obstacles = Obstacle.initialize_obstacles(@race_distance)
+    obstacles = initialize_obstacles(@race_distance)
     speed_boosts = initialize_speed_boosts(@race_distance)
 
     new(%{
@@ -182,10 +183,36 @@ defmodule FormulaX.Race do
     [car] ++ initialize_autonomous_cars(tail, remaining_car_images)
   end
 
+  @spec initialize_obstacles(Parameters.rem()) :: list(Obstacle.t())
+  defp initialize_obstacles(race_distance) when is_float(race_distance) do
+    %{distance: new_obstacle_distance} =
+      new_obstacle = Obstacle.initialize_obstacle(@obstacles_and_speed_boosts_free_distance)
+
+    [new_obstacle] ++
+      initialize_obstacles(race_distance, new_obstacle_distance)
+  end
+
+  @spec initialize_obstacles(Parameters.rem(), Parameters.rem()) :: list(Obstacle.t()) | []
+  defp initialize_obstacles(race_distance, distance_covered_with_obstacles)
+       when is_float(race_distance) and is_float(distance_covered_with_obstacles) do
+    cond do
+      race_distance - distance_covered_with_obstacles < @max_obstacle_y_position_step ->
+        []
+
+      true ->
+        %{distance: new_obstacle_distance} =
+          new_obstacle = Obstacle.initialize_obstacle(distance_covered_with_obstacles)
+
+        [new_obstacle] ++
+          initialize_obstacles(race_distance, new_obstacle_distance)
+    end
+  end
+
   @spec initialize_speed_boosts(Parameters.rem()) :: list(SpeedBoost.t())
   defp initialize_speed_boosts(race_distance) when is_float(race_distance) do
     %{distance: new_speed_boost_distance} =
-      new_speed_boost = SpeedBoost.initialize_speed_boost(@speed_boosts_free_distance)
+      new_speed_boost =
+      SpeedBoost.initialize_speed_boost(@obstacles_and_speed_boosts_free_distance)
 
     [new_speed_boost] ++
       initialize_speed_boosts(race_distance, new_speed_boost_distance)

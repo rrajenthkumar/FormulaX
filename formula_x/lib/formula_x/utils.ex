@@ -1,6 +1,6 @@
 defmodule FormulaX.Utils do
   @moduledoc """
-  Module for utility functions
+  Module for utility functions.
   """
   @spec get_filenames_of_images(String.t()) :: list(String.t()) | {:error, any()}
   def get_filenames_of_images(folder_name) do

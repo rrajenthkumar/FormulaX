@@ -1,6 +1,6 @@
 defmodule FormulaX.CarControl.CrashDetection do
   @moduledoc """
-  This module is used to detect crash with a car or with an obstacle
+  Used to detect crash with a car or an obstacle.
   """
 
   alias FormulaX.Parameters

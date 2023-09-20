@@ -20,7 +20,7 @@
   box-shadow: 0.35rem 0.35rem 0.35rem 0.35rem rgb(65, 65, 65);
 }
 
-/* Height of console screen defined here (35rem) has also been added in Parameters map in config file for Race visualisation related calculations */
+/* Height of console screen defined here (35rem) has also been added in Parameters map in config file for calculations */
 .race_live .console .screen {
   @apply h-[35rem] aspect-square bg-white rounded-md overflow-hidden font-Orbitron;
   box-shadow: 0 0 2rem rgb(197, 197, 197);
@@ -170,7 +170,7 @@
 }
 
 /* Second column of the grid is 18rem wide comprising of 3 lanes with 6rem width per lane.
- This info is used to create the lane info map added in config file for Race visualisation related calculations */
+ This info is used to create the lane info map added in config file for calculations */
 .race_live .console .race_screen {
   @apply grid;
   grid-template-columns: 1fr 18rem 1fr;
@@ -228,7 +228,7 @@
   @apply bg-gray-50;
 }
 
-/* Length of car image (7rem) derived using the width and aspect ratio defined here is added in Parameters map in config file for Race visualisation related calculations */
+/* Length of car image (7rem) derived using the width and aspect ratio defined here is added in Parameters map in config file for calculations */
 .race_live .console .race_screen .race .cars .car {
   @apply w-14 absolute z-10 rounded-2xl;
   aspect-ratio: 0.5;

@@ -1,6 +1,6 @@
 defmodule FormulaX.CarControl do
   @moduledoc """
-  This module is the interface for all controls related to player and autonomous cars
+  Interface for all controls related to player and autonomous cars.
   """
   alias FormulaX.CarControl.CrashDetection
   alias FormulaX.Parameters

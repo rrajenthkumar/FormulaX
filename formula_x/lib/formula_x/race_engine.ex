@@ -1,6 +1,6 @@
 defmodule FormulaX.RaceEngine do
   @moduledoc """
-  Module that drives all cars forward, taking player interations into account, using GenServer
+  Module that drives all cars forward, taking player interations into account, using GenServer.
   """
   use GenServer
 
