@@ -19,9 +19,9 @@ defmodule FormulaX.RaceControl.CrashDetection do
   def crash?(
         race = %Race{},
         querying_car = %Car{},
-        _crash_check_side = :front
+        crash_check_side = :front
       ) do
-    crash_with_car?(race, querying_car)
+    crash_with_car?(race, querying_car, crash_check_side)
     |> case do
       false -> crash_with_obstacle?(race, querying_car)
       result -> result
@@ -42,7 +42,7 @@ defmodule FormulaX.RaceControl.CrashDetection do
         true
 
       _querying_car_lane ->
-        crash_with_car?(race, querying_car)
+        crash_with_car?(race, querying_car, crash_check_side)
         |> case do
           false -> crash_with_obstacle?(race, querying_car)
           result -> result
@@ -71,8 +71,20 @@ defmodule FormulaX.RaceControl.CrashDetection do
 
   ### Crash check with another car
 
-  @spec crash_with_car?(Race.t(), Car.t()) :: boolean()
-  defp crash_with_car?(race = %Race{}, querying_car = %Car{}) do
+  @spec crash_with_car?(Race.t(), Car.t(), :front | :left | :right) :: boolean()
+  defp crash_with_car?(race = %Race{}, querying_car = %Car{}, _crash_check_side = :front) do
+    race
+    # Since the movement that could possibly cause the crash has already happened the crashable car will be in the same lane as the querying car
+    |> get_same_lane_cars(querying_car)
+    |> remove_cars_behind(querying_car)
+    |> Enum.any?(fn car ->
+      cars_are_touching?(car, querying_car) or
+        cars_are_overlapping?(car, querying_car)
+    end)
+  end
+
+  defp crash_with_car?(race = %Race{}, querying_car = %Car{}, crash_check_side)
+       when crash_check_side in [:left, :right] do
     race
     # Since the movement that could possibly cause the crash has already happened the crashable car will be in the same lane as the querying car
     |> get_same_lane_cars(querying_car)
@@ -95,6 +107,17 @@ defmodule FormulaX.RaceControl.CrashDetection do
     |> get_lanes_and_cars_map()
     |> Map.get(querying_car_lane, [])
     |> Enum.reject(fn car -> car.id == querying_car_id end)
+  end
+
+  @spec remove_cars_behind(list(Car.t()), Car.t()) :: list(Car.t())
+  defp remove_cars_behind(
+         same_lane_cars,
+         %Car{y_position: querying_car_y_position}
+       )
+       when is_list(same_lane_cars) do
+    Enum.reject(same_lane_cars, fn car ->
+      car.y_position < querying_car_y_position
+    end)
   end
 
   @spec cars_are_touching?(Car.t(), Car.t()) :: boolean()
