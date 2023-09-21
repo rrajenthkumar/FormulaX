@@ -24,7 +24,6 @@ config :formula_x,
     ],
     # Based on CSS styling of 'car' class
     # Please note that the car length should be <= the highest drive step value for crash detection to work.
-    # Lengths of race elements like speed boosts, obstacles are also set to the same value for ease of calculations
     car_length: 7.0,
     # Initial positions of cars during the start of a race
     car_initial_positions: [
@@ -40,6 +39,8 @@ config :formula_x,
     car_drive_steps: %{rest: 0.0, low: 4.0, moderate: 5.0, high: 6.0, speed_boost: 7.0},
     # Car steering X direction step value
     car_steering_step: 6.0,
+    # Length of speed boost and length of obstacle are set to the same value as car length for ease of calculations
+    obstacle_and_speed_boost_length: 7.0,
     # Obstacles and Speed boosts are not placed until this distance after the start of race
     obstacles_and_speed_boosts_free_distance: 60.0,
     # Y direction step values used to position Obstacles

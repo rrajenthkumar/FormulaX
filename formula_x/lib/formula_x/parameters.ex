@@ -65,6 +65,12 @@ defmodule FormulaX.Parameters do
     |> Map.get(:car_steering_step)
   end
 
+  @spec obstacle_and_speed_boost_length() :: rem()
+  def obstacle_and_speed_boost_length() do
+    get_parameters()
+    |> Map.get(:obstacle_and_speed_boost_length)
+  end
+
   @spec obstacles_and_speed_boosts_free_distance() :: rem()
   def obstacles_and_speed_boosts_free_distance() do
     get_parameters()
