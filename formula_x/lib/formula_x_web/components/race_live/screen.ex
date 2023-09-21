@@ -134,7 +134,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
     <div class="screen race_screen">
       <audio src="sounds/mixkit-arcade-fast-game-over-233.wav" type="audio/wav" autoplay="true" preload="auto"></audio>
       <.race_setup race={@race}/>
-      <div class="crash_info">
+      <div class="game_over_info">
         <div class="body">
           <span class="text_part_1">Game</span>&nbsp;<span class="text_part_2">Over</span>
         </div>
@@ -186,8 +186,11 @@ defmodule FormulaXWeb.RaceLive.Screen do
     ~H"""
     <.background images={@race.background.left_side_images} y_position={@race.background.y_position}/>
     <div class="race">
+      <%=if @race.status == :crash do %>
+        <img class="crash_illustration" src={"/images/misc/bang.png"} style={crash_illustration_position_style(@race.player_car)}/>
+      <% end %>
       <.lanes/>
-      <.cars status={@race.status} player_car={@race.player_car} autonomous_cars={@race.autonomous_cars}/>
+      <.cars player_car={@race.player_car} autonomous_cars={@race.autonomous_cars}/>
       <.obstacles race={@race}/>
       <.speed_boosts race={@race}/>
       <.finish_line race={@race}/>
@@ -219,9 +222,6 @@ defmodule FormulaXWeb.RaceLive.Screen do
   defp cars(assigns) do
     ~H"""
     <div class="cars">
-      <%=if @status == :crash do %>
-        <%=#<img class="bang" src={"/images/misc/bang.png"} style={crash_illustration_position_style(@player_car)}>%>
-      <% end %>
       <img class="car player_car car_highlight" src={"/images/cars/#{@player_car.image}"} style={car_position_style(@player_car)}/>
       <%= for autonomous_car = %Car{image: autonomous_car_image} <- @autonomous_cars do %>
         <img class="car autonomous_car" src={"/images/cars/#{autonomous_car_image}"} style={car_position_style(autonomous_car)}/>
@@ -234,7 +234,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
     ~H"""
     <div class="obstacles">
       <%= for obstacle <- @race.obstacles do %>
-        <div class="obstacle" style={stationary_item_position_style(obstacle, @race)}>
+        <div class="obstacle" style={obstacle_and_speed_boost_position_style(obstacle, @race)}>
           <.tires />
         </div>
       <% end %>
@@ -254,7 +254,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
     ~H"""
     <div class="speed_boosts">
       <%= for speed_boost <- @race.speed_boosts do %>
-        <div class="speed_boost" style={stationary_item_position_style(speed_boost, @race)}>
+        <div class="speed_boost" style={obstacle_and_speed_boost_position_style(speed_boost, @race)}>
           <img src={"/images/misc/speed_boost.png"} >
         </div>
       <% end %>
@@ -334,8 +334,9 @@ defmodule FormulaXWeb.RaceLive.Screen do
     "bottom: #{race_distance - distance_travelled_by_player_car}rem;"
   end
 
-  @spec stationary_item_position_style(Obstacle.t() | SpeedBoost.t(), Race.t()) :: String.t()
-  defp stationary_item_position_style(
+  @spec obstacle_and_speed_boost_position_style(Obstacle.t() | SpeedBoost.t(), Race.t()) ::
+          String.t()
+  defp obstacle_and_speed_boost_position_style(
          %{x_position: stationary_item_x_position, distance: stationary_item_distance},
          %Race{
            player_car: %Car{
