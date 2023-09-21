@@ -21,11 +21,8 @@ defmodule FormulaX.RaceControl.CrashDetection do
         querying_car = %Car{},
         crash_check_side = :front
       ) do
-    crash_with_car?(race, querying_car, crash_check_side)
-    |> case do
-      false -> crash_with_obstacle?(race, querying_car)
-      result -> result
-    end
+    crash_with_car?(race, querying_car, crash_check_side) or
+      crash_with_obstacle?(race, querying_car)
   end
 
   def crash?(
@@ -34,20 +31,9 @@ defmodule FormulaX.RaceControl.CrashDetection do
         crash_check_side
       )
       when crash_check_side in [:left, :right] do
-    querying_car_lane = Car.get_lane(querying_car)
-
-    case querying_car_lane do
-      # Crash with a background item outside tracks
-      :out_of_tracks ->
-        true
-
-      _querying_car_lane ->
-        crash_with_car?(race, querying_car, crash_check_side)
-        |> case do
-          false -> crash_with_obstacle?(race, querying_car)
-          result -> result
-        end
-    end
+    crash_with_car?(race, querying_car, crash_check_side) or
+      crash_with_obstacle?(race, querying_car) or
+      out_of_tracks?(querying_car)
   end
 
   @spec get_lanes_and_cars_map(Race.t()) :: map()
@@ -195,5 +181,11 @@ defmodule FormulaX.RaceControl.CrashDetection do
          car_y_position < obstacle_y_position) or
       (car_y_position > obstacle_y_position and
          car_y_position < obstacle_y_position + @obstacle_length)
+  end
+
+  ### Car out of tracks
+
+  defp out_of_tracks?(querying_car = %Car{}) do
+    Car.get_lane(querying_car) == :out_of_tracks
   end
 end
