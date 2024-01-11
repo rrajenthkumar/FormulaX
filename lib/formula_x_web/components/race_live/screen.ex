@@ -13,15 +13,15 @@ defmodule FormulaXWeb.RaceLive.Screen do
 
   def render(assigns = %{screen_state: :switched_off}) do
     ~H"""
-    <div class="screen switched_off_screen">
-    </div>
+    <div class="screen switched_off_screen"></div>
     """
   end
 
   def render(assigns = %{screen_state: :startup}) do
     ~H"""
     <div class="screen startup_screen">
-      <audio src="sounds/Carmack_FadeEndm.mp3" type="audio/mp3" autoplay="true" preload="auto"></audio>
+      <audio src="sounds/Carmack_FadeEndm.mp3" type="audio/mp3" autoplay="true" preload="auto">
+      </audio>
       <div class="body">
         <div class="content">
           <div class="text_container">
@@ -32,8 +32,8 @@ defmodule FormulaXWeb.RaceLive.Screen do
         </div>
       </div>
       <div class="footer">
-        <.to_proceed_info/>
-        <.power_off_info/>
+        <.to_proceed_info />
+        <.power_off_info />
       </div>
     </div>
     """
@@ -44,13 +44,19 @@ defmodule FormulaXWeb.RaceLive.Screen do
     <div class="screen car_selection_screen">
       <div class="body">
         <%= with car <- get_car_image(@car_selection_index) do %>
-          <img src={"/images/cars/#{car}"}/>
+          <img src={"/images/cars/#{car}"} />
         <% end %>
       </div>
       <div class="footer">
-        <p><span class="yellow">Yellow</span> / <span class="blue">Blue</span> buttons or <span class="arrow">&#8678</span> / <span class="arrow">&#8680</span> keys to browse cars</p>
-        <.to_proceed_info/>
-        <.power_off_info/>
+        <p>
+          <span class="yellow">Yellow</span>
+          / <span class="blue">Blue</span>
+          buttons or <span class="arrow">&#8678</span>
+          / <span class="arrow">&#8680</span>
+          keys to browse cars
+        </p>
+        <.to_proceed_info />
+        <.power_off_info />
       </div>
     </div>
     """
@@ -63,16 +69,32 @@ defmodule FormulaXWeb.RaceLive.Screen do
         <h1 class="title">Race controls:</h1>
         <ul class="instructions_list">
           <li>
-            <p><span class="green">Green</span> button or <span class="arrow">&#8679</span> key to switch car speeds in increasing order</p>
+            <p>
+              <span class="green">Green</span>
+              button or <span class="arrow">&#8679</span>
+              key to switch car speeds in increasing order
+            </p>
           </li>
           <li>
-            <p><span class="red">Red</span> button or <span class="arrow">&#8681</span> key to switch car speeds in decreasing order</p>
+            <p>
+              <span class="red">Red</span>
+              button or <span class="arrow">&#8681</span>
+              key to switch car speeds in decreasing order
+            </p>
           </li>
           <li>
-            <p><span class="yellow">Yellow</span> button or <span class="arrow">&#8678</span> key to move left</p>
+            <p>
+              <span class="yellow">Yellow</span>
+              button or <span class="arrow">&#8678</span>
+              key to move left
+            </p>
           </li>
           <li>
-            <p><span class="blue">Blue</span> button or <span class="arrow">&#8680</span> key to move right</p>
+            <p>
+              <span class="blue">Blue</span>
+              button or <span class="arrow">&#8680</span>
+              key to move right
+            </p>
           </li>
           <li>
             <p>Click on console screen or press Spacebar to pause / unpause race</p>
@@ -83,8 +105,8 @@ defmodule FormulaXWeb.RaceLive.Screen do
         </ul>
       </div>
       <div class="footer">
-        <.to_proceed_info/>
-        <.power_off_info/>
+        <.to_proceed_info />
+        <.power_off_info />
       </div>
     </div>
     """
@@ -93,8 +115,14 @@ defmodule FormulaXWeb.RaceLive.Screen do
   def render(assigns = %{screen_state: :race, race: %Race{status: :countdown}}) do
     ~H"""
     <div class="screen race_screen">
-      <audio src="sounds/mixkit-simple-game-countdown-921.wav" type="audio/wav" autoplay="true" preload="auto"></audio>
-      <.race_setup race={@race}/>
+      <audio
+        src="sounds/mixkit-simple-game-countdown-921.wav"
+        type="audio/wav"
+        autoplay="true"
+        preload="auto"
+      >
+      </audio>
+      <.race_setup race={@race} />
       <div class="count_down_info">
         <span class="countdown">
           <%= @countdown_count %>
@@ -107,8 +135,15 @@ defmodule FormulaXWeb.RaceLive.Screen do
   def render(assigns = %{screen_state: :race, race: %Race{status: :ongoing}}) do
     ~H"""
     <div class="screen race_screen race_pause_feature" phx-click="race_screen_clicked">
-      <audio src="sounds/rally-car-idle-loop-14-32339.mp3" type="audio/mp3" autoplay="true" loop="true" preload="auto"></audio>
-      <.race_setup race={@race}/>
+      <audio
+        src="sounds/rally-car-idle-loop-14-32339.mp3"
+        type="audio/mp3"
+        autoplay="true"
+        loop="true"
+        preload="auto"
+      >
+      </audio>
+      <.race_setup race={@race} />
     </div>
     """
   end
@@ -116,10 +151,10 @@ defmodule FormulaXWeb.RaceLive.Screen do
   def render(assigns = %{screen_state: :race, race: %Race{status: :paused}}) do
     ~H"""
     <div class="screen race_screen race_pause_feature" phx-click="race_screen_clicked">
-      <.race_setup race={@race}/>
+      <.race_setup race={@race} />
       <div class="pause_info">
         <div class="body">
-          <img class="pause_icon" src={"/images/icons/pause.png"} alt="pause icon"/>
+          <img class="pause_icon" src="/images/icons/pause.png" alt="pause icon" />
         </div>
         <div class="footer">
           <p>Click on console screen or press Spacebar to unpause</p>
@@ -132,15 +167,21 @@ defmodule FormulaXWeb.RaceLive.Screen do
   def render(assigns = %{screen_state: :race, race: %Race{status: :crash}}) do
     ~H"""
     <div class="screen race_screen">
-      <audio src="sounds/mixkit-arcade-fast-game-over-233.wav" type="audio/wav" autoplay="true" preload="auto"></audio>
-      <.race_setup race={@race}/>
+      <audio
+        src="sounds/mixkit-arcade-fast-game-over-233.wav"
+        type="audio/wav"
+        autoplay="true"
+        preload="auto"
+      >
+      </audio>
+      <.race_setup race={@race} />
       <div class="game_over_info">
         <div class="body">
           <span class="text_part_1">Game</span>&nbsp;<span class="text_part_2">Over</span>
         </div>
         <div class="footer">
-          <.new_race_info/>
-          <.power_off_info/>
+          <.new_race_info />
+          <.power_off_info />
         </div>
       </div>
     </div>
@@ -150,8 +191,14 @@ defmodule FormulaXWeb.RaceLive.Screen do
   def render(assigns = %{screen_state: :race, race: %Race{status: :ended}}) do
     ~H"""
     <div class="screen race_screen">
-      <audio src="sounds/mixkit-cheering-crowd-loud-whistle-610.wav" type="audio/wav" autoplay="true" preload="auto"></audio>
-      <.race_setup race={@race}/>
+      <audio
+        src="sounds/mixkit-cheering-crowd-loud-whistle-610.wav"
+        type="audio/wav"
+        autoplay="true"
+        preload="auto"
+      >
+      </audio>
+      <.race_setup race={@race} />
       <div class="result">
         <div class="body">
           <table>
@@ -162,20 +209,20 @@ defmodule FormulaXWeb.RaceLive.Screen do
               <th>Time</th>
               <th></th>
             </tr>
-            <%= for result <- @last_5_results do%>
+            <%= for result <- @last_5_results do %>
               <tr>
-                <td><img src={"/images/cars/#{result.car}"}/></td>
-                <td><%= result.status%></td>
-                <td><%= result.position%></td>
-                <td><%= "#{result.time} s"%></td>
+                <td><img src={"/images/cars/#{result.car}"} /></td>
+                <td><%= result.status %></td>
+                <td><%= result.position %></td>
+                <td><%= "#{result.time} s" %></td>
                 <td class={symbol_class(result.symbol)}><%= raw(result.symbol) %></td>
               </tr>
             <% end %>
           </table>
         </div>
         <div class="footer">
-          <.new_race_info/>
-          <.power_off_info/>
+          <.new_race_info />
+          <.power_off_info />
         </div>
       </div>
     </div>
@@ -184,18 +231,22 @@ defmodule FormulaXWeb.RaceLive.Screen do
 
   defp race_setup(assigns) do
     ~H"""
-    <.background images={@race.background.left_side_images} y_position={@race.background.y_position}/>
+    <.background images={@race.background.left_side_images} y_position={@race.background.y_position} />
     <div class="race">
-      <%=if @race.status == :crash do %>
-        <img class="crash_illustration" src={"/images/misc/bang.png"} style={crash_illustration_position_style(@race.player_car)}/>
+      <%= if @race.status == :crash do %>
+        <img
+          class="crash_illustration"
+          src="/images/misc/bang.png"
+          style={crash_illustration_position_style(@race.player_car)}
+        />
       <% end %>
-      <.lanes/>
-      <.cars player_car={@race.player_car} autonomous_cars={@race.autonomous_cars}/>
-      <.obstacles race={@race}/>
-      <.speed_boosts race={@race}/>
-      <.finish_line race={@race}/>
+      <.lanes />
+      <.cars player_car={@race.player_car} autonomous_cars={@race.autonomous_cars} />
+      <.obstacles race={@race} />
+      <.speed_boosts race={@race} />
+      <.finish_line race={@race} />
     </div>
-    <.background images={@race.background.right_side_images} y_position={@race.background.y_position}/>
+    <.background images={@race.background.right_side_images} y_position={@race.background.y_position} />
     """
   end
 
@@ -222,9 +273,17 @@ defmodule FormulaXWeb.RaceLive.Screen do
   defp cars(assigns) do
     ~H"""
     <div class="cars">
-      <img class="car player_car car_highlight" src={"/images/cars/#{@player_car.image}"} style={car_position_style(@player_car)}/>
+      <img
+        class="car player_car car_highlight"
+        src={"/images/cars/#{@player_car.image}"}
+        style={car_position_style(@player_car)}
+      />
       <%= for autonomous_car = %Car{image: autonomous_car_image} <- @autonomous_cars do %>
-        <img class="car autonomous_car" src={"/images/cars/#{autonomous_car_image}"} style={car_position_style(autonomous_car)}/>
+        <img
+          class="car autonomous_car"
+          src={"/images/cars/#{autonomous_car_image}"}
+          style={car_position_style(autonomous_car)}
+        />
       <% end %>
     </div>
     """
@@ -245,7 +304,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
   defp tires(assigns) do
     ~H"""
     <%= for _counter <- 1..12 do %>
-      <img src={"/images/misc/tire.png"}/>
+      <img src="/images/misc/tire.png" />
     <% end %>
     """
   end
@@ -255,7 +314,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
     <div class="speed_boosts">
       <%= for speed_boost <- @race.speed_boosts do %>
         <div class="speed_boost" style={obstacle_and_speed_boost_position_style(speed_boost, @race)}>
-          <img src={"/images/misc/speed_boost.png"} >
+          <img src="/images/misc/speed_boost.png" />
         </div>
       <% end %>
     </div>
@@ -267,16 +326,12 @@ defmodule FormulaXWeb.RaceLive.Screen do
     <div class="finish_line" style={finish_line_position_style(@race)}>
       <%= for _counter1 <- 1..3 do %>
         <%= for _counter2 <- 1..6 do %>
-          <div class="black">
-          </div>
-          <div class="white">
-          </div>
+          <div class="black"></div>
+          <div class="white"></div>
         <% end %>
         <%= for _counter3 <- 1..6 do %>
-          <div class="white">
-          </div>
-          <div class="black">
-          </div>
+          <div class="white"></div>
+          <div class="black"></div>
         <% end %>
       <% end %>
     </div>
@@ -291,7 +346,9 @@ defmodule FormulaXWeb.RaceLive.Screen do
 
   defp new_race_info(assigns) do
     ~H"""
-    <p><span class="green">Green</span> button or <span class="arrow">&#8679</span> key for a new race</p>
+    <p>
+      <span class="green">Green</span> button or <span class="arrow">&#8679</span> key for a new race
+    </p>
     """
   end
 
