@@ -38,3 +38,6 @@ formula_x-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Files created during release
+rel/overlays/bin
+
