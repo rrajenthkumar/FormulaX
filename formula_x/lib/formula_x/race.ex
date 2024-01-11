@@ -71,7 +71,7 @@ defmodule FormulaX.Race do
 
   @spec update_autonomous_car(Race.t(), Car.t()) :: Race.t()
   def update_autonomous_car(
-        race = %Race{autonomous_cars: autonomous_cars, status: :ongoing},
+        race = %Race{autonomous_cars: autonomous_cars},
         updated_autonomous_car = %Car{id: updated_autonomous_car_id, controller: :autonomous}
       ) do
     updated_autonomous_cars =

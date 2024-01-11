@@ -252,12 +252,12 @@
   @apply absolute w-24 h-[7rem] grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr 1fr;
-  transition: left 1s ease-out, bottom 1s ease-out;
+  transition: bottom 1s ease-out;
 }
 
 .race_live .console .race_screen .race .speed_boosts .speed_boost {
   @apply absolute w-24 h-16 flex justify-center;
-  transition: left 1s ease-out, bottom 1s ease-out;
+  transition: bottom 1s ease-out;
 }
 
 .race_live .console .race_screen .race .speed_boosts img {

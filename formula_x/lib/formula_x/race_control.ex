@@ -44,6 +44,7 @@ defmodule FormulaX.RaceControl do
     |> Race.update_background(updated_background)
     |> SpeedBoost.enable_if_fetched()
     |> Race.record_crash_if_applicable(_crash_check_side = :front)
+    |> adapt_autonomous_cars_positions
     |> Race.end_if_applicable()
   end
 
@@ -211,5 +212,31 @@ defmodule FormulaX.RaceControl do
       car.y_position < querying_autonomous_car_y_position - @car_length or
         car.y_position > querying_autonomous_car_y_position + @car_length
     end)
+  end
+
+  @spec adapt_autonomous_cars_positions(Race.t()) :: Race.t()
+  defp adapt_autonomous_cars_positions(race = %Race{autonomous_cars: autonomous_cars}) do
+    adapt_autonomous_cars_positions(autonomous_cars, race)
+  end
+
+  @spec adapt_autonomous_cars_positions(list(Car.t()), Race.t()) :: Race.t()
+  defp adapt_autonomous_cars_positions(
+         [autonomous_car = %Car{controller: :autonomous}],
+         race = %Race{}
+       ) do
+    updated_autonomous_car = Car.adapt_autonomous_car_position(autonomous_car, race)
+
+    Race.update_autonomous_car(race, updated_autonomous_car)
+  end
+
+  defp adapt_autonomous_cars_positions(
+         _autonomous_cars = [
+           autonomous_car = %Car{controller: :autonomous} | remaining_autonomous_cars
+         ],
+         race = %Race{}
+       ) do
+    updated_autonomous_car = Car.adapt_autonomous_car_position(autonomous_car, race)
+    updated_race = Race.update_autonomous_car(race, updated_autonomous_car)
+    adapt_autonomous_cars_positions(remaining_autonomous_cars, updated_race)
   end
 end
