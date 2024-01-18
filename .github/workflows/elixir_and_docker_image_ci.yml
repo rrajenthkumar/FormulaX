@@ -1,9 +1,4 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-name: Elixir CI
+name: Elixir and Docker Image CI
 
 on:
   push:
@@ -24,20 +19,28 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Elixir
         uses: erlef/setup-beam@61e01a43a562a89bfc54c7f9a378ff67b03e4a21 # v1.16.0
         with:
           elixir-version: "1.14.5" # [Required] Define the Elixir version
           otp-version: "26.2.1" # [Required] Define the Erlang/OTP version
+
       - name: Set environment variables
         run: echo "export SECRET_KEY_BASE=${SECRET_KEY_BASE}" >> $GITHUB_ENV
+
       - name: Restore dependencies cache
         uses: actions/cache@v3
         with:
           path: deps
           key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
           restore-keys: ${{ runner.os }}-mix-
+
       - name: Install dependencies
         run: mix deps.get
+
       - name: Run tests
         run: mix test
+
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
