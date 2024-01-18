@@ -20,6 +20,9 @@ jobs:
     name: Build and test
     runs-on: ubuntu-latest
 
+    env:
+      MY_APP_SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
+
     steps:
     - uses: actions/checkout@v3
     - name: Set up Elixir
@@ -27,6 +30,8 @@ jobs:
       with:
         elixir-version: '1.14.5' # [Required] Define the Elixir version
         otp-version: '26.2.1'      # [Required] Define the Erlang/OTP version
+    - name: Set environment variables
+      run: echo "export SECRET_KEY_BASE=${SECRET_KEY_BASE}" >> $GITHUB_ENV
     - name: Restore dependencies cache
       uses: actions/cache@v3
       with:
