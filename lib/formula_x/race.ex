@@ -239,10 +239,12 @@ defmodule FormulaX.Race do
          distance: race_distance,
          player_car: %Car{
            distance_travelled: distance_travelled_by_player_car,
+           y_position: player_car_y_position,
            controller: :player
          }
        }) do
     # To check if the player car has travelled a distance of half the console screen height beyond the finish line. This particular distance is just to make the end look smooth.
-    distance_travelled_by_player_car > race_distance + @console_screen_height / 2
+    distance_travelled_by_player_car + player_car_y_position >=
+      race_distance + @console_screen_height / 2
   end
 end

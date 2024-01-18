@@ -25,7 +25,7 @@ defmodule FormulaX.Race.Car do
     field(:x_position, Parameters.rem(), enforce: true)
     field(:y_position, Parameters.rem(), enforce: true)
     field(:speed, speed(), enforce: true)
-    field(:distance_travelled, Parameters.rem(), enforce: true)
+    field(:distance_travelled, Parameters.rem(), default: 0)
     field(:completion_time, Time.t(), default: nil)
   end
 
@@ -51,8 +51,7 @@ defmodule FormulaX.Race.Car do
       controller: :player,
       x_position: x_position,
       y_position: y_position,
-      speed: :rest,
-      distance_travelled: y_position
+      speed: :rest
     })
   end
 
@@ -68,8 +67,7 @@ defmodule FormulaX.Race.Car do
       controller: :autonomous,
       x_position: x_position,
       y_position: y_position,
-      speed: speed,
-      distance_travelled: y_position
+      speed: speed
     })
   end
 
@@ -202,9 +200,9 @@ defmodule FormulaX.Race.Car do
 
   @spec finished?(Car.t(), Race.t()) :: boolean()
   defp finished?(
-         %Car{distance_travelled: distance_travelled_by_car},
+         %Car{distance_travelled: distance_travelled_by_car, y_position: car_y_position},
          %Race{distance: race_distance}
        ) do
-    distance_travelled_by_car >= race_distance
+    distance_travelled_by_car + car_y_position >= race_distance
   end
 end

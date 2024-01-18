@@ -384,11 +384,12 @@ defmodule FormulaXWeb.RaceLive.Screen do
   defp finish_line_position_style(%Race{
          player_car: %Car{
            distance_travelled: distance_travelled_by_player_car,
+           y_position: player_car_y_position,
            controller: :player
          },
          distance: race_distance
        }) do
-    "bottom: #{race_distance - distance_travelled_by_player_car}rem;"
+    "bottom: #{race_distance - (distance_travelled_by_player_car + player_car_y_position)}rem;"
   end
 
   @spec obstacle_and_speed_boost_position_style(Obstacle.t() | SpeedBoost.t(), Race.t()) ::
