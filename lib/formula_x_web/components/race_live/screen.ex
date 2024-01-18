@@ -399,12 +399,15 @@ defmodule FormulaXWeb.RaceLive.Screen do
          %Race{
            player_car: %Car{
              distance_travelled: distance_travelled_by_player_car,
+             y_position: player_car_y_position,
              controller: :player
            }
          }
        )
        when is_float(stationary_item_x_position) and is_float(stationary_item_distance) do
-    stationary_item_y_position = stationary_item_distance - distance_travelled_by_player_car
+    stationary_item_y_position =
+      stationary_item_distance - (distance_travelled_by_player_car + player_car_y_position)
+
     "left: #{stationary_item_x_position}rem; bottom: #{stationary_item_y_position}rem;"
   end
 

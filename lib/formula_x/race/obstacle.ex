@@ -39,11 +39,12 @@ defmodule FormulaX.Race.Obstacle do
         %Race{
           player_car: %Car{
             distance_travelled: distance_travelled_by_player_car,
+            y_position: player_car_y_position,
             controller: :player
           }
         }
       ) do
-    obstacle_distance - distance_travelled_by_player_car
+    obstacle_distance - (distance_travelled_by_player_car + player_car_y_position)
   end
 
   @spec get_lane(Obstacle.t()) :: integer()
