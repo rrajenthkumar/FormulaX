@@ -49,8 +49,8 @@ defmodule FormulaX.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:typed_struct, "~> 0.3.0"},
-      {:credo, "~> 1.7"},
-      {:dialyxir, "~> 1.4", runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 
