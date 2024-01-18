@@ -7,7 +7,7 @@ import Config
 # before starting your production server.
 config :formula_x, FormulaXWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json",
-  check_origin: ["http://localhost:4001/", "https://formulax.rajenth.com/"]
+  check_origin: ["http://localhost:4001/", "https://formulax.rajenth.com/", "https://formulax-5u7vh.ondigitalocean.app"]
 
 # Configures Swoosh API Client
 config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: FormulaX.Finch
