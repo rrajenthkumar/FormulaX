@@ -79,8 +79,7 @@ defmodule FormulaX.Race.SpeedBoost do
     |> Enum.any?(fn speed_boost ->
       speed_boost_y_position = SpeedBoost.get_y_position(speed_boost, race)
 
-      touches_player_car?(speed_boost_y_position, player_car) or
-        overlaps_with_player_car?(speed_boost_y_position, player_car)
+      overlaps_with_player_car?(speed_boost_y_position, player_car)
     end)
   end
 
@@ -98,16 +97,6 @@ defmodule FormulaX.Race.SpeedBoost do
     Enum.group_by(speed_boosts, &SpeedBoost.get_lane/1, & &1)
   end
 
-  @spec touches_player_car?(Parameters.rem(), Car.t()) :: boolean()
-  defp touches_player_car?(speed_boost_y_position, %Car{
-         y_position: car_y_position,
-         controller: :player
-       })
-       when is_float(speed_boost_y_position) do
-    speed_boost_y_position + @speed_boost_length == car_y_position or
-      car_y_position + @car_length == speed_boost_y_position
-  end
-
   @spec overlaps_with_player_car?(Parameters.rem(), Car.t()) :: boolean()
   defp overlaps_with_player_car?(speed_boost_y_position, %Car{
          y_position: car_y_position,
@@ -117,10 +106,9 @@ defmodule FormulaX.Race.SpeedBoost do
     # Player car and the speed boost are exactly at the same position or
     # Player car front wheels are between speed boost start and end or
     # Player car rear wheels are between speed boost start and end
-    speed_boost_y_position == car_y_position or
-      (car_y_position + @car_length > speed_boost_y_position and
-         car_y_position < speed_boost_y_position) or
-      (car_y_position > speed_boost_y_position and
-         car_y_position < speed_boost_y_position + @speed_boost_length)
+    (car_y_position + @car_length >= speed_boost_y_position and
+       car_y_position <= speed_boost_y_position) or
+      (car_y_position >= speed_boost_y_position and
+         car_y_position <= speed_boost_y_position + @speed_boost_length)
   end
 end

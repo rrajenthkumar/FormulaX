@@ -105,8 +105,8 @@ defmodule FormulaX.RaceControl.CrashDetection do
     # Both cars are at the same position or
     # Car_1 front wheels between Car_2 front and rear wheels or
     # Car_1 rear wheels between Car_2 front and rear wheels
-      (car_1_y_position + @car_length >= car_2_y_position and
-         car_1_y_position <= car_2_y_position) or
+    (car_1_y_position + @car_length >= car_2_y_position and
+       car_1_y_position <= car_2_y_position) or
       (car_1_y_position >= car_2_y_position and
          car_1_y_position <= car_2_y_position + @car_length)
   end
@@ -149,8 +149,8 @@ defmodule FormulaX.RaceControl.CrashDetection do
     # Car and obstacle are at the same position or
     # Car front wheels between obstacle start and end or
     # Car rear wheels between obstacle start and end
-      (car_y_position + @car_length >= obstacle_y_position and
-         car_y_position <= obstacle_y_position) or
+    (car_y_position + @car_length >= obstacle_y_position and
+       car_y_position <= obstacle_y_position) or
       (car_y_position >= obstacle_y_position and
          car_y_position <= obstacle_y_position + @obstacle_length)
   end
