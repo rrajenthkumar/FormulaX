@@ -55,18 +55,13 @@ defmodule FormulaX.RaceControl.CrashDetection do
     )
   end
 
-  ### Crash check with another car
-
+  # Crash check with another car
   @spec crash_with_car?(Race.t(), Car.t(), :front | :left | :right) :: boolean()
   defp crash_with_car?(race = %Race{}, querying_car = %Car{}, _crash_check_side = :front) do
     race
-    # Since the movement that could possibly cause the crash has already happened the crashable car will be in the same lane as the querying car
     |> get_same_lane_cars(querying_car)
     |> remove_cars_behind(querying_car)
-    |> Enum.any?(fn car ->
-      cars_are_touching?(car, querying_car) or
-        cars_are_overlapping?(car, querying_car)
-    end)
+    |> Enum.any?(fn car -> cars_are_overlapping?(car, querying_car) end)
   end
 
   defp crash_with_car?(race = %Race{}, querying_car = %Car{}, crash_check_side)
@@ -74,10 +69,7 @@ defmodule FormulaX.RaceControl.CrashDetection do
     race
     # Since the movement that could possibly cause the crash has already happened the crashable car will be in the same lane as the querying car
     |> get_same_lane_cars(querying_car)
-    |> Enum.any?(fn car ->
-      cars_are_touching?(car, querying_car) or
-        cars_are_overlapping?(car, querying_car)
-    end)
+    |> Enum.any?(fn car -> cars_are_overlapping?(car, querying_car) end)
   end
 
   @spec get_same_lane_cars(Race.t(), Car.t()) :: list(Car.t())
@@ -106,14 +98,6 @@ defmodule FormulaX.RaceControl.CrashDetection do
     end)
   end
 
-  @spec cars_are_touching?(Car.t(), Car.t()) :: boolean()
-  defp cars_are_touching?(%Car{y_position: car_1_y_position}, %Car{
-         y_position: car_2_y_position
-       }) do
-    car_1_y_position + @car_length == car_2_y_position or
-      car_1_y_position == car_2_y_position + @car_length
-  end
-
   @spec cars_are_overlapping?(Car.t(), Car.t()) :: boolean()
   defp cars_are_overlapping?(%Car{y_position: car_1_y_position}, %Car{
          y_position: car_2_y_position
@@ -121,15 +105,13 @@ defmodule FormulaX.RaceControl.CrashDetection do
     # Both cars are at the same position or
     # Car_1 front wheels between Car_2 front and rear wheels or
     # Car_1 rear wheels between Car_2 front and rear wheels
-    car_1_y_position == car_2_y_position or
-      (car_1_y_position + @car_length > car_2_y_position and
-         car_1_y_position < car_2_y_position) or
-      (car_1_y_position > car_2_y_position and
-         car_1_y_position < car_2_y_position + @car_length)
+      (car_1_y_position + @car_length >= car_2_y_position and
+         car_1_y_position <= car_2_y_position) or
+      (car_1_y_position >= car_2_y_position and
+         car_1_y_position <= car_2_y_position + @car_length)
   end
 
-  ### Crash check with an obstacle
-
+  # Crash check with an obstacle
   @spec crash_with_obstacle?(Race.t(), Car.t()) :: boolean()
   defp crash_with_obstacle?(
          race = %Race{},
@@ -140,9 +122,7 @@ defmodule FormulaX.RaceControl.CrashDetection do
     |> get_same_lane_obstacles(querying_car)
     |> Enum.any?(fn obstacle ->
       obstacle_y_position = Obstacle.get_y_position(obstacle, race)
-
-      touches_obstacle?(querying_car, obstacle_y_position) or
-        overlaps_with_obstacle?(querying_car, obstacle_y_position)
+      overlaps_with_obstacle?(querying_car, obstacle_y_position)
     end)
   end
 
@@ -163,28 +143,19 @@ defmodule FormulaX.RaceControl.CrashDetection do
     Enum.group_by(obstacles, &Obstacle.get_lane/1, & &1)
   end
 
-  @spec touches_obstacle?(Car.t(), Parameters.rem()) :: boolean()
-  defp touches_obstacle?(%Car{y_position: car_y_position}, obstacle_y_position)
-       when is_float(obstacle_y_position) do
-    obstacle_y_position + @obstacle_length == car_y_position or
-      car_y_position + @car_length == obstacle_y_position
-  end
-
   @spec overlaps_with_obstacle?(Car.t(), Parameters.rem()) :: boolean()
   defp overlaps_with_obstacle?(%Car{y_position: car_y_position}, obstacle_y_position)
        when is_float(obstacle_y_position) do
     # Car and obstacle are at the same position or
     # Car front wheels between obstacle start and end or
     # Car rear wheels between obstacle start and end
-    obstacle_y_position == car_y_position or
-      (car_y_position + @car_length > obstacle_y_position and
-         car_y_position < obstacle_y_position) or
-      (car_y_position > obstacle_y_position and
-         car_y_position < obstacle_y_position + @obstacle_length)
+      (car_y_position + @car_length >= obstacle_y_position and
+         car_y_position <= obstacle_y_position) or
+      (car_y_position >= obstacle_y_position and
+         car_y_position <= obstacle_y_position + @obstacle_length)
   end
 
-  ### Car out of tracks
-
+  # Car out of tracks
   defp out_of_tracks?(querying_car = %Car{}) do
     Car.get_lane(querying_car) == :out_of_tracks
   end
