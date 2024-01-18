@@ -2,7 +2,8 @@
 /_build/
 
 # Config files.
-/config/
+dev.exs
+test.exs
 
 # If you run "mix test --cover", coverage assets end up here.
 /cover/
