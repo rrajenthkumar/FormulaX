@@ -12,7 +12,7 @@ defmodule FormulaX.Result do
 
   @typedoc "Result struct"
   typedstruct do
-    field(:car, Car.image(), enforce: true)
+    field(:car, Car.t(), enforce: true)
     field(:status, status(), enforce: true)
     field(:time, Time.t(), default: nil)
     field(:position, integer(), default: nil)

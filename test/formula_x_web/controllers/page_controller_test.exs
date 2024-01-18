@@ -3,6 +3,6 @@ defmodule FormulaXWeb.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")
-    assert html_response(conn, 200) =~ "Peace of mind from prototype to production"
+    assert html_response(conn, 200) =~ "© Rajenth 2023"
   end
 end

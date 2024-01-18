@@ -9,7 +9,8 @@ defmodule FormulaX.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      preferred_cli_env: [test: :test, check: :test]
     ]
   end
 
@@ -47,7 +48,9 @@ defmodule FormulaX.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
-      {:typed_struct, "~> 0.3.0"}
+      {:typed_struct, "~> 0.3.0"},
+      {:credo, "~> 1.7"},
+      {:dialyxir, "~> 1.4"}
     ]
   end
 
@@ -62,7 +65,8 @@ defmodule FormulaX.MixProject do
       setup: ["deps.get", "assets.setup", "assets.build"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind default", "esbuild default"],
-      "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
+      "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"],
+      check: ["format", "test", "dialyzer", "credo"]
     ]
   end
 end

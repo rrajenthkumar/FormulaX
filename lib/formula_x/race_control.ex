@@ -12,7 +12,7 @@ defmodule FormulaX.RaceControl do
 
   @car_length Parameters.car_length()
 
-  @spec start_race(Race.t(), pid()) :: :ok
+  @spec start_race(Race.t(), pid()) :: {:error, {:already_started, pid()}} | {:ok, pid()}
   def start_race(race = %Race{status: :countdown}, race_liveview_pid)
       when is_pid(race_liveview_pid) do
     race
