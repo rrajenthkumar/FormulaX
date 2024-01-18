@@ -38,6 +38,3 @@ formula_x-*.tar
 # In case you use Node.js/npm, you want to ignore these.
 npm-debug.log
 /assets/node_modules/
-
-# Files created during release
-rel/overlays/bin
