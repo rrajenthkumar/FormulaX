@@ -14,7 +14,7 @@ defmodule FormulaX.Result do
   typedstruct do
     field(:car, Car.t(), enforce: true)
     field(:status, status(), enforce: true)
-    field(:time, Time.t(), default: nil)
+    field(:time, integer(), default: nil)
     field(:position, integer(), default: nil)
     field(:symbol, String.t(), default: nil)
   end

@@ -20,7 +20,9 @@ defmodule FormulaX.Race.Obstacle do
   The newly initiated obstacle will be placed only beyond 'obstacles_prohibited_distance_or_distance_already_covered_with_obstacles' part of the track.
   """
   @spec initialize_obstacle(Parameters.rem()) :: Obstacle.t()
-  def initialize_obstacle(obstacles_prohibited_distance_or_distance_already_covered_with_obstacles)
+  def initialize_obstacle(
+        obstacles_prohibited_distance_or_distance_already_covered_with_obstacles
+      )
       when is_float(obstacles_prohibited_distance_or_distance_already_covered_with_obstacles) do
     obstacle_x_position =
       Parameters.obstacles_and_speed_boosts_x_positions()
