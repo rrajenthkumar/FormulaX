@@ -1,4 +1,4 @@
-defmodule FormulaX.BackgroundTest do
+defmodule FormulaX.Race.BackgroundTest do
   use ExUnit.Case
 
   import Mock

@@ -1,4 +1,4 @@
-defmodule FormulaX.ObstacleTest do
+defmodule FormulaX.Race.ObstacleTest do
   use ExUnit.Case
 
   alias FormulaX.Fixtures

@@ -1,4 +1,4 @@
-defmodule FormulaX.CarTest do
+defmodule FormulaX.Race.CarTest do
   use ExUnit.Case
 
   alias FormulaX.Fixtures

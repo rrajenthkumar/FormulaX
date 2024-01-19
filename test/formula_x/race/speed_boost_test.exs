@@ -1,4 +1,4 @@
-defmodule FormulaX.SpeedBoostTest do
+defmodule FormulaX.Race.SpeedBoostTest do
   use ExUnit.Case
 
   alias FormulaX.Fixtures
