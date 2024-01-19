@@ -991,10 +991,10 @@ defmodule FormulaXWeb.RaceLive do
 
   @spec initialize_race_count_down_screen(Socket.t()) :: Socket.t()
   defp initialize_race_count_down_screen(
-         socket = %Socket{assigns: %{car_selection_index: player_car_index}}
+         socket = %Socket{assigns: %{car_selection_index: player_car_image_index}}
        )
-       when is_integer(player_car_index) do
-    race = Race.initialize(player_car_index)
+       when is_integer(player_car_image_index) do
+    race = Race.initialize(player_car_image_index)
 
     updated_socket =
       socket

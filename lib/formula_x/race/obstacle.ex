@@ -57,7 +57,7 @@ defmodule FormulaX.Race.Obstacle do
   end
 
   @spec new(map()) :: Obstacle.t()
-  defp new(attrs) when is_map(attrs) do
+  def new(attrs) when is_map(attrs) do
     struct!(Obstacle, attrs)
   end
 end

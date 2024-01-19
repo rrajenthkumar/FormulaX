@@ -34,8 +34,8 @@ defmodule FormulaX.Race do
   end
 
   @spec initialize(integer()) :: Race.t()
-  def initialize(player_car_index) when is_integer(player_car_index) do
-    player_car = Car.initialize_player_car(player_car_index)
+  def initialize(player_car_image_index) when is_integer(player_car_image_index) do
+    player_car = Car.initialize_player_car(player_car_image_index)
     autonomous_cars = initialize_autonomous_cars(player_car)
     background = Background.initialize(@race_distance)
     obstacles = initialize_obstacles(@race_distance)
@@ -230,7 +230,7 @@ defmodule FormulaX.Race do
   end
 
   @spec new(map()) :: Race.t()
-  defp new(attrs) when is_map(attrs) do
+  def new(attrs) when is_map(attrs) do
     struct!(Race, attrs)
   end
 

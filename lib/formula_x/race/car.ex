@@ -25,15 +25,15 @@ defmodule FormulaX.Race.Car do
     field(:x_position, Parameters.rem(), enforce: true)
     field(:y_position, Parameters.rem(), enforce: true)
     field(:speed, speed(), enforce: true)
-    field(:distance_travelled, Parameters.rem(), default: 0)
+    field(:distance_travelled, Parameters.rem(), default: 0.0)
     field(:completion_time, Time.t(), default: nil)
   end
 
   @doc """
-  Please note that the origin point of every car is at its left bottom edge.
+  Please note that the origin position of every car is at its left bottom edge.
   """
   @spec initialize_player_car(integer()) :: Car.t()
-  def initialize_player_car(player_car_index) when is_integer(player_car_index) do
+  def initialize_player_car(player_car_image_index) when is_integer(player_car_image_index) do
     car_id =
       get_all_possible_ids()
       |> Enum.random()
@@ -41,9 +41,9 @@ defmodule FormulaX.Race.Car do
     image =
       "cars"
       |> Utils.get_filenames_of_images()
-      |> Enum.at(player_car_index)
+      |> Enum.at(player_car_image_index)
 
-    {x_position, y_position} = get_starting_x_and_y_positions(car_id)
+    {x_position, y_position} = get_initial_x_and_y_positions(car_id)
 
     new(%{
       id: car_id,
@@ -58,7 +58,7 @@ defmodule FormulaX.Race.Car do
   @spec initialize_autonomous_car(integer(), filename()) :: Car.t()
   def initialize_autonomous_car(car_id, image)
       when is_integer(car_id) and is_binary(image) do
-    {x_position, y_position} = get_starting_x_and_y_positions(car_id)
+    {x_position, y_position} = get_initial_x_and_y_positions(car_id)
     speed = Enum.random([:low, :moderate, :high])
 
     new(%{
@@ -96,7 +96,7 @@ defmodule FormulaX.Race.Car do
         },
         %Race{player_car: %Car{distance_travelled: distance_travelled_by_player_car}}
       ) do
-    {_, starting_y_position} = get_starting_x_and_y_positions(autonomous_car_id)
+    {_, starting_y_position} = get_initial_x_and_y_positions(autonomous_car_id)
 
     updated_y_position =
       starting_y_position +
@@ -148,10 +148,12 @@ defmodule FormulaX.Race.Car do
     %Car{car | speed: :moderate}
   end
 
+  @spec enable_speed_boost(Car.t()) :: Car.t()
   def enable_speed_boost(car = %Car{controller: :player}) do
     %Car{car | speed: :speed_boost}
   end
 
+  @spec disable_speed_boost(Car.t(), :low | :moderate | :high) :: Car.t()
   def disable_speed_boost(car = %Car{controller: :player}, pre_boost_speed)
       when is_atom(pre_boost_speed) do
     %Car{car | speed: pre_boost_speed}
@@ -181,6 +183,9 @@ defmodule FormulaX.Race.Car do
     end
   end
 
+  @doc """
+  @number of cars is the configured number of car initial positions
+  """
   @spec get_all_possible_ids() :: list(integer())
   def get_all_possible_ids() do
     1..@number_of_cars
@@ -188,12 +193,12 @@ defmodule FormulaX.Race.Car do
   end
 
   @spec new(map()) :: Car.t()
-  defp new(attrs) when is_map(attrs) do
+  def new(attrs) when is_map(attrs) do
     struct!(Car, attrs)
   end
 
-  @spec get_starting_x_and_y_positions(integer()) :: coordinates()
-  defp get_starting_x_and_y_positions(car_id) when is_integer(car_id) do
+  @spec get_initial_x_and_y_positions(integer()) :: coordinates()
+  defp get_initial_x_and_y_positions(car_id) when is_integer(car_id) do
     Parameters.car_initial_positions()
     |> Enum.at(car_id - 1)
   end

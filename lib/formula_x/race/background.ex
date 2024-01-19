@@ -65,7 +65,7 @@ defmodule FormulaX.Race.Background do
   end
 
   @spec new(map()) :: Background.t()
-  defp new(attrs) when is_map(attrs) do
+  def new(attrs) when is_map(attrs) do
     struct!(Background, attrs)
   end
 end

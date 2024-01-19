@@ -69,7 +69,7 @@ defmodule FormulaX.Race.SpeedBoost do
   end
 
   @spec new(map()) :: SpeedBoost.t()
-  defp new(attrs) when is_map(attrs) do
+  def new(attrs) when is_map(attrs) do
     struct!(SpeedBoost, attrs)
   end
 

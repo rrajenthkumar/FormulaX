@@ -80,7 +80,7 @@ defmodule FormulaX.Result do
   end
 
   @spec new(map()) :: Result.t()
-  defp new(attrs) when is_map(attrs) do
+  def new(attrs) when is_map(attrs) do
     struct!(Result, attrs)
   end
 
