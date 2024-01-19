@@ -7,9 +7,9 @@ defmodule FormulaX.ObstacleTest do
   test "initialize_obstacle" do
     obstacle = Obstacle.initialize_obstacle(_distance_covered_with_obstacles = 500.0)
 
+    assert obstacle.__struct__ === Obstacle
     assert obstacle.x_position in [0.0, 6.0, 12.0]
     assert obstacle.distance in [530.0, 560.0, 590.0]
-    assert is_struct(obstacle)
   end
 
   test "get_y_position" do

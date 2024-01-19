@@ -1,7 +1,8 @@
 defmodule FormulaX.Race.SpeedBoost do
   @moduledoc """
   The Speed boost context
-  Speed boost items are placed rarely, randomly on tracks to help player car drive faster than usual for few seconds. It gets activated when the player car drives past a Speed boost on it's lane.
+  Speed boost items are placed randomly on tracks to help player car drive faster than usual for few seconds.
+  A speed boost gets activated when the player car drives past it on it's lane.
   """
   use TypedStruct
 

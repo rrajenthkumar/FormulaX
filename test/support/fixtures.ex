@@ -35,6 +35,7 @@ defmodule FormulaX.Fixtures do
         obstacle(%{x_position: 12.0, distance: 480.0})
       ],
       speed_boosts: [speed_boost(), speed_boost(%{x_position: 6.0, distance: 900.0})],
+      status: :ongoing,
       distance: 1000.0
     }
     |> Map.merge(attrs)

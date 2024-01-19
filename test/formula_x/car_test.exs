@@ -7,6 +7,7 @@ defmodule FormulaX.CarTest do
   test "initialize_player_car" do
     car = Car.initialize_player_car(_player_car_image_index = 0)
 
+    assert car.__struct__ === Car
     assert car.id in 1..6
     assert car.controller === :player
 
@@ -27,12 +28,12 @@ defmodule FormulaX.CarTest do
     assert car.speed === :rest
     assert car.distance_travelled === 0.0
     assert car.completion_time === nil
-    assert is_struct(car)
   end
 
   test "initialize_autonomous_car" do
     car = Car.initialize_autonomous_car(_car_id = 3, "blue-with-spoiler.png")
 
+    assert car.__struct__ === Car
     assert car.id === 3
     assert car.controller === :autonomous
     assert car.image === "blue-with-spoiler.png"
