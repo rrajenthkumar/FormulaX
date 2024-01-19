@@ -10,7 +10,7 @@ defmodule FormulaX.Utils do
       {:ok, filenames_of_available_images} ->
         filenames_of_available_images
 
-        {:error, error} ->
+      {:error, error} ->
         raise error
     end
   end

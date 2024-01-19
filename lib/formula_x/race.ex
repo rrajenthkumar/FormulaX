@@ -15,7 +15,7 @@ defmodule FormulaX.Race do
 
   @race_distance Parameters.race_distance()
   @console_screen_height Parameters.console_screen_height()
-  @obstacles_and_speed_boosts_free_distance Parameters.obstacles_and_speed_boosts_free_distance()
+  @obstacles_and_speed_boosts_prohibited_distance Parameters.obstacles_and_speed_boosts_prohibited_distance()
   @speed_boost_y_position_step Parameters.speed_boost_y_position_step()
   @max_obstacle_y_position_step Parameters.max_obstacle_y_position_step()
 
@@ -179,7 +179,7 @@ defmodule FormulaX.Race do
   @spec initialize_obstacles(Parameters.rem()) :: list(Obstacle.t())
   defp initialize_obstacles(race_distance) when is_float(race_distance) do
     %{distance: new_obstacle_distance} =
-      new_obstacle = Obstacle.initialize_obstacle(@obstacles_and_speed_boosts_free_distance)
+      new_obstacle = Obstacle.initialize_obstacle(@obstacles_and_speed_boosts_prohibited_distance)
 
     [new_obstacle] ++
       initialize_obstacles(race_distance, new_obstacle_distance)
@@ -205,7 +205,7 @@ defmodule FormulaX.Race do
   defp initialize_speed_boosts(race_distance) when is_float(race_distance) do
     %{distance: new_speed_boost_distance} =
       new_speed_boost =
-      SpeedBoost.initialize_speed_boost(@obstacles_and_speed_boosts_free_distance)
+      SpeedBoost.initialize_speed_boost(@obstacles_and_speed_boosts_prohibited_distance)
 
     [new_speed_boost] ++
       initialize_speed_boosts(race_distance, new_speed_boost_distance)

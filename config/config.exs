@@ -42,7 +42,7 @@ config :formula_x,
     # Length of speed boost and length of obstacle are set to the same value as car length for ease of calculations
     obstacle_and_speed_boost_length: 7.0,
     # Obstacles and Speed boosts are not placed until this distance after the start of race
-    obstacles_and_speed_boosts_free_distance: 60.0,
+    obstacles_and_speed_boosts_prohibited_distance: 60.0,
     # Y direction step values used to position Obstacles
     obstacle_y_position_steps: [30.0, 60.0, 90.0],
     # Y direction step value used to position Speed boosts

@@ -21,16 +21,23 @@ defmodule FormulaX.Race.SpeedBoost do
     field(:distance, Parameters.rem(), enforce: true)
   end
 
+  @doc """
+  The newly initiated speed boost will be placed only beyond 'speed_boost_prohibited_distance_or_distance_already_covered_with_speed_boosts' part of the track.
+  """
   @spec initialize_speed_boost(Parameters.rem()) :: SpeedBoost.t()
-  def initialize_speed_boost(distance_covered_with_speed_boosts)
-      when is_float(distance_covered_with_speed_boosts) do
+  def initialize_speed_boost(
+        speed_boost_prohibited_distance_or_distance_already_covered_with_speed_boosts
+      )
+      when is_float(speed_boost_prohibited_distance_or_distance_already_covered_with_speed_boosts) do
     speed_boost_x_position =
       Parameters.obstacles_and_speed_boosts_x_positions()
       |> Enum.random()
 
     new(%{
       x_position: speed_boost_x_position,
-      distance: distance_covered_with_speed_boosts + @speed_boost_y_position_step
+      distance:
+        speed_boost_prohibited_distance_or_distance_already_covered_with_speed_boosts +
+          @speed_boost_y_position_step
     })
   end
 

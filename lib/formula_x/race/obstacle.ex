@@ -17,12 +17,11 @@ defmodule FormulaX.Race.Obstacle do
   end
 
   @doc """
-  'distance_covered_with_obstacles' refers to the race track length over which obstacles have been already placed randomly.
-  The newly initiated obstacle will be placed only beyond this part of the track.
+  The newly initiated obstacle will be placed only beyond 'obstacles_prohibited_distance_or_distance_already_covered_with_obstacles' part of the track.
   """
   @spec initialize_obstacle(Parameters.rem()) :: Obstacle.t()
-  def initialize_obstacle(distance_covered_with_obstacles)
-      when is_float(distance_covered_with_obstacles) do
+  def initialize_obstacle(obstacles_prohibited_distance_or_distance_already_covered_with_obstacles)
+      when is_float(obstacles_prohibited_distance_or_distance_already_covered_with_obstacles) do
     obstacle_x_position =
       Parameters.obstacles_and_speed_boosts_x_positions()
       |> Enum.random()
@@ -33,7 +32,9 @@ defmodule FormulaX.Race.Obstacle do
 
     new(%{
       x_position: obstacle_x_position,
-      distance: distance_covered_with_obstacles + obstacle_y_position_step
+      distance:
+        obstacles_prohibited_distance_or_distance_already_covered_with_obstacles +
+          obstacle_y_position_step
     })
   end
 

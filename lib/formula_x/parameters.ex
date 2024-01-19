@@ -1,6 +1,6 @@
 defmodule FormulaX.Parameters do
   @moduledoc """
-  Used to extract all parameters used in calculations from config file.
+  To centralise extraction of different race parameters used in calculations from config file.
   """
 
   alias FormulaX.Race.Car
@@ -14,6 +14,9 @@ defmodule FormulaX.Parameters do
     |> Map.get(:race_distance)
   end
 
+  @doc """
+  Returns a lane info map with limits of lanes in x direction
+  """
   @spec lanes() :: list(map())
   def lanes() do
     get_parameters()
@@ -53,12 +56,18 @@ defmodule FormulaX.Parameters do
     |> Enum.count()
   end
 
+  @doc """
+  Forward movement distance for cars during each call of the drive() function
+  """
   @spec car_drive_step(:rest | :low | :moderate | :high | :speed_boost) :: rem()
-  def car_drive_step(speed) do
+  def car_drive_step(speed) when speed in [:rest, :low, :moderate, :high, :speed_boost] do
     car_drive_steps()
     |> Map.get(speed)
   end
 
+  @doc """
+  Sideward movement distance for cars when steer() function is called
+  """
   @spec car_steering_step() :: rem()
   def car_steering_step() do
     get_parameters()
@@ -71,10 +80,13 @@ defmodule FormulaX.Parameters do
     |> Map.get(:obstacle_and_speed_boost_length)
   end
 
-  @spec obstacles_and_speed_boosts_free_distance() :: rem()
-  def obstacles_and_speed_boosts_free_distance() do
+  @doc """
+  Used to set obstacles and speed boosts free distance to avoid seeing obstacles and speedboost as soon as the race begins
+  """
+  @spec obstacles_and_speed_boosts_prohibited_distance() :: rem()
+  def obstacles_and_speed_boosts_prohibited_distance() do
     get_parameters()
-    |> Map.get(:obstacles_and_speed_boosts_free_distance)
+    |> Map.get(:obstacles_and_speed_boosts_prohibited_distance)
   end
 
   @spec obstacles_and_speed_boosts_x_positions() :: list(rem())
@@ -83,6 +95,9 @@ defmodule FormulaX.Parameters do
     |> Enum.map(fn lane_info -> lane_info.x_start end)
   end
 
+  @doc """
+  Returns a list of possible step values for positioning the next obstacle after an already positioned obstacle or after the obstacles free distance
+  """
   @spec obstacle_y_position_steps() :: list(rem())
   def obstacle_y_position_steps() do
     get_parameters()
@@ -95,6 +110,9 @@ defmodule FormulaX.Parameters do
     |> Enum.max()
   end
 
+  @doc """
+  Returns the step value for positioning the next speed boost after an already positioned speed boost or after the speed boosts free distance
+  """
   @spec speed_boost_y_position_step() :: rem()
   def speed_boost_y_position_step() do
     get_parameters()
