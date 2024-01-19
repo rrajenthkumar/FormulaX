@@ -970,7 +970,7 @@ defmodule FormulaXWeb.RaceLive do
   defp maximum_car_selection_index() do
     number_of_cars =
       "cars"
-      |> Utils.get_filenames_of_images()
+      |> Utils.get_filenames_of_images!()
       |> Enum.count()
 
     number_of_cars - 1

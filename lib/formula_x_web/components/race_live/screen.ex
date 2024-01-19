@@ -414,7 +414,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
   @spec get_car_image(integer()) :: Car.filename()
   defp get_car_image(index) when is_integer(index) do
     "cars"
-    |> Utils.get_filenames_of_images()
+    |> Utils.get_filenames_of_images!()
     |> Enum.at(index)
   end
 

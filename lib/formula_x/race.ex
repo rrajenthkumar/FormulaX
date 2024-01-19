@@ -152,7 +152,7 @@ defmodule FormulaX.Race do
          controller: :player
        }) do
     available_ids = Car.get_all_possible_ids() -- [player_car_id]
-    available_car_images = Utils.get_filenames_of_images("cars") -- [player_car_image]
+    available_car_images = Utils.get_filenames_of_images!("cars") -- [player_car_image]
 
     initialize_autonomous_cars(available_ids, available_car_images)
   end

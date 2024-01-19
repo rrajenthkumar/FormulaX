@@ -106,8 +106,8 @@ defmodule FormulaX.Race.SpeedBoost do
        })
        when is_float(speed_boost_y_position) do
     # Player car and the speed boost are exactly at the same position or
-    # Player car front wheels are between speed boost start and end or
-    # Player car rear wheels are between speed boost start and end
+    # Player car front wheels are between speed boost rear and front or
+    # Player car rear wheels are between speed boost rear and front
     (car_y_position + @car_length >= speed_boost_y_position and
        car_y_position <= speed_boost_y_position) or
       (car_y_position >= speed_boost_y_position and

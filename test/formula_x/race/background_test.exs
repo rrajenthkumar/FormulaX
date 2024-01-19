@@ -8,7 +8,7 @@ defmodule FormulaX.Race.BackgroundTest do
   alias FormulaX.Utils
 
   test "initialize" do
-    with_mock Utils, get_filenames_of_images: fn _directory -> ["image1.jpg"] end do
+    with_mock Utils, get_filenames_of_images!: fn _directory -> ["image1.jpg"] end do
       actual = Background.initialize(_race_distance = 25.0)
 
       expected = %Background{

@@ -40,7 +40,7 @@ defmodule FormulaX.Race.Car do
 
     image =
       "cars"
-      |> Utils.get_filenames_of_images()
+      |> Utils.get_filenames_of_images!()
       |> Enum.at(player_car_image_index)
 
     {x_position, y_position} = get_initial_x_and_y_positions(car_id)
