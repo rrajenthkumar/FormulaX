@@ -16,6 +16,10 @@ defmodule FormulaX.Race.Obstacle do
     field(:distance, Parameters.rem(), enforce: true)
   end
 
+  @doc """
+  'distance_covered_with_obstacles' refers to the race track length over which obstacles have been already placed randomly.
+  The newly initiated obstacle will be placed only beyond this part of the track.
+  """
   @spec initialize_obstacle(Parameters.rem()) :: Obstacle.t()
   def initialize_obstacle(distance_covered_with_obstacles)
       when is_float(distance_covered_with_obstacles) do

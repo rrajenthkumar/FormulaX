@@ -27,6 +27,7 @@ defmodule FormulaX.CarTest do
     assert car.speed === :rest
     assert car.distance_travelled === 0.0
     assert car.completion_time === nil
+    assert is_struct(car)
   end
 
   test "initialize_autonomous_car" do
