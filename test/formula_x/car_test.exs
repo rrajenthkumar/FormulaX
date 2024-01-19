@@ -341,7 +341,7 @@ defmodule FormulaX.CarTest do
   test "get_all_possible_ids" do
     actual = Car.get_all_possible_ids()
 
-    expected = [1,2,3,4,5,6]
+    expected = [1, 2, 3, 4, 5, 6]
 
     assert actual === expected
   end

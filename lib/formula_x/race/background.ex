@@ -49,6 +49,11 @@ defmodule FormulaX.Race.Background do
     %Background{background | y_position: updated_y_position}
   end
 
+  @spec new(map()) :: Background.t()
+  def new(attrs) when is_map(attrs) do
+    struct!(Background, attrs)
+  end
+
   @spec get_side_images(filenames(), Parameters.rem()) :: filenames()
   defp get_side_images(available_background_images, race_distance)
        when is_float(race_distance) and is_list(available_background_images) do
@@ -62,10 +67,5 @@ defmodule FormulaX.Race.Background do
     Enum.map(1..number_of_images_required, fn _grid_number ->
       Enum.random(available_background_images)
     end)
-  end
-
-  @spec new(map()) :: Background.t()
-  def new(attrs) when is_map(attrs) do
-    struct!(Background, attrs)
   end
 end

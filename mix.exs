@@ -50,7 +50,8 @@ defmodule FormulaX.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:typed_struct, "~> 0.3.0"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:mock, "~> 0.3.8"}
     ]
   end
 
