@@ -66,13 +66,11 @@ defmodule FormulaX.Race.SpeedBoost do
 
   @spec enable_if_fetched(Race.t()) :: Race.t()
   def enable_if_fetched(race = %Race{player_car: player_car = %Car{controller: :player}}) do
-    case speed_boost_fetched?(race) do
-      true ->
-        updated_player_car = Car.enable_speed_boost(player_car)
-        Race.update_player_car(race, updated_player_car)
-
-      false ->
-        race
+    if speed_boost_fetched?(race) do
+      updated_player_car = Car.enable_speed_boost(player_car)
+      Race.update_player_car(race, updated_player_car)
+    else
+      race
     end
   end
 

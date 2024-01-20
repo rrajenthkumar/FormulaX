@@ -233,7 +233,7 @@ defmodule FormulaXWeb.RaceLive.Screen do
     ~H"""
     <.background images={@race.background.left_side_images} y_position={@race.background.y_position} />
     <div class="race">
-      <%= if @race.status == :crash do %>
+      <%= if @race.status === :crash do %>
         <img
           class="crash_illustration"
           src="/images/misc/bang.png"

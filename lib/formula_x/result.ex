@@ -48,7 +48,7 @@ defmodule FormulaX.Result do
       all_cars
       |> Enum.reject(fn car -> is_nil(car.completion_time) end)
       |> Enum.sort_by(& &1.completion_time, Time)
-      |> Enum.find_index(fn car -> car.controller == :player end)
+      |> Enum.find_index(fn car -> car.controller === :player end)
 
     finishing_position = player_car_index_after_sorting_by_completion_time + 1
 
@@ -69,7 +69,7 @@ defmodule FormulaX.Result do
     results_count = length(last_5_results)
 
     cond do
-      results_count == 5 ->
+      results_count === 5 ->
         {_, last_4_results} = List.pop_at(last_5_results, 4)
         [new_result] ++ last_4_results
 
@@ -89,8 +89,8 @@ defmodule FormulaX.Result do
   defp add_symbol(_last_5_results = [result = %Result{status: status, position: position}]) do
     symbol =
       cond do
-        status == :crashed -> "&#128555"
-        position == 1 -> "&#127942"
+        status === :crashed -> "&#128555"
+        position === 1 -> "&#127942"
         true -> "&#128079"
       end
 
@@ -107,12 +107,12 @@ defmodule FormulaX.Result do
 
     symbol =
       cond do
-        last_result_status == :crashed -> "&#128555"
-        last_result_position == 1 -> "&#127942"
+        last_result_status === :crashed -> "&#128555"
+        last_result_position === 1 -> "&#127942"
         last_result_position < last_but_one_result_position -> "&#8679"
         last_result_position > last_but_one_result_position -> "&#8681"
-        last_result_position == last_but_one_result_position -> "&#128528"
-        last_but_one_result_position == nil -> "&#8679"
+        last_result_position === last_but_one_result_position -> "&#128528"
+        last_but_one_result_position === nil -> "&#8679"
       end
 
     updated_last_result = %Result{last_result | symbol: symbol}

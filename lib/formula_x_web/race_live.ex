@@ -903,7 +903,7 @@ defmodule FormulaXWeb.RaceLive do
       )
       when is_atom(status) do
     updated_socket =
-      if status == :crash or status == :ended do
+      if status === :crash or status === :ended do
         socket
         |> assign(:race, race)
         |> update_results()
@@ -942,9 +942,10 @@ defmodule FormulaXWeb.RaceLive do
        )
        when is_integer(car_selection_index) do
     updated_car_selection_index =
-      case car_selection_index - maximum_car_selection_index() do
-        0 -> 0
-        _ -> car_selection_index + 1
+      if car_selection_index - maximum_car_selection_index() === 0 do
+        0
+      else
+        car_selection_index + 1
       end
 
     assign(socket, :car_selection_index, updated_car_selection_index)
@@ -956,9 +957,10 @@ defmodule FormulaXWeb.RaceLive do
        )
        when is_integer(car_selection_index) do
     updated_car_selection_index =
-      case car_selection_index do
-        0 -> maximum_car_selection_index()
-        _ -> car_selection_index - 1
+      if car_selection_index === 0 do
+        maximum_car_selection_index()
+      else
+        car_selection_index - 1
       end
 
     assign(socket, :car_selection_index, updated_car_selection_index)
@@ -977,13 +979,11 @@ defmodule FormulaXWeb.RaceLive do
   @spec initialize_race_info_screen(Socket.t()) :: Socket.t()
   defp initialize_race_info_screen(socket = %Socket{assigns: %{last_5_results: last_5_results}})
        when is_list(last_5_results) do
-    case last_5_results do
-      [] ->
-        assign(socket, :screen_state, :race_info)
-
-      # To ensure that race info screen is showed only once after the console is switched ON
-      _last_5_results_not_empty ->
-        initialize_race_count_down_screen(socket)
+    # To ensure that race info screen is showed only once after the console is switched ON
+    if last_5_results === [] do
+      assign(socket, :screen_state, :race_info)
+    else
+      initialize_race_count_down_screen(socket)
     end
   end
 

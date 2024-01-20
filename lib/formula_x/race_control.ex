@@ -123,12 +123,10 @@ defmodule FormulaX.RaceControl do
 
     updated_race = Race.update_autonomous_car(race, updated_autonomous_car)
 
-    case CrashDetection.crash?(updated_race, updated_autonomous_car, _crash_check_side = :front) do
-      true ->
-        steer_autonomous_car(race, autonomous_car)
-
-      false ->
-        updated_race
+    if CrashDetection.crash?(updated_race, updated_autonomous_car, _crash_check_side = :front) do
+      steer_autonomous_car(race, autonomous_car)
+    else
+      updated_race
     end
   end
 
@@ -160,9 +158,10 @@ defmodule FormulaX.RaceControl do
     number_of_cars_in_vicinity_in_lane_2 =
       number_of_adjacent_lane_cars_in_vicinity(autonomous_car, lanes_cars_map, 2)
 
-    case number_of_cars_in_vicinity_in_lane_2 do
-      0 -> :right
-      _others -> :noop
+    if number_of_cars_in_vicinity_in_lane_2 === 0 do
+      :right
+    else
+      :noop
     end
   end
 
@@ -178,8 +177,8 @@ defmodule FormulaX.RaceControl do
       number_of_adjacent_lane_cars_in_vicinity(autonomous_car, lanes_cars_map, 3)
 
     cond do
-      number_of_cars_in_vicinity_in_lane_1 == 0 -> :left
-      number_of_cars_in_vicinity_in_lane_3 == 0 -> :right
+      number_of_cars_in_vicinity_in_lane_1 === 0 -> :left
+      number_of_cars_in_vicinity_in_lane_3 === 0 -> :right
       true -> :noop
     end
   end
@@ -192,9 +191,10 @@ defmodule FormulaX.RaceControl do
     number_of_cars_in_vicinity_in_lane_2 =
       number_of_adjacent_lane_cars_in_vicinity(autonomous_car, lanes_cars_map, 2)
 
-    case number_of_cars_in_vicinity_in_lane_2 do
-      0 -> :left
-      _others -> :noop
+    if number_of_cars_in_vicinity_in_lane_2 === 0 do
+      :left
+    else
+      :noop
     end
   end
 

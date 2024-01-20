@@ -5,7 +5,7 @@ defmodule FormulaXWeb.RaceLive.ConsoleControls do
     ~H"""
     <div class="speed_controls">
       <a class="top" href="#" phx-click="green_button_clicked">
-        <%= with animation_class <- if @screen_state == :switched_off, do: "flickering_button", else: get_button_animation_class(@clicked_button) do %>
+        <%= with animation_class <- if @screen_state === :switched_off, do: "flickering_button", else: get_button_animation_class(@clicked_button) do %>
           <span class={animation_class}></span>
         <% end %>
       </a>

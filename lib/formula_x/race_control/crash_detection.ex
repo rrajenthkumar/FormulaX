@@ -85,7 +85,7 @@ defmodule FormulaX.RaceControl.CrashDetection do
     race
     |> get_lanes_and_cars_map()
     |> Map.get(querying_car_lane, [])
-    |> Enum.reject(fn car -> car.id == querying_car_id end)
+    |> Enum.reject(fn car -> car.id === querying_car_id end)
   end
 
   @spec remove_cars_behind(list(Car.t()), Car.t()) :: list(Car.t())
@@ -159,6 +159,6 @@ defmodule FormulaX.RaceControl.CrashDetection do
 
   # Car out of tracks
   defp out_of_tracks?(querying_car = %Car{}) do
-    Car.get_lane(querying_car) == :out_of_tracks
+    Car.get_lane(querying_car) === :out_of_tracks
   end
 end

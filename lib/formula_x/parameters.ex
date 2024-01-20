@@ -27,12 +27,12 @@ defmodule FormulaX.Parameters do
   def driving_area_limits do
     x_start =
       lanes()
-      |> Enum.find(fn lane -> lane.lane_number == 1 end)
+      |> Enum.find(fn lane -> lane.lane_number === 1 end)
       |> Map.get(:x_start)
 
     x_end =
       lanes()
-      |> Enum.find(fn lane -> lane.lane_number == 3 end)
+      |> Enum.find(fn lane -> lane.lane_number === 3 end)
       |> Map.get(:x_end)
 
     %{x_start: x_start, x_end: x_end}

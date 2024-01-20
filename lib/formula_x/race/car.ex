@@ -161,9 +161,10 @@ defmodule FormulaX.Race.Car do
 
   @spec add_completion_time_if_finished(Car.t(), Race.t()) :: Car.t()
   def add_completion_time_if_finished(car = %Car{completion_time: nil}, race = %Race{}) do
-    case finished?(car, race) do
-      true -> %Car{car | completion_time: Time.utc_now()}
-      false -> car
+    if finished?(car, race) do
+      %Car{car | completion_time: Time.utc_now()}
+    else
+      car
     end
   end
 

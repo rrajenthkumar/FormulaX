@@ -76,7 +76,7 @@ defmodule FormulaX.Race do
       ) do
     updated_autonomous_cars =
       Enum.map(autonomous_cars, fn autonomous_car ->
-        if autonomous_car.id == updated_autonomous_car_id do
+        if autonomous_car.id === updated_autonomous_car_id do
           updated_autonomous_car
         else
           autonomous_car
@@ -110,12 +110,10 @@ defmodule FormulaX.Race do
         crash_check_side
       )
       when crash_check_side in [:left, :right, :front] do
-    case CrashDetection.crash?(race, player_car, crash_check_side) do
-      true ->
-        %Race{race | status: :crash}
-
-      false ->
-        race
+    if CrashDetection.crash?(race, player_car, crash_check_side) do
+      %Race{race | status: :crash}
+    else
+      race
     end
   end
 
@@ -125,12 +123,10 @@ defmodule FormulaX.Race do
   end
 
   def end_if_applicable(race = %Race{status: :ongoing}) do
-    case player_car_past_finish?(race) do
-      true ->
-        %Race{race | status: :ended}
-
-      false ->
-        race
+    if player_car_past_finish?(race) do
+      %Race{race | status: :ended}
+    else
+      race
     end
   end
 
@@ -141,7 +137,7 @@ defmodule FormulaX.Race do
       )
       when is_integer(searched_autonomous_car_id) do
     Enum.find(autonomous_cars, fn autonomous_car ->
-      autonomous_car.id == searched_autonomous_car_id
+      autonomous_car.id === searched_autonomous_car_id
     end)
   end
 
