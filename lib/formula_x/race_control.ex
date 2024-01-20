@@ -123,7 +123,7 @@ defmodule FormulaX.RaceControl do
 
     updated_race = Race.update_autonomous_car(race, updated_autonomous_car)
 
-    if CrashDetection.crash?(updated_race, updated_autonomous_car, _crash_check_side = :front) do
+    if CrashDetection.crash?(updated_race, updated_autonomous_car, :front) do
       steer_autonomous_car(race, autonomous_car)
     else
       updated_race
