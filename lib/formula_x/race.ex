@@ -13,6 +13,7 @@ defmodule FormulaX.Race do
   alias FormulaX.RaceControl.CrashDetection
   alias FormulaX.Utils
 
+  @car_length Parameters.car_length()
   @race_distance Parameters.race_distance()
   @console_screen_height Parameters.console_screen_height()
   @obstacle_or_speed_boost_prohibited_distance Parameters.obstacle_or_speed_boost_prohibited_distance()
@@ -163,6 +164,59 @@ defmodule FormulaX.Race do
     end)
   end
 
+  @spec enable_speed_boost_if_fetched(Race.t()) :: Race.t()
+  def enable_speed_boost_if_fetched(
+        race = %Race{
+          player_car: player_car = %Car{controller: :player, speed_boost_enabled?: false}
+        }
+      ) do
+    if speed_boost_fetched?(race) do
+      updated_player_car = Car.enable_speed_boost(player_car)
+
+      Race.update_player_car(race, updated_player_car)
+    else
+      race
+    end
+  end
+
+  # When the speed boost has been already activated and the car is still in the vicinity of speed boost
+  def enable_speed_boost_if_fetched(
+        race = %Race{
+          player_car: %Car{controller: :player, speed_boost_enabled?: true}
+        }
+      ) do
+    race
+  end
+
+  @doc """
+  Adapts all autonomous cars correctly w.r.t player car position on screen
+  """
+  @spec adapt_autonomous_cars_positions(Race.t()) :: Race.t()
+  def adapt_autonomous_cars_positions(race = %Race{autonomous_cars: autonomous_cars}) do
+    adapt_autonomous_cars_positions(autonomous_cars, race)
+  end
+
+  @spec adapt_autonomous_cars_positions(list(Car.t()), Race.t()) :: Race.t()
+  defp adapt_autonomous_cars_positions(
+         [autonomous_car = %Car{controller: :autonomous}],
+         race = %Race{}
+       ) do
+    updated_autonomous_car = Car.adapt_autonomous_car_position(autonomous_car, race)
+
+    Race.update_autonomous_car(race, updated_autonomous_car)
+  end
+
+  defp adapt_autonomous_cars_positions(
+         _autonomous_cars = [
+           autonomous_car = %Car{controller: :autonomous} | remaining_autonomous_cars
+         ],
+         race = %Race{}
+       ) do
+    updated_autonomous_car = Car.adapt_autonomous_car_position(autonomous_car, race)
+    updated_race = Race.update_autonomous_car(race, updated_autonomous_car)
+    adapt_autonomous_cars_positions(remaining_autonomous_cars, updated_race)
+  end
+
   @spec initialize_autonomous_cars(Car.t()) :: list(Car.t())
   defp initialize_autonomous_cars(%Car{
          id: player_car_id,
@@ -269,5 +323,45 @@ defmodule FormulaX.Race do
        obstacle_distance <= speed_boost_distance - @speed_boost_length) or
       (obstacle_distance <= speed_boost_distance + 2 * @speed_boost_length and
          obstacle_distance >= speed_boost_distance + @speed_boost_length)
+  end
+
+  @spec speed_boost_fetched?(Race.t()) :: boolean()
+  defp speed_boost_fetched?(race = %Race{player_car: player_car}) do
+    race
+    |> get_same_lane_speed_boosts()
+    |> Enum.any?(fn speed_boost ->
+      speed_boost_y_position = SpeedBoost.get_y_position(speed_boost, race)
+
+      overlaps_with_player_car?(speed_boost_y_position, player_car)
+    end)
+  end
+
+  @spec get_same_lane_speed_boosts(Race.t()) :: list(SpeedBoost.t())
+  defp get_same_lane_speed_boosts(race = %Race{player_car: player_car}) do
+    player_car_lane = Car.get_lane(player_car)
+
+    race
+    |> get_lanes_and_speed_boosts_map()
+    |> Map.get(player_car_lane, [])
+  end
+
+  @spec get_lanes_and_speed_boosts_map(Race.t()) :: map()
+  defp get_lanes_and_speed_boosts_map(%Race{speed_boosts: speed_boosts}) do
+    Enum.group_by(speed_boosts, &SpeedBoost.get_lane/1, & &1)
+  end
+
+  @spec overlaps_with_player_car?(Parameters.rem(), Car.t()) :: boolean()
+  defp overlaps_with_player_car?(speed_boost_y_position, %Car{
+         y_position: car_y_position,
+         controller: :player
+       })
+       when is_float(speed_boost_y_position) do
+    # Player car and the speed boost are exactly at the same position or
+    # Player car front wheels are between speed boost rear and front or
+    # Player car rear wheels are between speed boost rear and front
+    (car_y_position + @car_length >= speed_boost_y_position and
+       car_y_position <= speed_boost_y_position) or
+      (car_y_position >= speed_boost_y_position and
+         car_y_position <= speed_boost_y_position + @speed_boost_length)
   end
 end

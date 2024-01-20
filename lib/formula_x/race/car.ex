@@ -14,7 +14,7 @@ defmodule FormulaX.Race.Car do
 
   @type filename :: String.t()
   @type controller :: :player | :autonomous
-  @type speed :: :rest | :low | :moderate | :high | :speed_boost
+  @type speed :: :rest | :low | :moderate | :high
   @type coordinates :: {Parameters.rem(), Parameters.rem()}
 
   @typedoc "Car struct"
@@ -25,6 +25,7 @@ defmodule FormulaX.Race.Car do
     field(:x_position, Parameters.rem(), enforce: true)
     field(:y_position, Parameters.rem(), enforce: true)
     field(:speed, speed(), enforce: true)
+    field(:speed_boost_enabled?, boolean(), default: false)
     field(:distance_travelled, Parameters.rem(), default: 0.0)
     field(:completion_time, Time.t(), default: nil)
   end
@@ -74,8 +75,21 @@ defmodule FormulaX.Race.Car do
   @spec drive(Car.t()) :: Car.t()
   def drive(
         car = %Car{
+          distance_travelled: distance_travelled,
+          speed_boost_enabled?: true
+        }
+      ) do
+    %Car{
+      car
+      | distance_travelled: distance_travelled + Parameters.car_drive_step(:speed_boost)
+    }
+  end
+
+  def drive(
+        car = %Car{
           speed: speed,
-          distance_travelled: distance_travelled
+          distance_travelled: distance_travelled,
+          speed_boost_enabled?: false
         }
       ) do
     %Car{
@@ -150,13 +164,12 @@ defmodule FormulaX.Race.Car do
 
   @spec enable_speed_boost(Car.t()) :: Car.t()
   def enable_speed_boost(car = %Car{controller: :player}) do
-    %Car{car | speed: :speed_boost}
+    %Car{car | speed_boost_enabled?: true}
   end
 
-  @spec disable_speed_boost(Car.t(), :low | :moderate | :high) :: Car.t()
-  def disable_speed_boost(car = %Car{controller: :player}, pre_boost_speed)
-      when is_atom(pre_boost_speed) do
-    %Car{car | speed: pre_boost_speed}
+  @spec disable_speed_boost(Car.t()) :: Car.t()
+  def disable_speed_boost(car = %Car{controller: :player}) do
+    %Car{car | speed_boost_enabled?: false}
   end
 
   @spec add_completion_time_if_finished(Car.t(), Race.t()) :: Car.t()

@@ -44,22 +44,43 @@ defmodule FormulaX.Race.CarTest do
     assert car.completion_time === nil
   end
 
-  test "drive" do
-    actual =
-      Fixtures.car()
-      |> Car.drive()
+  describe "drive" do
+    test "speed boost disabled" do
+      actual =
+        Fixtures.car()
+        |> Car.drive()
 
-    expected = %Car{
-      id: 1,
-      controller: :player,
-      image: "car.png",
-      speed: :low,
-      x_position: 1.25,
-      y_position: 9.0,
-      distance_travelled: 4.0
-    }
+      expected = %Car{
+        id: 1,
+        controller: :player,
+        image: "car.png",
+        speed: :low,
+        x_position: 1.25,
+        y_position: 9.0,
+        distance_travelled: 4.0
+      }
 
-    assert actual === expected
+      assert actual === expected
+    end
+
+    test "speed boost enabled" do
+      actual =
+        Fixtures.car(%{speed_boost_enabled?: true})
+        |> Car.drive()
+
+      expected = %Car{
+        id: 1,
+        controller: :player,
+        image: "car.png",
+        speed: :low,
+        speed_boost_enabled?: true,
+        x_position: 1.25,
+        y_position: 9.0,
+        distance_travelled: 7.0
+      }
+
+      assert actual === expected
+    end
   end
 
   test "adapt_autonomous_car_position" do
@@ -267,7 +288,8 @@ defmodule FormulaX.Race.CarTest do
       id: 1,
       controller: :player,
       image: "car.png",
-      speed: :speed_boost,
+      speed: :low,
+      speed_boost_enabled?: true,
       x_position: 1.25,
       y_position: 9.0
     }
@@ -278,13 +300,14 @@ defmodule FormulaX.Race.CarTest do
   test "disable_speed_boost" do
     actual =
       Fixtures.car()
-      |> Car.disable_speed_boost(:high)
+      |> Car.disable_speed_boost()
 
     expected = %Car{
       id: 1,
       controller: :player,
       image: "car.png",
-      speed: :high,
+      speed: :low,
+      speed_boost_enabled?: false,
       x_position: 1.25,
       y_position: 9.0
     }

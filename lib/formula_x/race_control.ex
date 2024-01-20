@@ -6,10 +6,8 @@ defmodule FormulaX.RaceControl do
   alias FormulaX.Race
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
-  alias FormulaX.Race.SpeedBoost
   alias FormulaX.RaceControl.CrashDetection
   alias FormulaX.RaceEngine
-
   @car_length Parameters.car_length()
 
   @spec start_race(Race.t(), pid()) :: {:error, {:already_started, pid()}} | {:ok, pid()}
@@ -41,9 +39,9 @@ defmodule FormulaX.RaceControl do
 
     race
     |> Race.update_player_car(updated_player_car)
-    |> adapt_autonomous_cars_positions
+    |> Race.adapt_autonomous_cars_positions()
     |> Race.update_background(updated_background)
-    |> SpeedBoost.enable_if_fetched()
+    |> Race.enable_speed_boost_if_fetched()
     |> Race.record_crash_if_applicable(_crash_check_side = :front)
     |> Race.end_if_applicable()
   end
@@ -58,7 +56,7 @@ defmodule FormulaX.RaceControl do
 
     race
     |> Race.update_player_car(updated_player_car)
-    |> SpeedBoost.enable_if_fetched()
+    |> Race.enable_speed_boost_if_fetched()
     |> Race.record_crash_if_applicable(_crash_check_side = direction)
     |> RaceEngine.update()
   end
@@ -76,11 +74,6 @@ defmodule FormulaX.RaceControl do
     |> RaceEngine.update()
   end
 
-  @spec drive_autonomous_cars(Race.t()) :: Race.t()
-  def drive_autonomous_cars(race = %Race{autonomous_cars: autonomous_cars}) do
-    drive_autonomous_cars(autonomous_cars, race)
-  end
-
   @spec pause_race(Race.t()) :: :ok
   def pause_race(race = %Race{status: :ongoing}) do
     race
@@ -93,6 +86,25 @@ defmodule FormulaX.RaceControl do
     race
     |> Race.unpause()
     |> RaceEngine.update()
+  end
+
+  @spec disable_speed_boost(Race.t()) :: :ok
+  def disable_speed_boost(
+        race = %Race{
+          status: :ongoing,
+          player_car: player_car = %Car{controller: :player, speed_boost_enabled?: true}
+        }
+      ) do
+    updated_player_car = Car.disable_speed_boost(player_car)
+
+    race
+    |> Race.update_player_car(updated_player_car)
+    |> RaceEngine.update()
+  end
+
+  @spec drive_autonomous_cars(Race.t()) :: Race.t()
+  def drive_autonomous_cars(race = %Race{autonomous_cars: autonomous_cars}) do
+    drive_autonomous_cars(autonomous_cars, race)
   end
 
   @spec drive_autonomous_cars(list(Car.t()), Race.t()) :: Race.t()
@@ -223,31 +235,5 @@ defmodule FormulaX.RaceControl do
       car.y_position < autonomous_car_y_position - @car_length or
         car.y_position > autonomous_car_y_position + @car_length
     end)
-  end
-
-  @spec adapt_autonomous_cars_positions(Race.t()) :: Race.t()
-  defp adapt_autonomous_cars_positions(race = %Race{autonomous_cars: autonomous_cars}) do
-    adapt_autonomous_cars_positions(autonomous_cars, race)
-  end
-
-  @spec adapt_autonomous_cars_positions(list(Car.t()), Race.t()) :: Race.t()
-  defp adapt_autonomous_cars_positions(
-         [autonomous_car = %Car{controller: :autonomous}],
-         race = %Race{}
-       ) do
-    updated_autonomous_car = Car.adapt_autonomous_car_position(autonomous_car, race)
-
-    Race.update_autonomous_car(race, updated_autonomous_car)
-  end
-
-  defp adapt_autonomous_cars_positions(
-         _autonomous_cars = [
-           autonomous_car = %Car{controller: :autonomous} | remaining_autonomous_cars
-         ],
-         race = %Race{}
-       ) do
-    updated_autonomous_car = Car.adapt_autonomous_car_position(autonomous_car, race)
-    updated_race = Race.update_autonomous_car(race, updated_autonomous_car)
-    adapt_autonomous_cars_positions(remaining_autonomous_cars, updated_race)
   end
 end

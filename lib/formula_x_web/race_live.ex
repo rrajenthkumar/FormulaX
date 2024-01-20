@@ -5,6 +5,7 @@ defmodule FormulaXWeb.RaceLive do
   use FormulaXWeb, :live_view
 
   alias FormulaX.Race
+  alias FormulaX.Race.Car
   alias FormulaX.RaceControl
   alias FormulaX.Result
   alias FormulaX.Utils
@@ -898,20 +899,51 @@ defmodule FormulaXWeb.RaceLive do
   end
 
   def handle_info(
-        {:update_visuals, race = %Race{status: status}},
+        {:update_visuals,
+         race = %Race{
+           player_car: %Car{speed_boost_enabled?: speed_boost_enabled?},
+           status: status
+         }},
         socket = %Socket{}
       )
       when is_atom(status) do
     updated_socket =
-      if status === :crash or status === :ended do
-        socket
-        |> assign(:race, race)
-        |> update_results()
-      else
-        assign(socket, :race, race)
+      cond do
+        status === :crash or status === :ended ->
+          socket
+          |> assign(:race, race)
+          |> update_results()
+
+        status === :ongoing and speed_boost_enabled? ->
+          Process.send_after(self(), :disable_speed_boost, 3000)
+
+          assign(socket, :race, race)
+
+        true ->
+          assign(socket, :race, race)
       end
 
     {:noreply, updated_socket}
+  end
+
+  def handle_info(
+        :disable_speed_boost,
+        socket = %Socket{
+          assigns: %{
+            race:
+              race = %Race{
+                player_car: %Car{speed_boost_enabled?: speed_boost_enabled?},
+                status: status
+              },
+            screen_state: :race
+          }
+        }
+      ) do
+    if status === :ongoing and speed_boost_enabled? do
+      RaceControl.disable_speed_boost(race)
+    end
+
+    {:noreply, socket}
   end
 
   def handle_info(
