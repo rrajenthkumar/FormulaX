@@ -134,7 +134,12 @@ defmodule FormulaX.RaceControl do
 
   @spec steer_autonomous_car(Race.t(), Car.t()) :: Race.t()
   defp steer_autonomous_car(race = %Race{}, autonomous_car = %Car{controller: :autonomous}) do
-    direction = get_autonomous_car_steering_direction(race, autonomous_car)
+    lanes_cars_map = CrashDetection.get_lanes_and_cars_map(race)
+
+    autonomous_car_lane = Car.get_lane(autonomous_car)
+
+    direction =
+      get_autonomous_car_steering_direction(autonomous_car, lanes_cars_map, autonomous_car_lane)
 
     case direction do
       :noop ->
@@ -146,71 +151,77 @@ defmodule FormulaX.RaceControl do
     end
   end
 
-  @spec get_autonomous_car_steering_direction(Race.t(), Car.t()) :: :left | :right | :noop
+  @spec get_autonomous_car_steering_direction(Car.t(), map(), 1 | 2 | 3) :: :left | :right | :noop
   defp get_autonomous_car_steering_direction(
-         race = %Race{},
-         querying_autonomous_car = %Car{controller: :autonomous}
+         autonomous_car = %Car{controller: :autonomous},
+         lanes_cars_map = %{},
+         _autonomous_car_lane = 1
        ) do
-    lanes_cars_map = CrashDetection.get_lanes_and_cars_map(race)
+    number_of_cars_in_vicinity_in_lane_2 =
+      number_of_adjacent_lane_cars_in_vicinity(autonomous_car, lanes_cars_map, 2)
 
-    case Car.get_lane(querying_autonomous_car) do
-      1 ->
-        number_of_cars_in_vicinity_in_lane_2 =
-          number_of_adjacent_lane_cars_in_vicinity(lanes_cars_map, querying_autonomous_car, 2)
-
-        case number_of_cars_in_vicinity_in_lane_2 do
-          0 -> :right
-          _others -> :noop
-        end
-
-      2 ->
-        number_of_cars_in_vicinity_in_lane_1 =
-          number_of_adjacent_lane_cars_in_vicinity(lanes_cars_map, querying_autonomous_car, 1)
-
-        number_of_cars_in_vicinity_in_lane_3 =
-          number_of_adjacent_lane_cars_in_vicinity(lanes_cars_map, querying_autonomous_car, 3)
-
-        cond do
-          number_of_cars_in_vicinity_in_lane_1 == 0 -> :left
-          number_of_cars_in_vicinity_in_lane_3 == 0 -> :right
-          true -> :noop
-        end
-
-      3 ->
-        number_of_cars_in_vicinity_in_lane_2 =
-          number_of_adjacent_lane_cars_in_vicinity(lanes_cars_map, querying_autonomous_car, 2)
-
-        case number_of_cars_in_vicinity_in_lane_2 do
-          0 -> :left
-          _others -> :noop
-        end
+    case number_of_cars_in_vicinity_in_lane_2 do
+      0 -> :right
+      _others -> :noop
     end
   end
 
-  @spec number_of_adjacent_lane_cars_in_vicinity(map(), Car.t(), integer()) :: integer()
+  defp get_autonomous_car_steering_direction(
+         autonomous_car = %Car{controller: :autonomous},
+         lanes_cars_map = %{},
+         _autonomous_car_lane = 2
+       ) do
+    number_of_cars_in_vicinity_in_lane_1 =
+      number_of_adjacent_lane_cars_in_vicinity(autonomous_car, lanes_cars_map, 1)
+
+    number_of_cars_in_vicinity_in_lane_3 =
+      number_of_adjacent_lane_cars_in_vicinity(autonomous_car, lanes_cars_map, 3)
+
+    cond do
+      number_of_cars_in_vicinity_in_lane_1 == 0 -> :left
+      number_of_cars_in_vicinity_in_lane_3 == 0 -> :right
+      true -> :noop
+    end
+  end
+
+  defp get_autonomous_car_steering_direction(
+         autonomous_car = %Car{controller: :autonomous},
+         lanes_cars_map = %{},
+         _autonomous_car_lane = 3
+       ) do
+    number_of_cars_in_vicinity_in_lane_2 =
+      number_of_adjacent_lane_cars_in_vicinity(autonomous_car, lanes_cars_map, 2)
+
+    case number_of_cars_in_vicinity_in_lane_2 do
+      0 -> :left
+      _others -> :noop
+    end
+  end
+
+  @spec number_of_adjacent_lane_cars_in_vicinity(Car.t(), map(), 1 | 2 | 3) :: integer()
   defp number_of_adjacent_lane_cars_in_vicinity(
+         autonomous_car = %Car{controller: :autonomous},
          lanes_cars_map,
-         querying_autonomous_car = %Car{controller: :autonomous},
          adjacent_lane
        )
-       when is_map(lanes_cars_map) and is_integer(adjacent_lane) do
+       when is_map(lanes_cars_map) and adjacent_lane in [1, 2, 3] do
     lanes_cars_map
     |> Map.get(adjacent_lane, [])
-    |> adjacent_lane_cars_in_vicinity(querying_autonomous_car)
+    |> adjacent_lane_cars_in_vicinity(autonomous_car)
     |> length()
   end
 
   @spec adjacent_lane_cars_in_vicinity(list(Car.t()), Car.t()) :: list(Car.t())
   defp adjacent_lane_cars_in_vicinity(
          adjacent_lane_cars,
-         %Car{y_position: querying_autonomous_car_y_position, controller: :autonomous}
+         %Car{y_position: autonomous_car_y_position, controller: :autonomous}
        )
        when is_list(adjacent_lane_cars) do
-    # We take adjacent lane cars in the region from one car length behind the querying car to one car length in front of the querying car.
+    # We take adjacent lane cars in the region from one car length behind the querying autonomous car to one car length in front of the querying autonomous car.
 
     Enum.reject(adjacent_lane_cars, fn car ->
-      car.y_position < querying_autonomous_car_y_position - @car_length or
-        car.y_position > querying_autonomous_car_y_position + @car_length
+      car.y_position < autonomous_car_y_position - @car_length or
+        car.y_position > autonomous_car_y_position + @car_length
     end)
   end
 

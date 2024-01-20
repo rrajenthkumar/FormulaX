@@ -188,16 +188,14 @@ defmodule FormulaX.Race do
   @spec initialize_obstacles(Parameters.rem(), Parameters.rem()) :: list(Obstacle.t()) | []
   defp initialize_obstacles(race_distance, distance_covered_with_obstacles)
        when is_float(race_distance) and is_float(distance_covered_with_obstacles) do
-    cond do
-      race_distance - distance_covered_with_obstacles < @max_obstacle_y_position_step ->
-        []
+    if race_distance - distance_covered_with_obstacles < @max_obstacle_y_position_step do
+      []
+    else
+      %{distance: new_obstacle_distance} =
+        new_obstacle = Obstacle.initialize_obstacle(distance_covered_with_obstacles)
 
-      true ->
-        %{distance: new_obstacle_distance} =
-          new_obstacle = Obstacle.initialize_obstacle(distance_covered_with_obstacles)
-
-        [new_obstacle] ++
-          initialize_obstacles(race_distance, new_obstacle_distance)
+      [new_obstacle] ++
+        initialize_obstacles(race_distance, new_obstacle_distance)
     end
   end
 
@@ -215,17 +213,14 @@ defmodule FormulaX.Race do
           list(SpeedBoost.t()) | []
   defp initialize_speed_boosts(race_distance, distance_covered_with_speed_boosts)
        when is_float(race_distance) and is_float(distance_covered_with_speed_boosts) do
-    cond do
-      race_distance - distance_covered_with_speed_boosts <
-          @speed_boost_y_position_step ->
-        []
+    if race_distance - distance_covered_with_speed_boosts < @speed_boost_y_position_step do
+      []
+    else
+      %{distance: new_speed_boost_distance} =
+        new_speed_boost = SpeedBoost.initialize_speed_boost(distance_covered_with_speed_boosts)
 
-      true ->
-        %{distance: new_speed_boost_distance} =
-          new_speed_boost = SpeedBoost.initialize_speed_boost(distance_covered_with_speed_boosts)
-
-        [new_speed_boost] ++
-          initialize_speed_boosts(race_distance, new_speed_boost_distance)
+      [new_speed_boost] ++
+        initialize_speed_boosts(race_distance, new_speed_boost_distance)
     end
   end
 

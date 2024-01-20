@@ -903,14 +903,12 @@ defmodule FormulaXWeb.RaceLive do
       )
       when is_atom(status) do
     updated_socket =
-      cond do
-        status == :crash or status == :ended ->
-          socket
-          |> assign(:race, race)
-          |> update_results()
-
-        true ->
-          assign(socket, :race, race)
+      if status == :crash or status == :ended do
+        socket
+        |> assign(:race, race)
+        |> update_results()
+      else
+        assign(socket, :race, race)
       end
 
     {:noreply, updated_socket}

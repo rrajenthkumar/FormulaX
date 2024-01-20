@@ -274,7 +274,7 @@ defmodule FormulaXWeb.CoreComponents do
 
   slot :inner_block
 
-  def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
+  def input(assigns = %{field: %Phoenix.HTML.FormField{} = field}) do
     assigns
     |> assign(field: nil, id: assigns.id || field.id)
     |> assign(:errors, Enum.map(field.errors, &translate_error(&1)))
@@ -283,7 +283,7 @@ defmodule FormulaXWeb.CoreComponents do
     |> input()
   end
 
-  def input(%{type: "checkbox", value: value} = assigns) do
+  def input(assigns = %{type: "checkbox", value: value}) do
     assigns =
       assign_new(assigns, :checked, fn -> Phoenix.HTML.Form.normalize_value("checkbox", value) end)
 
@@ -307,7 +307,7 @@ defmodule FormulaXWeb.CoreComponents do
     """
   end
 
-  def input(%{type: "select"} = assigns) do
+  def input(assigns = %{type: "select"}) do
     ~H"""
     <div phx-feedback-for={@name}>
       <.label for={@id}><%= @label %></.label>
@@ -326,7 +326,7 @@ defmodule FormulaXWeb.CoreComponents do
     """
   end
 
-  def input(%{type: "textarea"} = assigns) do
+  def input(assigns = %{type: "textarea"}) do
     ~H"""
     <div phx-feedback-for={@name}>
       <.label for={@id}><%= @label %></.label>
@@ -570,7 +570,7 @@ defmodule FormulaXWeb.CoreComponents do
   attr :name, :string, required: true
   attr :class, :string, default: nil
 
-  def icon(%{name: "hero-" <> _} = assigns) do
+  def icon(assigns = %{name: "hero-" <> _}) do
     ~H"""
     <span class={[@name, @class]} />
     """

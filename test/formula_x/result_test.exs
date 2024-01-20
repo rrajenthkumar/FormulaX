@@ -59,7 +59,8 @@ defmodule FormulaX.ResultTest do
     new_result =
       Fixtures.result(%{
         car: "car1.png",
-        status: :crashed
+        status: :completed,
+        position: 2
       })
 
     last_5_results = [
@@ -99,8 +100,9 @@ defmodule FormulaX.ResultTest do
     expected = [
       Fixtures.result(%{
         car: "car1.png",
-        status: :crashed,
-        symbol: "&#128555"
+        status: :completed,
+        position: 2,
+        symbol: "&#8679"
       }),
       Fixtures.result(%{
         car: "car2.png",
