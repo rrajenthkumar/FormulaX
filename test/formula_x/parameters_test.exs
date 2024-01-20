@@ -112,16 +112,16 @@ defmodule FormulaX.ParametersTest do
     assert actual === expected
   end
 
-  test "obstacle_and_speed_boost_length" do
-    actual = Parameters.obstacle_and_speed_boost_length()
+  test "obstacle_or_speed_boost_length" do
+    actual = Parameters.obstacle_or_speed_boost_length()
 
     expected = 7.0
 
     assert actual === expected
   end
 
-  test "obstacles_and_speed_boosts_prohibited_distance" do
-    actual = Parameters.obstacles_and_speed_boosts_prohibited_distance()
+  test "obstacle_or_speed_boost_prohibited_distance" do
+    actual = Parameters.obstacle_or_speed_boost_prohibited_distance()
 
     expected = 60.0
 

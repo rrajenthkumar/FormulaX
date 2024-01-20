@@ -9,7 +9,7 @@ defmodule FormulaX.RaceControl.CrashDetection do
   alias FormulaX.Race.Obstacle
 
   @car_length Parameters.car_length()
-  @obstacle_length Parameters.obstacle_and_speed_boost_length()
+  @obstacle_length Parameters.obstacle_or_speed_boost_length()
 
   @doc """
   Please note that the race and car structs passed into this function have already been updated with the forward or sideward movement for which the possibility of crash is checked.

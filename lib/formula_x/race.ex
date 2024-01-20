@@ -15,7 +15,8 @@ defmodule FormulaX.Race do
 
   @race_distance Parameters.race_distance()
   @console_screen_height Parameters.console_screen_height()
-  @obstacles_and_speed_boosts_prohibited_distance Parameters.obstacles_and_speed_boosts_prohibited_distance()
+  @obstacle_or_speed_boost_prohibited_distance Parameters.obstacle_or_speed_boost_prohibited_distance()
+  @speed_boost_length Parameters.obstacle_or_speed_boost_length()
   @speed_boost_y_position_step Parameters.speed_boost_y_position_step()
   @max_obstacle_y_position_step Parameters.max_obstacle_y_position_step()
 
@@ -38,8 +39,12 @@ defmodule FormulaX.Race do
     player_car = Car.initialize_player_car(player_car_image_index)
     autonomous_cars = initialize_autonomous_cars(player_car)
     background = Background.initialize(@race_distance)
-    obstacles = initialize_obstacles(@race_distance)
     speed_boosts = initialize_speed_boosts(@race_distance)
+
+    obstacles =
+      @race_distance
+      |> initialize_obstacles()
+      |> remove_obstacles_in_the_vicinity_of_speedboosts(speed_boosts)
 
     new(%{
       player_car: player_car,
@@ -141,6 +146,23 @@ defmodule FormulaX.Race do
     end)
   end
 
+  @spec new(map()) :: Race.t()
+  def new(attrs) when is_map(attrs) do
+    struct!(Race, attrs)
+  end
+
+  @spec remove_obstacles_in_the_vicinity_of_speedboosts(list(Obstacle.t()), list(SpeedBoost.t())) ::
+          list(Obstacle.t())
+  def remove_obstacles_in_the_vicinity_of_speedboosts(obstacles, speed_boosts)
+      when is_list(obstacles) and is_list(speed_boosts) do
+    obstacles
+    |> Enum.reject(fn obstacle = %Obstacle{} ->
+      Enum.any?(speed_boosts, fn speed_boost = %SpeedBoost{} ->
+        obstacle_in_the_vicinity_of_speedboost?(obstacle, speed_boost)
+      end)
+    end)
+  end
+
   @spec initialize_autonomous_cars(Car.t()) :: list(Car.t())
   defp initialize_autonomous_cars(%Car{
          id: player_car_id,
@@ -175,7 +197,7 @@ defmodule FormulaX.Race do
   @spec initialize_obstacles(Parameters.rem()) :: list(Obstacle.t())
   defp initialize_obstacles(race_distance) when is_float(race_distance) do
     %{distance: new_obstacle_distance} =
-      new_obstacle = Obstacle.initialize_obstacle(@obstacles_and_speed_boosts_prohibited_distance)
+      new_obstacle = Obstacle.initialize_obstacle(@obstacle_or_speed_boost_prohibited_distance)
 
     [new_obstacle] ++
       initialize_obstacles(race_distance, new_obstacle_distance)
@@ -199,7 +221,7 @@ defmodule FormulaX.Race do
   defp initialize_speed_boosts(race_distance) when is_float(race_distance) do
     %{distance: new_speed_boost_distance} =
       new_speed_boost =
-      SpeedBoost.initialize_speed_boost(@obstacles_and_speed_boosts_prohibited_distance)
+      SpeedBoost.initialize_speed_boost(@obstacle_or_speed_boost_prohibited_distance)
 
     [new_speed_boost] ++
       initialize_speed_boosts(race_distance, new_speed_boost_distance)
@@ -220,11 +242,6 @@ defmodule FormulaX.Race do
     end
   end
 
-  @spec new(map()) :: Race.t()
-  def new(attrs) when is_map(attrs) do
-    struct!(Race, attrs)
-  end
-
   @spec player_car_past_finish?(Race.t()) :: boolean
   defp player_car_past_finish?(%Race{
          distance: race_distance,
@@ -238,5 +255,19 @@ defmodule FormulaX.Race do
     # This particular distance is just to make the end look smooth.
     distance_travelled_by_player_car + player_car_y_position >=
       race_distance + @console_screen_height / 2
+  end
+
+  @spec obstacle_in_the_vicinity_of_speedboost?(Obstacle.t(), SpeedBoost.t()) :: boolean()
+  defp obstacle_in_the_vicinity_of_speedboost?(
+         %Obstacle{distance: obstacle_distance},
+         %SpeedBoost{distance: speed_boost_distance}
+       ) do
+    # Is obstacle in the area starting from '@speed_boost_length' behind speed boost
+    # until '@speed_boost_length' after speed boost?
+    (obstacle_distance + @speed_boost_length >=
+       speed_boost_distance - @speed_boost_length and
+       obstacle_distance <= speed_boost_distance - @speed_boost_length) or
+      (obstacle_distance <= speed_boost_distance + 2 * @speed_boost_length and
+         obstacle_distance >= speed_boost_distance + @speed_boost_length)
   end
 end

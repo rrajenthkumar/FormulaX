@@ -11,7 +11,7 @@ defmodule FormulaX.Race.SpeedBoost do
   alias FormulaX.Race
   alias FormulaX.Race.Car
 
-  @speed_boost_length Parameters.obstacle_and_speed_boost_length()
+  @speed_boost_length Parameters.obstacle_or_speed_boost_length()
   @speed_boost_y_position_step Parameters.speed_boost_y_position_step()
   @car_length Parameters.car_length()
 
