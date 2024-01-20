@@ -2,12 +2,12 @@ defmodule FormulaX.RaceControl do
   @moduledoc """
   Interface for all controls related to the Race.
   """
-  alias FormulaX.RaceControl.CrashDetection
   alias FormulaX.Parameters
   alias FormulaX.Race
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
   alias FormulaX.Race.SpeedBoost
+  alias FormulaX.RaceControl.CrashDetection
   alias FormulaX.RaceEngine
 
   @car_length Parameters.car_length()
@@ -217,8 +217,8 @@ defmodule FormulaX.RaceControl do
          %Car{y_position: autonomous_car_y_position, controller: :autonomous}
        )
        when is_list(adjacent_lane_cars) do
-    # We take adjacent lane cars in the region from one car length behind the querying autonomous car to one car length in front of the querying autonomous car.
-
+    # We take adjacent lane cars in the region from one car length behind the querying autonomous car
+    # to one car length in front of the querying autonomous car.
     Enum.reject(adjacent_lane_cars, fn car ->
       car.y_position < autonomous_car_y_position - @car_length or
         car.y_position > autonomous_car_y_position + @car_length

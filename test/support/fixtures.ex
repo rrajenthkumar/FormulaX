@@ -2,11 +2,11 @@ defmodule FormulaX.Fixtures do
   @moduledoc """
   Fixtures for Car, Background, Obstacle, Speedboost, Race, Result to be used in tests
   """
-  alias FormulaX.Race.Car
+  alias FormulaX.Race
   alias FormulaX.Race.Background
+  alias FormulaX.Race.Car
   alias FormulaX.Race.Obstacle
   alias FormulaX.Race.SpeedBoost
-  alias FormulaX.Race
   alias FormulaX.Result
 
   @spec car(map()) :: Car.t()

@@ -5,8 +5,8 @@ defmodule FormulaX.Race.Car do
   use TypedStruct
 
   alias __MODULE__
-  alias FormulaX.Race
   alias FormulaX.Parameters
+  alias FormulaX.Race
   alias FormulaX.Utils
 
   @number_of_cars Parameters.number_of_cars()
@@ -187,7 +187,7 @@ defmodule FormulaX.Race.Car do
   @number of cars is the configured number of car initial positions
   """
   @spec get_all_possible_ids() :: list(integer())
-  def get_all_possible_ids() do
+  def get_all_possible_ids do
     1..@number_of_cars
     |> Enum.to_list()
   end

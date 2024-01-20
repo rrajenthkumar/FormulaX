@@ -6,8 +6,8 @@ defmodule FormulaX.Race.Background do
   use TypedStruct
 
   alias __MODULE__
-  alias FormulaX.Utils
   alias FormulaX.Parameters
+  alias FormulaX.Utils
 
   @console_screen_height Parameters.console_screen_height()
   @background_image_height Parameters.background_image_height()
@@ -28,9 +28,12 @@ defmodule FormulaX.Race.Background do
     left_side_images = get_side_images(available_background_images, race_distance)
     right_side_images = get_side_images(available_background_images, race_distance)
 
-    # The origins of left and right side Background DIVs which are at their top left edges are initially aligned to the top of console screen.
-    # After the below correction the bottom of these Background DIVs will be at a distance of '@console_screen_height' beyond the top of console screen.
-    # This is done to ensure that we can add few more background images to the bottom of the DIVs to show after the finish line
+    # The origins of left and right side Background DIVs which are at their top left edges
+    # are initially aligned to the top of console screen.
+    # After the below correction the bottom of these Background DIVs
+    # will be at a distance of '@console_screen_height' beyond the top of console screen.
+    # This is done to ensure that we can add few more background images
+    # to the bottom of the DIVs to show after the finish line.
     y_position = -@console_screen_height - race_distance
 
     new(%{
@@ -57,7 +60,8 @@ defmodule FormulaX.Race.Background do
   @spec get_side_images(filenames(), Parameters.rem()) :: filenames()
   defp get_side_images(available_background_images, race_distance)
        when is_float(race_distance) and is_list(available_background_images) do
-    # 2 * @console_screen_height is added to race length here to have few more background images to be shown after the finish line as explained earlier
+    # 2 * @console_screen_height is added to race length here to have few more background images
+    # to be shown after the finish line as explained earlier
 
     number_of_images_required =
       ((race_distance + 2 * @console_screen_height) /

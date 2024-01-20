@@ -67,7 +67,8 @@ defmodule FormulaX.RaceControl.CrashDetection do
   defp crash_with_car?(race = %Race{}, querying_car = %Car{}, crash_check_side)
        when crash_check_side in [:left, :right] do
     race
-    # Since the movement that could possibly cause the crash has already happened the crashable car will be in the same lane as the querying car
+    # Since the movement that could possibly cause the crash has already happened
+    # the crashable car will be in the same lane as the querying car
     |> get_same_lane_cars(querying_car)
     |> Enum.any?(fn car -> cars_are_overlapping?(car, querying_car) end)
   end
@@ -118,7 +119,8 @@ defmodule FormulaX.RaceControl.CrashDetection do
          querying_car = %Car{}
        ) do
     race
-    # Since the movement that could possibly cause the crash has already happened the crashable obstacle will be in the same lane as the querying car
+    # Since the movement that could possibly cause the crash has already happened
+    # the crashable obstacle will be in the same lane as the querying car
     |> get_same_lane_obstacles(querying_car)
     |> Enum.any?(fn obstacle ->
       obstacle_y_position = Obstacle.get_y_position(obstacle, race)

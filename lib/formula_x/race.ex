@@ -5,12 +5,12 @@ defmodule FormulaX.Race do
   use TypedStruct
 
   alias __MODULE__
-  alias FormulaX.RaceControl.CrashDetection
   alias FormulaX.Parameters
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
   alias FormulaX.Race.Obstacle
   alias FormulaX.Race.SpeedBoost
+  alias FormulaX.RaceControl.CrashDetection
   alias FormulaX.Utils
 
   @race_distance Parameters.race_distance()
@@ -238,7 +238,8 @@ defmodule FormulaX.Race do
            controller: :player
          }
        }) do
-    # To check if the player car has travelled a distance of half the console screen height beyond the finish line. This particular distance is just to make the end look smooth.
+    # To check if the player car has travelled a distance of half the console screen height beyond the finish line.
+    # This particular distance is just to make the end look smooth.
     distance_travelled_by_player_car + player_car_y_position >=
       race_distance + @console_screen_height / 2
   end

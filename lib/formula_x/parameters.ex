@@ -9,7 +9,7 @@ defmodule FormulaX.Parameters do
   @type rem() :: float()
 
   @spec race_distance() :: rem()
-  def race_distance() do
+  def race_distance do
     get_parameters()
     |> Map.get(:race_distance)
   end
@@ -18,13 +18,13 @@ defmodule FormulaX.Parameters do
   Returns a lane info map with limits of lanes in x direction
   """
   @spec lanes() :: list(map())
-  def lanes() do
+  def lanes do
     get_parameters()
     |> Map.get(:lanes)
   end
 
   @spec driving_area_limits() :: map()
-  def driving_area_limits() do
+  def driving_area_limits do
     x_start =
       lanes()
       |> Enum.find(fn lane -> lane.lane_number == 1 end)
@@ -39,19 +39,19 @@ defmodule FormulaX.Parameters do
   end
 
   @spec car_length() :: rem()
-  def car_length() do
+  def car_length do
     get_parameters()
     |> Map.get(:car_length)
   end
 
   @spec car_initial_positions() :: list(Car.coordinates())
-  def car_initial_positions() do
+  def car_initial_positions do
     get_parameters()
     |> Map.get(:car_initial_positions)
   end
 
   @spec number_of_cars() :: integer()
-  def number_of_cars() do
+  def number_of_cars do
     car_initial_positions()
     |> Enum.count()
   end
@@ -69,13 +69,13 @@ defmodule FormulaX.Parameters do
   Sideward movement distance for cars when steer() function is called
   """
   @spec car_steering_step() :: rem()
-  def car_steering_step() do
+  def car_steering_step do
     get_parameters()
     |> Map.get(:car_steering_step)
   end
 
   @spec obstacle_and_speed_boost_length() :: rem()
-  def obstacle_and_speed_boost_length() do
+  def obstacle_and_speed_boost_length do
     get_parameters()
     |> Map.get(:obstacle_and_speed_boost_length)
   end
@@ -84,13 +84,13 @@ defmodule FormulaX.Parameters do
   Used to set obstacles and speed boosts free distance to avoid seeing obstacles and speedboost as soon as the race begins
   """
   @spec obstacles_and_speed_boosts_prohibited_distance() :: rem()
-  def obstacles_and_speed_boosts_prohibited_distance() do
+  def obstacles_and_speed_boosts_prohibited_distance do
     get_parameters()
     |> Map.get(:obstacles_and_speed_boosts_prohibited_distance)
   end
 
   @spec obstacles_and_speed_boosts_x_positions() :: list(rem())
-  def obstacles_and_speed_boosts_x_positions() do
+  def obstacles_and_speed_boosts_x_positions do
     lanes()
     |> Enum.map(fn lane_info -> lane_info.x_start end)
   end
@@ -99,13 +99,13 @@ defmodule FormulaX.Parameters do
   Returns a list of possible step values for positioning the next obstacle after an already positioned obstacle or after the obstacles free distance
   """
   @spec obstacle_y_position_steps() :: list(rem())
-  def obstacle_y_position_steps() do
+  def obstacle_y_position_steps do
     get_parameters()
     |> Map.get(:obstacle_y_position_steps)
   end
 
   @spec max_obstacle_y_position_step() :: rem()
-  def max_obstacle_y_position_step() do
+  def max_obstacle_y_position_step do
     obstacle_y_position_steps()
     |> Enum.max()
   end
@@ -114,19 +114,19 @@ defmodule FormulaX.Parameters do
   Returns the step value for positioning the next speed boost after an already positioned speed boost or after the speed boosts free distance
   """
   @spec speed_boost_y_position_step() :: rem()
-  def speed_boost_y_position_step() do
+  def speed_boost_y_position_step do
     get_parameters()
     |> Map.get(:speed_boost_y_position_step)
   end
 
   @spec console_screen_height() :: rem()
-  def console_screen_height() do
+  def console_screen_height do
     get_parameters()
     |> Map.get(:console_screen_height)
   end
 
   @spec background_image_height() :: rem()
-  def background_image_height() do
+  def background_image_height do
     driving_area_width = driving_area_limits().x_end - driving_area_limits().x_start
 
     # Console screen has an aspect ratio of 1
@@ -138,12 +138,12 @@ defmodule FormulaX.Parameters do
   end
 
   @spec get_parameters() :: map()
-  defp get_parameters() do
+  defp get_parameters do
     Application.get_env(:formula_x, :parameters)
   end
 
   @spec car_drive_steps() :: map()
-  defp car_drive_steps() do
+  defp car_drive_steps do
     get_parameters()
     |> Map.get(:car_drive_steps)
   end

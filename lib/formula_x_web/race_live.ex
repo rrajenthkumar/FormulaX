@@ -4,12 +4,12 @@ defmodule FormulaXWeb.RaceLive do
   """
   use FormulaXWeb, :live_view
 
-  alias FormulaX.RaceControl
   alias FormulaX.Race
-  alias FormulaXWeb.RaceLive.ConsoleControls
-  alias FormulaXWeb.RaceLive.Screen
+  alias FormulaX.RaceControl
   alias FormulaX.Result
   alias FormulaX.Utils
+  alias FormulaXWeb.RaceLive.ConsoleControls
+  alias FormulaXWeb.RaceLive.Screen
   alias Phoenix.LiveView.Socket
 
   @impl true
@@ -965,7 +965,7 @@ defmodule FormulaXWeb.RaceLive do
   end
 
   @spec maximum_car_selection_index() :: integer()
-  defp maximum_car_selection_index() do
+  defp maximum_car_selection_index do
     number_of_cars =
       "cars"
       |> Utils.get_filenames_of_images!()
