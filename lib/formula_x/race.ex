@@ -17,7 +17,7 @@ defmodule FormulaX.Race do
   @race_distance Parameters.race_distance()
   @console_screen_height Parameters.console_screen_height()
   @obstacle_or_speed_boost_prohibited_distance Parameters.obstacle_or_speed_boost_prohibited_distance()
-  @speed_boost_length Parameters.obstacle_or_speed_boost_length()
+  @obstacle_or_speed_boost_length Parameters.obstacle_or_speed_boost_length()
   @speed_boost_y_position_step Parameters.speed_boost_y_position_step()
   @max_obstacle_y_position_step Parameters.max_obstacle_y_position_step()
 
@@ -157,9 +157,10 @@ defmodule FormulaX.Race do
   def remove_obstacles_in_the_vicinity_of_speedboosts(obstacles, speed_boosts)
       when is_list(obstacles) and is_list(speed_boosts) do
     obstacles
-    |> Enum.reject(fn obstacle = %Obstacle{} ->
-      Enum.any?(speed_boosts, fn speed_boost = %SpeedBoost{} ->
-        obstacle_in_the_vicinity_of_speedboost?(obstacle, speed_boost)
+    |> Enum.reject(fn obstacle = %Obstacle{x_position: obstacle_x_position} ->
+      Enum.any?(speed_boosts, fn speed_boost = %SpeedBoost{x_position: speed_boost_x_position} ->
+        obstacle_x_position === speed_boost_x_position and
+          obstacle_in_the_vicinity_of_speedboost?(obstacle, speed_boost)
       end)
     end)
   end
@@ -316,13 +317,10 @@ defmodule FormulaX.Race do
          %Obstacle{distance: obstacle_distance},
          %SpeedBoost{distance: speed_boost_distance}
        ) do
-    # Is obstacle in the area starting from '@speed_boost_length' behind speed boost
-    # until '@speed_boost_length' after speed boost?
-    (obstacle_distance + @speed_boost_length >=
-       speed_boost_distance - @speed_boost_length and
-       obstacle_distance <= speed_boost_distance - @speed_boost_length) or
-      (obstacle_distance <= speed_boost_distance + 2 * @speed_boost_length and
-         obstacle_distance >= speed_boost_distance + @speed_boost_length)
+    # Is obstacle in the area starting from '2 * @obstacle_or_speed_boost_length' behind speed boost
+    # until ' 2 * @obstacle_or_speed_boost_length' after speed boost?
+    obstacle_distance >= speed_boost_distance - 2 * @obstacle_or_speed_boost_length and
+      obstacle_distance <= speed_boost_distance + 3 * @obstacle_or_speed_boost_length
   end
 
   @spec speed_boost_fetched?(Race.t()) :: boolean()
@@ -362,6 +360,6 @@ defmodule FormulaX.Race do
     (car_y_position + @car_length >= speed_boost_y_position and
        car_y_position <= speed_boost_y_position) or
       (car_y_position >= speed_boost_y_position and
-         car_y_position <= speed_boost_y_position + @speed_boost_length)
+         car_y_position <= speed_boost_y_position + @obstacle_or_speed_boost_length)
   end
 end
