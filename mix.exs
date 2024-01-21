@@ -67,7 +67,7 @@ defmodule FormulaX.MixProject do
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind default", "esbuild default"],
       "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"],
-      check: ["format", "test", "dialyzer", "credo"]
+      check: ["format", "test", "dialyzer", "credo --strict"]
     ]
   end
 end
