@@ -399,7 +399,10 @@ defmodule FormulaXWeb.RaceLive.Screen do
   @spec obstacle_and_speed_boost_position_style(Obstacle.t() | SpeedBoost.t(), Race.t()) ::
           String.t()
   defp obstacle_and_speed_boost_position_style(
-         %{x_position: stationary_item_x_position, distance: stationary_item_distance},
+         %{
+           x_position: obstacle_or_speed_boost_x_position,
+           distance: obstacle_or_speed_boost_distance
+         },
          %Race{
            player_car: %Car{
              distance_travelled: distance_travelled_by_player_car,
@@ -408,11 +411,13 @@ defmodule FormulaXWeb.RaceLive.Screen do
            }
          }
        )
-       when is_float(stationary_item_x_position) and is_float(stationary_item_distance) do
-    stationary_item_y_position =
-      stationary_item_distance - (distance_travelled_by_player_car + player_car_y_position)
+       when is_float(obstacle_or_speed_boost_x_position) and
+              is_float(obstacle_or_speed_boost_distance) do
+    obstacle_or_speed_boost_y_position =
+      obstacle_or_speed_boost_distance -
+        (distance_travelled_by_player_car + player_car_y_position)
 
-    "left: #{stationary_item_x_position}rem; bottom: #{stationary_item_y_position}rem;"
+    "left: #{obstacle_or_speed_boost_x_position}rem; bottom: #{obstacle_or_speed_boost_y_position}rem;"
   end
 
   @spec get_car_image(integer()) :: Car.filename()

@@ -7,8 +7,6 @@ defmodule FormulaX.Race.Obstacle do
 
   alias __MODULE__
   alias FormulaX.Parameters
-  alias FormulaX.Race
-  alias FormulaX.Race.Car
 
   @typedoc "Obstacle struct"
   typedstruct do
@@ -38,20 +36,6 @@ defmodule FormulaX.Race.Obstacle do
         obstacles_prohibited_distance_or_distance_already_covered_with_obstacles +
           obstacle_y_position_step
     })
-  end
-
-  @spec get_y_position(Obstacle.t(), Race.t()) :: Parameters.rem()
-  def get_y_position(
-        %Obstacle{distance: obstacle_distance},
-        %Race{
-          player_car: %Car{
-            distance_travelled: distance_travelled_by_player_car,
-            y_position: player_car_y_position,
-            controller: :player
-          }
-        }
-      ) do
-    obstacle_distance - (distance_travelled_by_player_car + player_car_y_position)
   end
 
   @spec get_lane(Obstacle.t()) :: integer()

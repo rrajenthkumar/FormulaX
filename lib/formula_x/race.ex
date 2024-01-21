@@ -323,11 +323,7 @@ defmodule FormulaX.Race do
   defp speed_boost_fetched?(race = %Race{player_car: player_car}) do
     race
     |> get_same_lane_speed_boosts()
-    |> Enum.any?(fn speed_boost ->
-      speed_boost_y_position = SpeedBoost.get_y_position(speed_boost, race)
-
-      overlaps_with_player_car?(speed_boost_y_position, player_car)
-    end)
+    |> Enum.any?(fn speed_boost -> overlaps_with_speed_boost?(player_car, speed_boost) end)
   end
 
   @spec get_same_lane_speed_boosts(Race.t()) :: list(SpeedBoost.t())
@@ -344,18 +340,23 @@ defmodule FormulaX.Race do
     Enum.group_by(speed_boosts, &SpeedBoost.get_lane/1, & &1)
   end
 
-  @spec overlaps_with_player_car?(Parameters.rem(), Car.t()) :: boolean()
-  defp overlaps_with_player_car?(speed_boost_y_position, %Car{
-         y_position: car_y_position,
-         controller: :player
-       })
-       when is_float(speed_boost_y_position) do
+  @spec overlaps_with_speed_boost?(Car.t(), SpeedBoost.t()) :: boolean()
+  defp overlaps_with_speed_boost?(
+         %Car{
+           y_position: car_y_position,
+           distance_travelled: distance_travelled_by_car,
+           controller: :player
+         },
+         %SpeedBoost{distance: speed_boost_distance}
+       ) do
     # Player car and the speed boost are exactly at the same position or
     # Player car front wheels are between speed boost rear and front or
     # Player car rear wheels are between speed boost rear and front
-    (car_y_position + @car_length >= speed_boost_y_position and
-       car_y_position <= speed_boost_y_position) or
-      (car_y_position >= speed_boost_y_position and
-         car_y_position <= speed_boost_y_position + @obstacle_or_speed_boost_length)
+    (car_y_position + distance_travelled_by_car + @car_length >= speed_boost_distance and
+       car_y_position + distance_travelled_by_car <= speed_boost_distance) or
+      (car_y_position + distance_travelled_by_car <=
+         speed_boost_distance + @obstacle_or_speed_boost_length and
+         car_y_position + distance_travelled_by_car + @car_length >=
+           speed_boost_distance + @obstacle_or_speed_boost_length)
   end
 end

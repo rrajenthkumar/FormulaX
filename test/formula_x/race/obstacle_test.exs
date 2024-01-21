@@ -12,20 +12,6 @@ defmodule FormulaX.Race.ObstacleTest do
     assert obstacle.distance in [530.0, 560.0, 590.0]
   end
 
-  test "get_y_position" do
-    obstacle = Fixtures.obstacle(%{distance: 160.0})
-
-    player_car = Fixtures.car(%{y_position: 9.0, distance_travelled: 160.0})
-
-    race = Fixtures.race(%{player_car: player_car})
-
-    actual = Obstacle.get_y_position(obstacle, race)
-
-    expected = -9.0
-
-    assert actual === expected
-  end
-
   test "get_lane" do
     actual =
       Fixtures.obstacle()

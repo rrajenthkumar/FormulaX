@@ -122,10 +122,7 @@ defmodule FormulaX.RaceControl.CrashDetection do
     # Since the movement that could possibly cause the crash has already happened
     # the crashable obstacle will be in the same lane as the querying car
     |> get_same_lane_obstacles(querying_car)
-    |> Enum.any?(fn obstacle ->
-      obstacle_y_position = Obstacle.get_y_position(obstacle, race)
-      overlaps_with_obstacle?(querying_car, obstacle_y_position)
-    end)
+    |> Enum.any?(fn obstacle -> overlaps_with_obstacle?(querying_car, obstacle) end)
   end
 
   @spec get_same_lane_obstacles(Race.t(), Car.t()) :: list(Obstacle.t())
@@ -145,16 +142,19 @@ defmodule FormulaX.RaceControl.CrashDetection do
     Enum.group_by(obstacles, &Obstacle.get_lane/1, & &1)
   end
 
-  @spec overlaps_with_obstacle?(Car.t(), Parameters.rem()) :: boolean()
-  defp overlaps_with_obstacle?(%Car{y_position: car_y_position}, obstacle_y_position)
-       when is_float(obstacle_y_position) do
+  @spec overlaps_with_obstacle?(Car.t(), Obstacle.t()) :: boolean()
+  defp overlaps_with_obstacle?(
+         %Car{y_position: car_y_position, distance_travelled: distance_travelled_by_car},
+         %Obstacle{distance: obstacle_distance}
+       ) do
     # Car and obstacle are at the same position or
     # Car front wheels between obstacle start and end or
     # Car rear wheels between obstacle start and end
-    (car_y_position + @car_length >= obstacle_y_position and
-       car_y_position <= obstacle_y_position) or
-      (car_y_position >= obstacle_y_position and
-         car_y_position <= obstacle_y_position + @obstacle_length)
+    (car_y_position + distance_travelled_by_car + @car_length >= obstacle_distance and
+       car_y_position + distance_travelled_by_car <= obstacle_distance) or
+      (car_y_position + distance_travelled_by_car <= obstacle_distance + @obstacle_length and
+         car_y_position + distance_travelled_by_car + @car_length >=
+           obstacle_distance + @obstacle_length)
   end
 
   # Car out of tracks

@@ -12,20 +12,6 @@ defmodule FormulaX.Race.SpeedBoostTest do
     assert speed_boost.distance === 660.0
   end
 
-  test "get_y_position" do
-    speed_boost = Fixtures.speed_boost(%{distance: 960.0})
-
-    player_car = Fixtures.car(%{y_position: 1.0, distance_travelled: 945.0})
-
-    race = Fixtures.race(%{player_car: player_car})
-
-    actual = SpeedBoost.get_y_position(speed_boost, race)
-
-    expected = 14.0
-
-    assert actual === expected
-  end
-
   test "get_lane" do
     actual =
       Fixtures.speed_boost()
