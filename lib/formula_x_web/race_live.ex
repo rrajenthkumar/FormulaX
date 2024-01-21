@@ -407,9 +407,11 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    updated_socket = initialize_switched_off_screen(socket)
+    # To avoid screen getting switched off immediately on pressing red button during a crash
+    # This might occur when the user tries to unsuccessfully slowdown the car to avoid a crash for example
+    Process.send_after(self(), :switch_off_after_crash, 2000)
 
-    {:noreply, updated_socket}
+    {:noreply, socket}
   end
 
   def handle_event(
@@ -422,12 +424,13 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    updated_socket =
-      socket
-      |> initialize_switched_off_screen()
-      |> assign(:clicked_button, :red)
+    updated_socket = assign(socket, :clicked_button, :red)
 
     Process.send_after(self(), :reset_clicked_button_assign, 250)
+
+    # To avoid screen getting switched off immediately on pressing red button during a crash
+    # This might occur when the user tries to unsuccessfully slowdown the car to avoid a crash for example
+    Process.send_after(self(), :switch_off_after_crash, 2000)
 
     {:noreply, updated_socket}
   end
@@ -960,6 +963,11 @@ defmodule FormulaXWeb.RaceLive do
       ) do
     updated_socket = assign(socket, :clicked_button, nil)
 
+    {:noreply, updated_socket}
+  end
+
+  def handle_info(:switch_off_after_crash, socket) do
+    updated_socket = initialize_switched_off_screen(socket)
     {:noreply, updated_socket}
   end
 
