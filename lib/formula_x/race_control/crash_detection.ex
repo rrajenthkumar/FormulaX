@@ -108,8 +108,8 @@ defmodule FormulaX.RaceControl.CrashDetection do
   defp cars_are_touching_or_overlapping?(%Car{y_position: car_1_y_position}, %Car{
          y_position: car_2_y_position
        }) do
-    # lower bound = car_2_y_position - @car_length
-    # upper bound = car_2_y_position + @car_length
+    # lower bound is car_2_y_position - @car_length
+    # upper bound is car_2_y_position + @car_length
     car_2_y_position - @car_length <= car_1_y_position and
       car_1_y_position <= car_2_y_position + @car_length
   end
@@ -144,8 +144,8 @@ defmodule FormulaX.RaceControl.CrashDetection do
          %Car{y_position: car_y_position, distance_travelled: distance_travelled_by_car},
          %Obstacle{distance: obstacle_distance}
        ) do
-    # lower bound = obstacle_distance - @car_length
-    # upper bound = obstacle_distance + @obstacle_length
+    # lower bound is obstacle_distance - @car_length
+    # upper bound is obstacle_distance + @obstacle_length
     obstacle_distance - @car_length <= car_y_position + distance_travelled_by_car and
       car_y_position + distance_travelled_by_car <=
         obstacle_distance + @obstacle_length

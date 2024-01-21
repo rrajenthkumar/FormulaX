@@ -273,7 +273,7 @@ defmodule FormulaX.RaceControl do
       |> CrashDetection.get_lanes_and_obstacles_map()
       |> Map.get(target_lane, [])
 
-    # Is there is no obstacle in the area starting from '2 * @obstacle_or_speed_boost_length' behind car
+    # Is there no obstacle in the area starting from '2 * @obstacle_or_speed_boost_length' behind car
     # until '2 * @obstacle_or_speed_boost_length' after car?
     Enum.all?(
       target_lane_obstacles,

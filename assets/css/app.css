@@ -266,7 +266,7 @@
 }
 
 .race_live .console .race_screen .race .speed_boosts img {
-  @apply w-12;
+  @apply w-12 rounded-full;
   animation: speed_boost_highlight_animation 250ms ease-in-out 0s infinite
     forwards;
 }
@@ -561,7 +561,7 @@
   }
 
   50% {
-    box-shadow: 0rem 0rem 2.5rem rgb(251, 255, 0);
+    box-shadow: 0rem 0rem 2.5rem red;
   }
 
   100% {

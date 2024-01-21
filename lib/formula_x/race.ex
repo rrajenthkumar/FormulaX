@@ -351,8 +351,8 @@ defmodule FormulaX.Race do
          },
          %SpeedBoost{distance: speed_boost_distance}
        ) do
-    # lower bound = speed_boost_distance - @car_length
-    # upper bound = speed_boost_distance + @obstacle_or_speed_boost_length
+    # lower bound is speed_boost_distance - @car_length
+    # upper bound is speed_boost_distance + @obstacle_or_speed_boost_length
     speed_boost_distance - @car_length <= car_y_position + distance_travelled_by_car and
       car_y_position + distance_travelled_by_car <=
         speed_boost_distance + @obstacle_or_speed_boost_length

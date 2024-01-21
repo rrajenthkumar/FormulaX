@@ -11,7 +11,7 @@ import Config
 config :formula_x,
   parameters: %{
     # Total race distance
-    race_distance: 650.0,
+    race_distance: 750.0,
     # Based on CSS styling of 'screen' class
     console_screen_height: 35.0,
     # List of lane info maps
@@ -42,9 +42,9 @@ config :formula_x,
     # Length of speed boost and length of obstacle are set to the same value as car length for ease of calculations
     obstacle_or_speed_boost_length: 7.0,
     # Obstacles or Speed boosts are not placed until this distance after the start of race
-    obstacle_or_speed_boost_prohibited_distance: 60.0,
+    obstacle_or_speed_boost_prohibited_distance: 100.0,
     # Y direction step values used to position Obstacles
-    obstacle_y_position_steps: [30.0, 60.0, 90.0],
+    obstacle_y_position_steps: [50.0, 100.0, 150.0],
     # Y direction step value used to position Speed boosts
     # These are rare elements and so the step value is set high
     speed_boost_y_position_step: 300.0
