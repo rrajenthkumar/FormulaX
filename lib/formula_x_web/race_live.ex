@@ -337,11 +337,9 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    # To avoid screen getting switched off immediately on pressing green button during a crash
-    # This might occur when the user tries to unsuccessfully speedup the car to avoid a crash for example
-    Process.send_after(self(), :restart_after_crash, 2000)
+    updated_socket = restart_car_selection_screen(socket)
 
-    {:noreply, socket}
+    {:noreply, updated_socket}
   end
 
   def handle_event(
@@ -354,13 +352,12 @@ defmodule FormulaXWeb.RaceLive do
           }
         }
       ) do
-    updated_socket = assign(socket, :clicked_button, :green)
+    updated_socket =
+      socket
+      |> assign(:clicked_button, :green)
+      |> restart_car_selection_screen()
 
     Process.send_after(self(), :reset_clicked_button_assign, 250)
-
-    # To avoid going to restart car selection screen immediately on pressing green button during a crash
-    # This might occur when the user tries to unsuccessfully speedup the car to avoid a crash for example
-    Process.send_after(self(), :restart_after_crash, 2000)
 
     {:noreply, updated_socket}
   end
@@ -971,11 +968,6 @@ defmodule FormulaXWeb.RaceLive do
 
   def handle_info(:switch_off_after_crash, socket) do
     updated_socket = initialize_switched_off_screen(socket)
-    {:noreply, updated_socket}
-  end
-
-  def handle_info(:restart_after_crash, socket) do
-    updated_socket = restart_car_selection_screen(socket)
     {:noreply, updated_socket}
   end
 
