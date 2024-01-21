@@ -6,7 +6,7 @@ defmodule FormulaX.ParametersTest do
   test "race_distance" do
     actual = Parameters.race_distance()
 
-    expected = 650.0
+    expected = 750.0
 
     assert actual === expected
   end
@@ -123,7 +123,7 @@ defmodule FormulaX.ParametersTest do
   test "obstacle_or_speed_boost_prohibited_distance" do
     actual = Parameters.obstacle_or_speed_boost_prohibited_distance()
 
-    expected = 60.0
+    expected = 100.0
 
     assert actual === expected
   end
@@ -139,7 +139,7 @@ defmodule FormulaX.ParametersTest do
   test "obstacle_y_position_steps" do
     actual = Parameters.obstacle_y_position_steps()
 
-    expected = [30.0, 60.0, 90.0]
+    expected = [50.0, 100.0, 150.0]
 
     assert actual === expected
   end
@@ -147,7 +147,7 @@ defmodule FormulaX.ParametersTest do
   test "max_obstacle_y_position_step" do
     actual = Parameters.max_obstacle_y_position_step()
 
-    expected = 90.0
+    expected = 150.0
 
     assert actual === expected
   end

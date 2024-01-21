@@ -9,7 +9,7 @@ defmodule FormulaX.Race.ObstacleTest do
 
     assert obstacle.__struct__ === Obstacle
     assert obstacle.x_position in [0.0, 6.0, 12.0]
-    assert obstacle.distance in [530.0, 560.0, 590.0]
+    assert obstacle.distance in [550.0, 600.0, 650.0]
   end
 
   test "get_lane" do
