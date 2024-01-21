@@ -946,6 +946,14 @@ defmodule FormulaXWeb.RaceLive do
     {:noreply, socket}
   end
 
+  # When 'screen_state' is not :race
+  def handle_info(
+        :disable_speed_boost,
+        socket = %Socket{}
+      ) do
+    {:noreply, socket}
+  end
+
   def handle_info(
         :reset_clicked_button_assign,
         socket = %Socket{}

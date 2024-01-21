@@ -45,40 +45,82 @@ defmodule FormulaX.Race.BackgroundTest do
     end
   end
 
-  test "move" do
-    actual =
-      Fixtures.background()
-      |> Background.move(:moderate)
+  describe "move" do
+    test "speed_boost_enabled?: true" do
+      player_car = Fixtures.car(%{speed_boost_enabled?: true})
 
-    expected = %Background{
-      left_side_images: [
-        "image1.png",
-        "image2.png",
-        "image3.png",
-        "image4.png",
-        "image5.png",
-        "image6.png",
-        "image7.png",
-        "image8.png",
-        "image9.png",
-        "image10.png"
-      ],
-      right_side_images: [
-        "image10.png",
-        "image9.png",
-        "image8.png",
-        "image7.png",
-        "image6.png",
-        "image5.png",
-        "image4.png",
-        "image3.png",
-        "image2.png",
-        "image1.png"
-      ],
-      y_position: -1030.0
-    }
+      actual =
+        Fixtures.background()
+        |> Background.move(player_car)
 
-    assert actual === expected
+      expected = %Background{
+        left_side_images: [
+          "image1.png",
+          "image2.png",
+          "image3.png",
+          "image4.png",
+          "image5.png",
+          "image6.png",
+          "image7.png",
+          "image8.png",
+          "image9.png",
+          "image10.png"
+        ],
+        right_side_images: [
+          "image10.png",
+          "image9.png",
+          "image8.png",
+          "image7.png",
+          "image6.png",
+          "image5.png",
+          "image4.png",
+          "image3.png",
+          "image2.png",
+          "image1.png"
+        ],
+        y_position: -1028.0
+      }
+
+      assert actual === expected
+    end
+
+    test "speed_boost_enabled?: false" do
+      player_car = Fixtures.car()
+
+      actual =
+        Fixtures.background()
+        |> Background.move(player_car)
+
+      expected = %Background{
+        left_side_images: [
+          "image1.png",
+          "image2.png",
+          "image3.png",
+          "image4.png",
+          "image5.png",
+          "image6.png",
+          "image7.png",
+          "image8.png",
+          "image9.png",
+          "image10.png"
+        ],
+        right_side_images: [
+          "image10.png",
+          "image9.png",
+          "image8.png",
+          "image7.png",
+          "image6.png",
+          "image5.png",
+          "image4.png",
+          "image3.png",
+          "image2.png",
+          "image1.png"
+        ],
+        y_position: -1031.0
+      }
+
+      assert actual === expected
+    end
   end
 
   test "new" do

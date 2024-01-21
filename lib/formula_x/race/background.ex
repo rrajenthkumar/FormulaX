@@ -7,6 +7,7 @@ defmodule FormulaX.Race.Background do
 
   alias __MODULE__
   alias FormulaX.Parameters
+  alias FormulaX.Race.Car
   alias FormulaX.Utils
 
   @console_screen_height Parameters.console_screen_height()
@@ -43,9 +44,21 @@ defmodule FormulaX.Race.Background do
     })
   end
 
-  @spec move(Background.t(), :rest | :low | :moderate | :high | :speed_boost) :: Background.t()
-  def move(background = %Background{y_position: y_position}, player_car_speed)
-      when player_car_speed in [:rest, :low, :moderate, :high, :speed_boost] do
+  @spec move(Background.t(), Car.t()) :: Background.t()
+  def move(
+        background = %Background{y_position: y_position},
+        %Car{speed_boost_enabled?: true}
+      ) do
+    car_drive_step = Parameters.car_drive_step(:speed_boost)
+    updated_y_position = y_position + car_drive_step
+
+    %Background{background | y_position: updated_y_position}
+  end
+
+  def move(
+        background = %Background{y_position: y_position},
+        %Car{speed_boost_enabled?: false, speed: player_car_speed}
+      ) do
     car_drive_step = Parameters.car_drive_step(player_car_speed)
     updated_y_position = y_position + car_drive_step
 

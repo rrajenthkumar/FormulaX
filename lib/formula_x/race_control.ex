@@ -29,13 +29,12 @@ defmodule FormulaX.RaceControl do
           player_car: player_car = %Car{controller: :player}
         }
       ) do
-    %Car{speed: player_car_speed} =
-      updated_player_car =
+    updated_player_car =
       player_car
       |> Car.drive()
       |> Car.add_completion_time_if_finished(race)
 
-    updated_background = Background.move(background, player_car_speed)
+    updated_background = Background.move(background, updated_player_car)
 
     race
     |> Race.update_player_car(updated_player_car)
