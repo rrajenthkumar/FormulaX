@@ -45,8 +45,8 @@ jobs:
       - name: Run mix credo
         run: mix credo --strict
 
-      # - name: Run mix dialyzer
-      #   run: mix dialyzer --format dialyzer --halt-exit-status
+      - name: Run mix dialyzer
+        run: mix dialyzer --format dialyzer --halt-exit-status
 
       - name: Run tests
         run: mix test

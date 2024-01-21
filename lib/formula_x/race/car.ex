@@ -223,11 +223,11 @@ defmodule FormulaX.Race.Car do
     |> Enum.at(car_id - 1)
   end
 
-  @spec finished?(Car.t(), Race.t()) :: boolean()
+  @spec finished?(%Car{}, Race.t()) :: boolean()
   defp finished?(
          %Car{distance_travelled: distance_travelled_by_car, y_position: car_y_position},
          %Race{distance: race_distance}
        ) do
-    distance_travelled_by_car + car_y_position >= race_distance
+    (distance_travelled_by_car + car_y_position) >= race_distance
   end
 end
