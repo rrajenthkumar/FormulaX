@@ -55,13 +55,18 @@ defmodule FormulaX.RaceControl.CrashDetection do
     )
   end
 
+  @spec get_lanes_and_obstacles_map(Race.t()) :: map()
+  def get_lanes_and_obstacles_map(%Race{obstacles: obstacles}) do
+    Enum.group_by(obstacles, &Obstacle.get_lane/1, & &1)
+  end
+
   # Crash check with another car
   @spec crash_with_car?(Race.t(), Car.t(), :front | :left | :right) :: boolean()
   defp crash_with_car?(race = %Race{}, querying_car = %Car{}, _crash_check_side = :front) do
     race
     |> get_same_lane_cars(querying_car)
     |> remove_cars_behind(querying_car)
-    |> Enum.any?(fn car -> cars_are_overlapping?(car, querying_car) end)
+    |> Enum.any?(fn car -> cars_are_touching_or_overlapping?(car, querying_car) end)
   end
 
   defp crash_with_car?(race = %Race{}, querying_car = %Car{}, crash_check_side)
@@ -70,7 +75,7 @@ defmodule FormulaX.RaceControl.CrashDetection do
     # Since the movement that could possibly cause the crash has already happened
     # the crashable car will be in the same lane as the querying car
     |> get_same_lane_cars(querying_car)
-    |> Enum.any?(fn car -> cars_are_overlapping?(car, querying_car) end)
+    |> Enum.any?(fn car -> cars_are_touching_or_overlapping?(car, querying_car) end)
   end
 
   @spec get_same_lane_cars(Race.t(), Car.t()) :: list(Car.t())
@@ -99,17 +104,14 @@ defmodule FormulaX.RaceControl.CrashDetection do
     end)
   end
 
-  @spec cars_are_overlapping?(Car.t(), Car.t()) :: boolean()
-  defp cars_are_overlapping?(%Car{y_position: car_1_y_position}, %Car{
+  @spec cars_are_touching_or_overlapping?(Car.t(), Car.t()) :: boolean()
+  defp cars_are_touching_or_overlapping?(%Car{y_position: car_1_y_position}, %Car{
          y_position: car_2_y_position
        }) do
-    # Both cars are at the same position or
-    # Car_1 front wheels between Car_2 front and rear wheels or
-    # Car_1 rear wheels between Car_2 front and rear wheels
-    (car_1_y_position + @car_length >= car_2_y_position and
-       car_1_y_position <= car_2_y_position) or
-      (car_1_y_position >= car_2_y_position and
-         car_1_y_position <= car_2_y_position + @car_length)
+    # lower bound = car_2_y_position - @car_length
+    # upper bound = car_2_y_position + @car_length
+    car_2_y_position - @car_length <= car_1_y_position and
+      car_1_y_position <= car_2_y_position + @car_length
   end
 
   # Crash check with an obstacle
@@ -122,7 +124,7 @@ defmodule FormulaX.RaceControl.CrashDetection do
     # Since the movement that could possibly cause the crash has already happened
     # the crashable obstacle will be in the same lane as the querying car
     |> get_same_lane_obstacles(querying_car)
-    |> Enum.any?(fn obstacle -> overlaps_with_obstacle?(querying_car, obstacle) end)
+    |> Enum.any?(fn obstacle -> car_touches_or_overlaps_obstacle?(querying_car, obstacle) end)
   end
 
   @spec get_same_lane_obstacles(Race.t(), Car.t()) :: list(Obstacle.t())
@@ -137,24 +139,16 @@ defmodule FormulaX.RaceControl.CrashDetection do
     |> Map.get(querying_car_lane, [])
   end
 
-  @spec get_lanes_and_obstacles_map(Race.t()) :: map()
-  defp get_lanes_and_obstacles_map(%Race{obstacles: obstacles}) do
-    Enum.group_by(obstacles, &Obstacle.get_lane/1, & &1)
-  end
-
-  @spec overlaps_with_obstacle?(Car.t(), Obstacle.t()) :: boolean()
-  defp overlaps_with_obstacle?(
+  @spec car_touches_or_overlaps_obstacle?(Car.t(), Obstacle.t()) :: boolean()
+  defp car_touches_or_overlaps_obstacle?(
          %Car{y_position: car_y_position, distance_travelled: distance_travelled_by_car},
          %Obstacle{distance: obstacle_distance}
        ) do
-    # Car and obstacle are at the same position or
-    # Car front wheels between obstacle start and end or
-    # Car rear wheels between obstacle start and end
-    (car_y_position + distance_travelled_by_car + @car_length >= obstacle_distance and
-       car_y_position + distance_travelled_by_car <= obstacle_distance) or
-      (car_y_position + distance_travelled_by_car <= obstacle_distance + @obstacle_length and
-         car_y_position + distance_travelled_by_car + @car_length >=
-           obstacle_distance + @obstacle_length)
+    # lower bound = obstacle_distance - @car_length
+    # upper bound = obstacle_distance + @obstacle_length
+    obstacle_distance - @car_length <= car_y_position + distance_travelled_by_car and
+      car_y_position + distance_travelled_by_car <=
+        obstacle_distance + @obstacle_length
   end
 
   # Car out of tracks

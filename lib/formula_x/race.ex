@@ -323,7 +323,9 @@ defmodule FormulaX.Race do
   defp speed_boost_fetched?(race = %Race{player_car: player_car}) do
     race
     |> get_same_lane_speed_boosts()
-    |> Enum.any?(fn speed_boost -> overlaps_with_speed_boost?(player_car, speed_boost) end)
+    |> Enum.any?(fn speed_boost ->
+      player_car_touches_or_overlaps_speed_boost?(player_car, speed_boost)
+    end)
   end
 
   @spec get_same_lane_speed_boosts(Race.t()) :: list(SpeedBoost.t())
@@ -340,8 +342,8 @@ defmodule FormulaX.Race do
     Enum.group_by(speed_boosts, &SpeedBoost.get_lane/1, & &1)
   end
 
-  @spec overlaps_with_speed_boost?(Car.t(), SpeedBoost.t()) :: boolean()
-  defp overlaps_with_speed_boost?(
+  @spec player_car_touches_or_overlaps_speed_boost?(Car.t(), SpeedBoost.t()) :: boolean()
+  defp player_car_touches_or_overlaps_speed_boost?(
          %Car{
            y_position: car_y_position,
            distance_travelled: distance_travelled_by_car,
@@ -349,14 +351,10 @@ defmodule FormulaX.Race do
          },
          %SpeedBoost{distance: speed_boost_distance}
        ) do
-    # Player car and the speed boost are exactly at the same position or
-    # Player car front wheels are between speed boost rear and front or
-    # Player car rear wheels are between speed boost rear and front
-    (car_y_position + distance_travelled_by_car + @car_length >= speed_boost_distance and
-       car_y_position + distance_travelled_by_car <= speed_boost_distance) or
-      (car_y_position + distance_travelled_by_car <=
-         speed_boost_distance + @obstacle_or_speed_boost_length and
-         car_y_position + distance_travelled_by_car + @car_length >=
-           speed_boost_distance + @obstacle_or_speed_boost_length)
+    # lower bound = speed_boost_distance - @car_length
+    # upper bound = speed_boost_distance + @obstacle_or_speed_boost_length
+    speed_boost_distance - @car_length <= car_y_position + distance_travelled_by_car and
+      car_y_position + distance_travelled_by_car <=
+        speed_boost_distance + @obstacle_or_speed_boost_length
   end
 end

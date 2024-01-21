@@ -6,9 +6,12 @@ defmodule FormulaX.RaceControl do
   alias FormulaX.Race
   alias FormulaX.Race.Background
   alias FormulaX.Race.Car
+  alias FormulaX.Race.Obstacle
   alias FormulaX.RaceControl.CrashDetection
   alias FormulaX.RaceEngine
+
   @car_length Parameters.car_length()
+  @obstacle_length Parameters.obstacle_or_speed_boost_length()
 
   @spec start_race(Race.t(), pid()) :: {:error, {:already_started, pid()}} | {:ok, pid()}
   def start_race(race = %Race{status: :countdown}, race_liveview_pid)
@@ -143,33 +146,39 @@ defmodule FormulaX.RaceControl do
 
   @spec steer_autonomous_car(Race.t(), Car.t()) :: Race.t()
   defp steer_autonomous_car(race = %Race{}, autonomous_car = %Car{controller: :autonomous}) do
-    lanes_cars_map = CrashDetection.get_lanes_and_cars_map(race)
-
     autonomous_car_lane = Car.get_lane(autonomous_car)
 
-    direction =
-      get_autonomous_car_steering_direction(autonomous_car, lanes_cars_map, autonomous_car_lane)
+    steering_direction =
+      get_autonomous_car_steering_direction(race, autonomous_car, autonomous_car_lane)
 
-    case direction do
+    case steering_direction do
       :noop ->
-        race
+        if CrashDetection.crash?(race, autonomous_car, :front) do
+          steer_autonomous_car(race, autonomous_car)
+        else
+          race
+        end
 
-      direction ->
-        updated_autonomous_car = Car.steer(autonomous_car, direction)
+      steering_direction ->
+        updated_autonomous_car = Car.steer(autonomous_car, steering_direction)
         Race.update_autonomous_car(race, updated_autonomous_car)
     end
   end
 
-  @spec get_autonomous_car_steering_direction(Car.t(), map(), 1 | 2 | 3) :: :left | :right | :noop
+  @spec get_autonomous_car_steering_direction(Race.t(), Car.t(), 1 | 2 | 3) ::
+          :left | :right | :noop
   defp get_autonomous_car_steering_direction(
+         race = %Race{},
          autonomous_car = %Car{controller: :autonomous},
-         lanes_cars_map = %{},
          _autonomous_car_lane = 1
        ) do
+    lanes_cars_map = CrashDetection.get_lanes_and_cars_map(race)
+
     number_of_cars_in_vicinity_in_lane_2 =
       number_of_adjacent_lane_cars_in_vicinity(autonomous_car, lanes_cars_map, 2)
 
-    if number_of_cars_in_vicinity_in_lane_2 === 0 do
+    if number_of_cars_in_vicinity_in_lane_2 === 0 and
+         no_target_lane_obstacles_in_vicinity?(race, autonomous_car, 2) do
       :right
     else
       :noop
@@ -177,10 +186,12 @@ defmodule FormulaX.RaceControl do
   end
 
   defp get_autonomous_car_steering_direction(
+         race = %Race{},
          autonomous_car = %Car{controller: :autonomous},
-         lanes_cars_map = %{},
          _autonomous_car_lane = 2
        ) do
+    lanes_cars_map = CrashDetection.get_lanes_and_cars_map(race)
+
     number_of_cars_in_vicinity_in_lane_1 =
       number_of_adjacent_lane_cars_in_vicinity(autonomous_car, lanes_cars_map, 1)
 
@@ -188,21 +199,31 @@ defmodule FormulaX.RaceControl do
       number_of_adjacent_lane_cars_in_vicinity(autonomous_car, lanes_cars_map, 3)
 
     cond do
-      number_of_cars_in_vicinity_in_lane_1 === 0 -> :left
-      number_of_cars_in_vicinity_in_lane_3 === 0 -> :right
-      true -> :noop
+      number_of_cars_in_vicinity_in_lane_1 === 0 and
+          no_target_lane_obstacles_in_vicinity?(race, autonomous_car, 1) ->
+        :left
+
+      number_of_cars_in_vicinity_in_lane_3 === 0 and
+          no_target_lane_obstacles_in_vicinity?(race, autonomous_car, 3) ->
+        :right
+
+      true ->
+        :noop
     end
   end
 
   defp get_autonomous_car_steering_direction(
+         race = %Race{},
          autonomous_car = %Car{controller: :autonomous},
-         lanes_cars_map = %{},
          _autonomous_car_lane = 3
        ) do
+    lanes_cars_map = CrashDetection.get_lanes_and_cars_map(race)
+
     number_of_cars_in_vicinity_in_lane_2 =
       number_of_adjacent_lane_cars_in_vicinity(autonomous_car, lanes_cars_map, 2)
 
-    if number_of_cars_in_vicinity_in_lane_2 === 0 do
+    if number_of_cars_in_vicinity_in_lane_2 === 0 and
+         no_target_lane_obstacles_in_vicinity?(race, autonomous_car, 2) do
       :left
     else
       :noop
@@ -232,7 +253,38 @@ defmodule FormulaX.RaceControl do
     # to one car length in front of the querying autonomous car.
     Enum.reject(adjacent_lane_cars, fn car ->
       car.y_position < autonomous_car_y_position - @car_length or
-        car.y_position > autonomous_car_y_position + @car_length
+        car.y_position > autonomous_car_y_position + 2 * @car_length
     end)
+  end
+
+  @spec no_target_lane_obstacles_in_vicinity?(Race.t(), Car.t(), 1 | 2 | 3) :: boolean()
+  defp no_target_lane_obstacles_in_vicinity?(
+         race = %Race{},
+         %Car{
+           y_position: autonomous_car_y_position,
+           distance_travelled: distance_travelled_by_autonomous_car,
+           controller: :autonomous
+         },
+         target_lane
+       )
+       when target_lane in [1, 2, 3] do
+    target_lane_obstacles =
+      race
+      |> CrashDetection.get_lanes_and_obstacles_map()
+      |> Map.get(target_lane, [])
+
+    # Is there is no obstacle in the area starting from '2 * @obstacle_or_speed_boost_length' behind car
+    # until '2 * @obstacle_or_speed_boost_length' after car?
+    Enum.all?(
+      target_lane_obstacles,
+      fn %Obstacle{distance: target_lane_obstacle_distance} ->
+        target_lane_obstacle_distance <
+          autonomous_car_y_position + distance_travelled_by_autonomous_car -
+            3 * @obstacle_length or
+          target_lane_obstacle_distance >
+            autonomous_car_y_position + distance_travelled_by_autonomous_car + @car_length +
+              2 * @obstacle_length
+      end
+    )
   end
 end
