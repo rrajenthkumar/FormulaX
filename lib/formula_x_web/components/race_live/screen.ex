@@ -275,9 +275,9 @@ defmodule FormulaXWeb.RaceLive.Screen do
   defp cars(assigns) do
     ~H"""
     <div class="cars">
-      <%= with car_highlight_class <- if @player_car.speed_boost_enabled?, do: "car_highlight_during_speed_boost", else: "car_highlight" do %>
+      <%= with highlight_class <- if @player_car.speed_boost_enabled?, do: "speed_boost_highlight", else: "car_highlight" do %>
         <img
-          class={"car player_car #{car_highlight_class}"}
+          class={"car player_car #{highlight_class}"}
           src={"/images/cars/#{@player_car.image}"}
           style={car_position_style(@player_car)}
         />

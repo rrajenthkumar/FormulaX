@@ -247,9 +247,9 @@
   animation: car_highlight_animation 1s ease-in-out 0s infinite forwards;
 }
 
-.race_live .console .race_screen .race .cars .car_highlight_during_speed_boost {
-  animation: car_highlight_animation_during_speed_boost 250ms ease-in-out 0s
-    infinite forwards;
+.race_live .console .race_screen .race .cars .speed_boost_highlight {
+  animation: speed_boost_highlight_animation 250ms ease-in-out 0s infinite
+    forwards;
 }
 
 /* Height of obstacle defined here is the length of an obstacle element used in calculations and it should be of same value as the car length in Parameters map in config file */
@@ -267,6 +267,8 @@
 
 .race_live .console .race_screen .race .speed_boosts img {
   @apply w-12;
+  animation: speed_boost_highlight_animation 250ms ease-in-out 0s infinite
+    forwards;
 }
 
 .race_live .console .race_screen .race .crash_illustration {
@@ -553,13 +555,13 @@
   }
 }
 
-@keyframes car_highlight_animation_during_speed_boost {
+@keyframes speed_boost_highlight_animation {
   0% {
     box-shadow: none;
   }
 
   50% {
-    box-shadow: 0rem 0rem 2.5rem red;
+    box-shadow: 0rem 0rem 2.5rem rgb(251, 255, 0);
   }
 
   100% {
