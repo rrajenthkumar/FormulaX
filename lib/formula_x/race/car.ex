@@ -228,6 +228,6 @@ defmodule FormulaX.Race.Car do
          %Car{distance_travelled: distance_travelled_by_car, y_position: car_y_position},
          %Race{distance: race_distance}
        ) do
-    (distance_travelled_by_car + car_y_position) >= race_distance
+    distance_travelled_by_car + car_y_position >= race_distance
   end
 end
