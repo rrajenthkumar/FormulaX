@@ -246,7 +246,7 @@ defmodule FormulaX.Race do
 
     remaining_car_images = car_images -- [car_image]
 
-    [car] ++ initialize_autonomous_cars(tail, remaining_car_images)
+    [car | initialize_autonomous_cars(tail, remaining_car_images)]
   end
 
   @spec initialize_obstacles(Parameters.rem()) :: list(Obstacle.t())
@@ -254,8 +254,7 @@ defmodule FormulaX.Race do
     %{distance: new_obstacle_distance} =
       new_obstacle = Obstacle.initialize_obstacle(@obstacle_or_speed_boost_prohibited_distance)
 
-    [new_obstacle] ++
-      initialize_obstacles(race_distance, new_obstacle_distance)
+    [new_obstacle | initialize_obstacles(race_distance, new_obstacle_distance)]
   end
 
   @spec initialize_obstacles(Parameters.rem(), Parameters.rem()) :: list(Obstacle.t()) | []
@@ -267,8 +266,7 @@ defmodule FormulaX.Race do
       %{distance: new_obstacle_distance} =
         new_obstacle = Obstacle.initialize_obstacle(distance_covered_with_obstacles)
 
-      [new_obstacle] ++
-        initialize_obstacles(race_distance, new_obstacle_distance)
+      [new_obstacle | initialize_obstacles(race_distance, new_obstacle_distance)]
     end
   end
 
@@ -278,8 +276,7 @@ defmodule FormulaX.Race do
       new_speed_boost =
       SpeedBoost.initialize_speed_boost(@obstacle_or_speed_boost_prohibited_distance)
 
-    [new_speed_boost] ++
-      initialize_speed_boosts(race_distance, new_speed_boost_distance)
+    [new_speed_boost | initialize_speed_boosts(race_distance, new_speed_boost_distance)]
   end
 
   @spec initialize_speed_boosts(Parameters.rem(), Parameters.rem()) ::
@@ -292,8 +289,7 @@ defmodule FormulaX.Race do
       %{distance: new_speed_boost_distance} =
         new_speed_boost = SpeedBoost.initialize_speed_boost(distance_covered_with_speed_boosts)
 
-      [new_speed_boost] ++
-        initialize_speed_boosts(race_distance, new_speed_boost_distance)
+      [new_speed_boost | initialize_speed_boosts(race_distance, new_speed_boost_distance)]
     end
   end
 

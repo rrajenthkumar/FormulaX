@@ -162,11 +162,17 @@ defmodule FormulaX.Race.Car do
     %Car{car | speed: :moderate}
   end
 
+  @doc """
+  Only for player car
+  """
   @spec enable_speed_boost(Car.t()) :: Car.t()
   def enable_speed_boost(car = %Car{controller: :player}) do
     %Car{car | speed_boost_enabled?: true}
   end
 
+  @doc """
+  Only for player car
+  """
   @spec disable_speed_boost(Car.t()) :: Car.t()
   def disable_speed_boost(car = %Car{controller: :player}) do
     %Car{car | speed_boost_enabled?: false}

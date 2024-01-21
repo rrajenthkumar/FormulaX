@@ -42,7 +42,7 @@ defmodule FormulaX.Result do
         start_time: race_start_time,
         status: :ended
       }) do
-    all_cars = autonomous_cars ++ [player_car]
+    all_cars = [player_car | autonomous_cars]
 
     player_car_index_after_sorting_by_completion_time =
       all_cars
@@ -71,10 +71,10 @@ defmodule FormulaX.Result do
     cond do
       results_count === 5 ->
         {_, last_4_results} = List.pop_at(last_5_results, 4)
-        [new_result] ++ last_4_results
+        [new_result | last_4_results]
 
       results_count < 5 ->
-        [new_result] ++ last_5_results
+        [new_result | last_5_results]
     end
     |> add_symbol
   end
@@ -116,6 +116,6 @@ defmodule FormulaX.Result do
       end
 
     updated_last_result = %Result{last_result | symbol: symbol}
-    [updated_last_result] ++ other_4_results
+    [updated_last_result | other_4_results]
   end
 end

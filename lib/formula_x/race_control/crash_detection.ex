@@ -51,7 +51,7 @@ defmodule FormulaX.RaceControl.CrashDetection do
     Map.put(
       lanes_and_autonomous_cars_map,
       player_car_lane,
-      autonomous_cars_in_player_car_lane ++ [player_car]
+      [player_car | autonomous_cars_in_player_car_lane]
     )
   end
 
