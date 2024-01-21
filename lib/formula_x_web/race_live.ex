@@ -915,7 +915,7 @@ defmodule FormulaXWeb.RaceLive do
           |> update_results()
 
         status === :ongoing and speed_boost_enabled? ->
-          Process.send_after(self(), :disable_speed_boost, 3000)
+          Process.send_after(self(), :disable_speed_boost, 5000)
 
           assign(socket, :race, race)
 

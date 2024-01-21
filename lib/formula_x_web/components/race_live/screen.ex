@@ -210,13 +210,15 @@ defmodule FormulaXWeb.RaceLive.Screen do
               <th></th>
             </tr>
             <%= for result <- @last_5_results do %>
-              <tr>
-                <td><img src={"/images/cars/#{result.car}"} /></td>
-                <td><%= result.status %></td>
-                <td><%= result.position %></td>
-                <td><%= "#{result.time} s" %></td>
-                <td class={symbol_class(result.symbol)}><%= raw(result.symbol) %></td>
-              </tr>
+              <%= with result_time <- if result.time, do: "#{result.time} s", else: "" do %>
+                <tr>
+                  <td><img src={"/images/cars/#{result.car}"} /></td>
+                  <td><%= result.status %></td>
+                  <td><%= result.position %></td>
+                  <td><%= result_time %></td>
+                  <td class={symbol_class(result.symbol)}><%= raw(result.symbol) %></td>
+                </tr>
+              <% end %>
             <% end %>
           </table>
         </div>
@@ -273,11 +275,13 @@ defmodule FormulaXWeb.RaceLive.Screen do
   defp cars(assigns) do
     ~H"""
     <div class="cars">
-      <img
-        class="car player_car car_highlight"
-        src={"/images/cars/#{@player_car.image}"}
-        style={car_position_style(@player_car)}
-      />
+      <%= with car_highlight_class <- if @player_car.speed_boost_enabled?, do: "car_highlight_during_speed_boost", else: "car_highlight" do %>
+        <img
+          class={"car player_car #{car_highlight_class}"}
+          src={"/images/cars/#{@player_car.image}"}
+          style={car_position_style(@player_car)}
+        />
+      <% end %>
       <%= for autonomous_car = %Car{image: autonomous_car_image} <- @autonomous_cars do %>
         <img
           class="car autonomous_car"
