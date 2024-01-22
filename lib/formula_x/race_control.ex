@@ -114,7 +114,7 @@ defmodule FormulaX.RaceControl do
          [autonomous_car = %Car{controller: :autonomous}],
          race = %Race{}
        ) do
-    drive_autonomous_car(race, autonomous_car)
+    drive_autonomous_car(autonomous_car, race)
   end
 
   defp drive_autonomous_cars(
@@ -123,12 +123,12 @@ defmodule FormulaX.RaceControl do
          ],
          race = %Race{}
        ) do
-    updated_race = drive_autonomous_car(race, autonomous_car)
+    updated_race = drive_autonomous_car(autonomous_car, race)
     drive_autonomous_cars(remaining_autonomous_cars, updated_race)
   end
 
-  @spec drive_autonomous_car(Race.t(), Car.t()) :: Race.t()
-  defp drive_autonomous_car(race = %Race{}, autonomous_car = %Car{controller: :autonomous}) do
+  @spec drive_autonomous_car(Car.t(), Race.t()) :: Race.t()
+  defp drive_autonomous_car(autonomous_car = %Car{controller: :autonomous}, race = %Race{}) do
     updated_autonomous_car =
       autonomous_car
       |> Car.drive()
